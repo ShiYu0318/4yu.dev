@@ -30,6 +30,8 @@ shiyu-portfolio/
 ├── 404.html                  ← 找不到頁面：舊部落格網址（4yu.dev/post/...）轉到 blog.4yu.dev 同路徑；/NCCU-GenAI-HW/... 轉成去掉前綴的網址
 ├── NCCU-GenAI-HW/index.html  ← 作業繳交時的舊網址 4yu.dev/NCCU-GenAI-HW/，轉到首頁，不要刪
 ├── favicon.ico               ← 分頁圖示（部落格 Logo `</⚡>`，16/32/48px）
+├── site.webmanifest          ← 加到主畫面時的名稱、顏色與圖示
+├── robots.txt、sitemap.xml   ← SEO；sitemap 由 scripts/sitemap.py 產生（§10）
 ├── .nojekyll                 ← 讓 GitHub Pages 不要跑 Jekyll
 ├── assets/
 │   ├── style.css             ← 全站唯一的樣式表
@@ -44,14 +46,15 @@ shiyu-portfolio/
 │   ├── projects/
 │   │   └── <project-id>.md   ← 每個專案一個介紹檔
 │   └── img/
-│       ├── profile/          ← logo.webp（左上角標誌，取自 blog.4yu.dev）、favicon-32.png、favicon-180.png（分頁圖示，同一個 Logo）、portrait.webp（首頁圓形照片）、github-avatar.webp（頁尾點陣用的黑貓頭像）
+│       ├── profile/          ← logo.webp（左上角標誌，取自 blog.4yu.dev）、favicon-32.png、favicon-180.png（分頁圖示，同一個 Logo）、portrait.webp（首頁圓形照片）、github-avatar.webp（頁尾點陣用的黑貓頭像）、og.jpg（1200×630 分享預覽圖）、icon-512.png（manifest 圖示）
 │       └── <project-id>/     ← 該專案的截圖
 ├── templates/
 │   └── project-template.md   ← 新專案介紹的起手式
 ├── scripts/
 │   ├── check.py              ← 一致性檢查，改完內容一定要跑
-│   └── sync_notion.py        ← Notion「經歷」表格 → content/experience.json
-└── .github/workflows/sync-notion.yml ← 每天自動跑 sync_notion.py，有變動才 commit
+│   ├── sync_notion.py        ← Notion「經歷」表格 → content/experience.json
+│   └── sitemap.py            ← 依 projects.json 重新產生 sitemap.xml
+└── .github/workflows/sync-notion.yml ← 每天自動跑 sync_notion.py 與 sitemap.py，有變動才 commit
 ```
 
 ### 禁止事項
@@ -267,14 +270,16 @@ shiyu-portfolio/
 - 圓角：小東西 6、按鈕 / 輸入 8、卡片與截圖 12–16。不是每樣東西都是膠囊。
 - 經歷頁：880px 窄欄。預設「時間線」：左側一條細線，年份是大段落（等寬大字），月份是小段落並附上當時的年級，例如 `2025/09（大一）`；也可以切換「分類」「年級」分組。每筆經歷用履歷式排版：第一行是具體日期 `2025/09/01 – 至今`，第二行左邊是標題、中間虛線、右邊是身分；第三行左邊是 ▫ 單位（主辦），右邊是成果（`--accent`）；最後一行是標籤（類型 / 領域，等寬灰字）。首頁在跑馬燈下方、專案之前放最近 10 筆，下方置中「更多」與「全部」；導覽列的順序也是經歷在前、專案在後。
 - 導覽列只放三個文字連結：經歷（`experience.html`）、專案（`projects.html`）、Blog（`https://blog.4yu.dev`，同分頁、走換頁布幕），右邊一個放大鏡圖示的搜尋按鈕（⌘K）。GitHub、LinkedIn、Instagram 不放導覽列，做成只有圖示的方形按鈕（`.icon-btn`，40px、細框，hover 變 `--accent`），出現在自我介紹的按鈕列（經歷、專案、CV 之後）和頁尾；圖示來自 lucide-static 0.460.0（ISC），寫在 `app.js` 的 `ICON`，由 `profile.links` 的 label 對應。
-- 自我介紹的文字欄佔掉照片以外的寬度（最寬 48rem），用 `text-wrap: pretty` 避免最後一行只剩一兩個字；電腦版連結名稱不拆行，手機版正常換行。
+- 自我介紹一句一行。寬度不夠時（多半是手機）`fitBio()` 依最長那句自動縮小字級，最小 13px；比這更小就不好讀，寧可讓少數長句折行（句與句之間多 8px 間距）。
+- 自我介紹的文字欄佔掉照片以外的寬度（最寬 56rem），用 `text-wrap: pretty` 避免最後一行只剩一兩個字；電腦版連結名稱不拆行，手機版正常換行。
 - 自我介紹下方的按鈕列：「經歷」「專案」（兩個主要按鈕，點了平滑捲到首頁的經歷區、專案區）→ CV → 社群圖示。
 - 首頁的首屏（自我介紹）高度是 `100svh - 64px`，導覽列以下剛好填滿一個畫面，內容垂直置中；底部中間是往下的圓形小箭頭，右下是背景的「下一個」圖示。頁尾最底下一行右邊是回到頂端的圓形按鈕。
-- 首頁的經歷與專案預設各放前 10 筆（專案用交錯檢視）。區塊底下置中一排加大的按鈕（高 56px、20px 字）：「更多 N」（主要按鈕，電光藍，N 是這次會再加的筆數，每次加 10 筆，全部放完就藏起來）與右邊的「全部 N」（`--accent` 細框，N 是總數，連到 `experience.html` / `projects.html`）。
+- 首頁的經歷與專案預設各放前 10 筆（專案用交錯檢視）。區塊底下置中一排加大的按鈕（高 50px、18px 字）：「更多 N」（主要按鈕，電光藍，N 是這次會再加的筆數，每次加 10 筆，全部放完就藏起來）與右邊的「全部 N」（`--accent` 細框，N 是總數，連到 `experience.html` / `projects.html`）。
 - 專案頁、經歷頁左上有「← 首頁」連結回首頁；專案介紹頁的導覽列「專案」回到 `projects.html`。
 - 首頁：自我介紹是兩欄：左邊文字依內容寬度、右邊圓形照片（`clamp(220px, 25vw, 340px)`，高度和文字區差不多），兩欄推到左右兩側、間距 `clamp(48px, 6vw, 88px)`；自我介紹字級最大 21px，確保最長那句在桌機一行放得下。手機版照片縮成 120px 放在最上面→ 技術標籤跑馬燈 →「經歷」最近 10 筆 +「查看全部經歷」按鈕 →「專案」標題 + 分段篩選（附數量）+ 檢視切換（交錯 / 矩陣 / 表格）→ 頁尾（大字信箱 + 點陣頭像）。
 - 專案頁：標頭（編號、標題、一句話、GitHub 按鈕、技術清單）→ 封面截圖 → 左側目錄 + 720px 內文。
-- 手機（< 760px）全部改單欄，索引只留編號與名稱。
+- 手機（< 760px）全部改單欄，索引只留編號與名稱。篩選列改成一排、可左右滑（點到的按鈕自動滑進畫面），不要折成好幾排；搜尋面板貼齊畫面、不顯示快捷鍵提示與右邊的分類欄。
+- 觸控裝置（`pointer: coarse`）上，導覽列、搜尋、篩選按鈕、返回連結等可點的東西至少 40px 高。鍵盤焦點一律有 `--accent` 的 `:focus-visible` 外框。
 
 ### 6.5 動態與互動
 
@@ -287,7 +292,7 @@ shiyu-portfolio/
 | 按鈕與連結 | 磁吸：游標靠近時被吸過去一點，離開後彈回 |
 | 往下箭頭 | 首屏底部中間的圓形小箭頭緩慢上下浮動（CSS `scroll-bob`），點一下用 Lenis 平滑捲到跑馬燈；開始捲動後淡出 |
 | 回到頂端 | 頁尾右下的圓形按鈕，hover 時箭頭上移，點一下平滑捲回最上面（`smoothTo`） |
-| 加載畫面 | 同一次瀏覽的第一頁：散落的點飛向中央、聚成點陣版 `4yü.dev`（`.dev` 是電光藍），資料載好後向四周炸開、底色淡掉（`FX.loader`）。各頁 `<head>` 有一行行內 script 先加上 `is-loading` 蓋住畫面，避免內容閃一下；首頁、經歷頁、專案頁的進場動畫會等它結束。減少動態時不出現 |
+| 加載畫面 | 同一次瀏覽的第一頁（點一下或按任何鍵可以加速跳過）：散落的點飛向中央、聚成點陣版 `4yü.dev`（`.dev` 是電光藍），資料載好後向四周炸開、底色淡掉（`FX.loader`）。各頁 `<head>` 有一行行內 script 先加上 `is-loading` 蓋住畫面，避免內容閃一下；首頁、經歷頁、專案頁的進場動畫會等它結束。減少動態時不出現 |
 | 換頁 | 布幕從下蓋上、中間出現 Logo 與 `4yü.dev`，新頁面載入後布幕往上收；點到部落格（blog.4yu.dev）也先蓋布幕再同分頁前往，從部落格點回來時布幕收起（`SITES` 清單） |
 | 導覽列 | 流體 hover：底色滑到游標所在的連結 |
 | 頂端進度條 | 2px 電光藍，跟著捲動 / 閱讀進度 |
@@ -385,3 +390,22 @@ python3 -m http.server 8000
 python3 scripts/sync_notion.py                 # 用環境變數 NOTION_TOKEN、NOTION_DATA_SOURCE_ID 連 Notion
 python3 scripts/sync_notion.py --from rows.json  # 從 MCP 查詢結果產生（欄位同上，日期欄叫 s / e）
 ```
+
+---
+
+## 10. SEO 與效能
+
+### SEO
+
+- 每一頁的 `<head>` 都要有：`description`、`canonical`（`https://4yu.dev/...`）、Open Graph（`og:title`、`og:description`、`og:url`、`og:image`、`og:site_name` = `4yü.dev`、`og:locale` = `zh_TW`）與 Twitter card。分享圖是 `content/img/profile/og.jpg`（1200×630）。
+- 專案介紹頁由 JS 依專案改寫 title、description、canonical 與分享圖（有 `cover` 就用 `cover`）。內文 Markdown 的 H1 會被拿掉，整頁只留頁首一個 `<h1>`。
+- 首頁有 JSON-LD（`WebSite` + `Person`，名字寫 `4yü`，`sameAs` 放 Blog、GitHub、LinkedIn、Instagram）；社群連結或身分變了要一起改。
+- **新增或發佈專案後要跑 `python3 scripts/sitemap.py`**；`check.py` 會檢查 sitemap 有沒有跟 `projects.json` 同步。`robots.txt` 指向 sitemap，並排除作業時期的轉址頁 `/NCCU-GenAI-HW/`。
+
+### 效能
+
+- `<head>` 會 preload 該頁要用的 JSON（首頁另外 preload 首屏照片），`fetch()` 不要加 `cache: "no-cache"`，否則 preload 會被浪費、資料下載兩次。
+- 每一頁只載入自己用得到的 vendor 函式庫（Flip 只在專案頁；marked、highlight.js 只在專案介紹頁）。
+- 圖片都要 `loading="lazy"` 與 `decoding="async"`（首屏照片例外，用 `fetchpriority="high"`）。
+- 首屏背景畫布最高 1.5 倍解析度；手機、核心數 ≤ 4 或開了省電模式的裝置（`LITE`）再降到 1.25 倍，粒子與鳥的數量減半。畫面外與減少動態時停止更新。
+
