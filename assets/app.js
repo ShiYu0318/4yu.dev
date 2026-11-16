@@ -836,7 +836,7 @@
 
   // 首頁的專案區：先放前 4 個，「更多」每次再加 4 個，全部放完就藏起來；「全部」連到專案頁
   function renderHomeProjects(data) {
-    const box = $("#home-projects"), more = $("#projects-more"), list = data.published, STEP = 4;
+    const box = $("#home-projects"), more = $("#projects-more"), list = data.published, STEP = 10;
     $("#project-count").textContent = String(list.length).padStart(2, "0");
     let shown = 0;
     const add = (first) => {
@@ -848,7 +848,9 @@
       if (first) FX.projects(); else FX.features(added);
       FX.magnetize(box);
       if (shown >= list.length) more.hidden = true;
+      else more.querySelector(".more-count").textContent = Math.min(STEP, list.length - shown);
     };
+    $(".all-count", more.parentElement).textContent = list.length;
     add(true);
     more.addEventListener("click", () => add(false));
   }
@@ -1389,7 +1391,7 @@
     catch { $("#experience").hidden = true; return; }
     $("#exp-count").textContent = String(data.items.length).padStart(2, "0");
     // 先放最近 5 筆，「更多」每次再加 5 筆；「全部」連到經歷頁
-    const more = $("#exp-more"), STEP = 5;
+    const more = $("#exp-more"), STEP = 10;
     let shown = 0;
     const add = () => {
       const next = data.items.slice(shown, shown + STEP);
@@ -1397,7 +1399,9 @@
       riseIn([...box.children].slice(shown));
       shown += next.length;
       if (shown >= data.items.length) more.hidden = true;
+      else more.querySelector(".more-count").textContent = Math.min(STEP, data.items.length - shown);
     };
+    $(".all-count", more.parentElement).textContent = data.items.length;
     add();
     more.addEventListener("click", add);
     FX.magnetize($("#experience"));
