@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>黃士育 · 專案</title>
-  <meta name="description" content="黃士育（ShiYu0318）的公開專案：強化學習、RAG、AI Agent、研究與教學。">
+  <meta name="description" content="黃士育（ShiYu0318）的專案：強化學習、RAG、AI Agent、研究、城市與校園工具、教學。">
   <meta name="theme-color" content="#07081a">
   <link rel="icon" href="content/img/profile/avatar.webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,12 +12,15 @@
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body class="page-home">
+  <div class="progress" aria-hidden="true"></div>
   <header class="site-header">
     <a class="wordmark" href="index.html">黃士育</a>
     <nav class="nav" aria-label="主要連結">
+      <span class="nav-hover" aria-hidden="true"></span>
       <a href="#projects">專案</a>
+      <a href="#contact">聯絡</a>
       <a href="https://4yu.dev" target="_blank" rel="noopener">Blog</a>
-      <a class="nav-button" href="https://github.com/ShiYu0318" target="_blank" rel="noopener">GitHub</a>
+      <button class="search-trigger" type="button" data-palette-open aria-label="搜尋專案">搜尋 <kbd>⌘K</kbd></button>
     </nav>
   </header>
 
@@ -26,20 +29,29 @@
 
     <section id="projects" class="projects" aria-labelledby="projects-title">
       <div class="projects-head">
-        <h2 id="projects-title">專案</h2>
+        <h2 id="projects-title">專案 <span id="project-count" class="meta"></span></h2>
         <div id="filters" class="segmented" role="tablist" aria-label="依領域篩選"></div>
       </div>
       <div id="lead" class="lead"></div>
-      <div id="index-head" class="index-head"></div>
+      <div class="index-head" aria-hidden="true"><span>No.</span><span>專案</span><span>領域</span><span>年份</span></div>
       <ol id="index" class="index"></ol>
+      <p id="empty" class="empty" hidden>這個領域還沒有其他專案</p>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <span>黃士育 · 2026</span>
-    <span>內容與版面依 <a href="https://github.com/ShiYu0318/NCCU-GenAI-HW/blob/main/AGENTS.md">AGENTS.md</a> 維護</span>
-  </footer>
+  <footer id="contact" class="site-footer"></footer>
 
-  <script src="assets/app.js"></script>
+  <div class="preview" aria-hidden="true"><img alt=""></div>
+  <dialog id="palette" class="palette" aria-label="搜尋專案">
+    <input id="palette-input" type="search" placeholder="搜尋專案" autocomplete="off" aria-controls="palette-list">
+    <ul id="palette-list" class="palette-list" role="listbox"></ul>
+    <p class="palette-hint meta"><kbd>↑</kbd><kbd>↓</kbd> 選擇　<kbd>Enter</kbd> 開啟　<kbd>Esc</kbd> 關閉</p>
+  </dialog>
+
+  <script src="assets/vendor/gsap.min.js" defer></script>
+  <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
+  <script src="assets/vendor/SplitText.min.js" defer></script>
+  <script src="assets/vendor/Flip.min.js" defer></script>
+  <script src="assets/app.js" defer></script>
 </body>
 </html>
