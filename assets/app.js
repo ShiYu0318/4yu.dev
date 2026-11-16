@@ -44,6 +44,19 @@
   // 自我介紹：空一行分段、單一換行就換行；[文字](網址) 轉成連結（其他文字一律跳脫，不支援別的 Markdown）
   const linkify = (text) => esc(text).replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,
     (_, label, url) => `<a href="${url}" target="_blank" rel="noopener">${label}</a>`);
+  // 自我介紹一句一行：寬度不夠時（多半是手機）依最長那句自動縮小字級，最小 13px；再小就不好讀，寧可讓少數長句折行
+  const BIO_MIN = 13;
+  function fitBio() {
+    const bio = $(".hero .bio");
+    if (!bio) return;
+    bio.style.fontSize = "";
+    const base = parseFloat(getComputedStyle(bio).fontSize);
+    bio.classList.add("is-measuring");
+    const need = Math.max(...$$(".bio-line", bio).map((l) => l.getBoundingClientRect().width));
+    bio.classList.remove("is-measuring");
+    const avail = bio.clientWidth;
+    if (need > avail + 0.5) bio.style.fontSize = `${Math.max(BIO_MIN, Math.floor((base * avail / need) * 10) / 10)}px`;
+  }
   // 平滑捲動：有 Lenis 用 Lenis，沒有就用瀏覽器的 smooth；減少動態時直接跳過去
   const smoothTo = (target, offset = 0) => {
     if (FX.lenis) { FX.lenis.scrollTo(target, { offset, duration: 1.4, easing: (t) => 1 - Math.pow(1 - t, 4) }); return; }
@@ -64,7 +77,7 @@
   }
 
   async function loadManifest() {
-    const res = await fetch(MANIFEST, { cache: "no-cache" });
+    const res = await fetch(MANIFEST);   // 不加 no-cache，<head> 的 preload 才能直接沿用（GitHub Pages 本身快取 10 分鐘）
     if (!res.ok) throw new Error(`讀不到 ${MANIFEST}（HTTP ${res.status}）`);
     const data = await res.json();
     data.published = data.projects.filter((p) => p.status === "published");
@@ -153,7 +166,11 @@
         });
         tl.to(pts, { x: (i, p) => p.tx + (p.tx - W / 2) * (2 + Math.random() * 2), y: (i, p) => p.ty + (p.ty - H / 2) * (2 + Math.random() * 2), duration: 0.8, ease: "expo.in" })
           .to(el, { backgroundColor: "rgba(0,0,0,0)", duration: 0.5, ease: "power2.in" }, "-=0.55")
-          .add(() => { el.remove(); root.style.overflow = ""; done(); });
+          .add(() => { el.remove(); root.style.overflow = ""; done(); removeEventListener("pointerdown", skip); removeEventListener("keydown", skip); });
+        // 不想等：點一下或按任何鍵，動畫加速播完
+        const skip = () => { tl.timeScale(4); if (tl.paused()) tl.play(); };
+        addEventListener("pointerdown", skip, { once: true });
+        addEventListener("keydown", skip, { once: true });
       });
     },
 
@@ -289,6 +306,9 @@
       };
       const m = { x: 0, y: 0, on: false, k: 0 };   // 游標；k 是游標影響力（進出時漸變）
       let bursts = [];                               // 點擊產生的衝擊波：{ x, y, r, life }
+      // 手機、核心數少或開了省電模式的裝置：粒子與鳥的數量減半
+      const LITE = innerWidth < 760 || (navigator.hardwareConcurrency || 8) <= 4 || navigator.connection?.saveData === true;
+      const DENSITY = LITE ? 0.5 : 1;
       const near = (x, y, r) => m.k ? Math.max(0, 1 - Math.hypot(x - m.x, y - m.y) / r) * m.k : 0;
       let w = 0, h = 0, dpr = 1;
       const clear = () => ctx.clearRect(0, 0, w, h);
@@ -328,7 +348,7 @@
         },
         flow: {
           label: "流場粒子", trails: true,
-          init(s) { s.t = Math.random() * 100; s.p = Array.from({ length: Math.round(w * h / 400) }, () => ({ x: Math.random() * w, y: Math.random() * h, a: Math.random() * 400 })); },
+          init(s) { s.t = Math.random() * 100; s.p = Array.from({ length: Math.round(w * h / 400 * DENSITY) }, () => ({ x: Math.random() * w, y: Math.random() * h, a: Math.random() * 400 })); },
           frame(s) {
             s.t += 0.004;
             ctx.globalCompositeOperation = "destination-out"; ctx.fillStyle = "rgba(0,0,0,0.06)"; ctx.fillRect(0, 0, w, h);
@@ -396,7 +416,7 @@
         },
         boids: {
           label: "鳥群演算法",
-          init(s) { s.b = Array.from({ length: Math.min(520, Math.round(w * h / 2000)) }, () => ({ x: Math.random() * w, y: Math.random() * h, vx: Math.random() * 2 - 1, vy: Math.random() * 2 - 1 })); },
+          init(s) { s.b = Array.from({ length: Math.min(LITE ? 220 : 520, Math.round(w * h / 2000 * DENSITY)) }, () => ({ x: Math.random() * w, y: Math.random() * h, vx: Math.random() * 2 - 1, vy: Math.random() * 2 - 1 })); },
           frame(s) {
             clear(); ctx.lineWidth = 1.2;
             const dim = new Path2D(), lit = new Path2D();
@@ -501,7 +521,8 @@
 
       const size = () => {
         const r = canvas.getBoundingClientRect();
-        w = r.width; h = r.height; dpr = Math.min(devicePixelRatio || 1, 2);
+        // 背景是細線與小點，1.5 倍解析度就夠清楚；手機或核心少的裝置再降一點
+        w = r.width; h = r.height; dpr = Math.min(devicePixelRatio || 1, LITE ? 1.25 : 1.5);
         canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         start(key);
@@ -841,9 +862,13 @@
         </div>
       </div>
       <figure class="portrait">
-        <img src="${esc(pf.portrait)}" alt="${esc(pf.name)} 的照片" width="800" height="800">
+        <img src="${esc(pf.portrait)}" alt="${esc(pf.name)} 的照片" width="800" height="800" fetchpriority="high" decoding="async">
         <figcaption class="meta">@${esc(pf.handle)}</figcaption>
       </figure>`;
+    fitBio();
+    document.fonts?.ready.then(fitBio);
+    let fitTimer = 0;
+    addEventListener("resize", () => { clearTimeout(fitTimer); fitTimer = setTimeout(fitBio, 120); });
     // 首屏剛好填滿畫面，底部中間的小箭頭點一下平滑捲到下一段；開始捲動後淡出
     const down = document.createElement("button");
     down.type = "button"; down.className = "scroll-down"; down.setAttribute("aria-label", "往下捲"); down.title = "往下捲";
@@ -899,7 +924,7 @@
 
   // 封面：有截圖用截圖；沒有的話用程式畫一張專案資訊卡（不是假截圖）
   const coverHTML = (p, data) => p.cover
-    ? `<img src="${esc(p.cover)}" alt="${esc(p.title)} 的畫面" loading="lazy">`
+    ? `<img src="${esc(p.cover)}" alt="${esc(p.title)} 的畫面" loading="lazy" decoding="async">`
     : `<div class="gen-cover" role="img" aria-label="${esc(p.title)} 的資訊卡">
          <span class="gc-path">~/projects/${esc(p.id)}</span>
          <span class="gc-title">${esc(p.title)}</span>
@@ -937,6 +962,8 @@
       if (!btn || btn.getAttribute(attr) === "true") return;
       $$("button", box).forEach((b) => b.setAttribute(attr, b === btn));
       move(btn, true);
+      // 手機上篩選列可以左右滑：點到的按鈕滑進可見範圍
+      if (box.scrollWidth > box.clientWidth) btn.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "nearest", inline: "nearest" });
       onChange(btn.dataset.value);
     });
     const sync = () => move($(`button[${attr}="true"]`, box), false);
@@ -1220,7 +1247,7 @@
     let data, md;
     try {
       data = await loadManifest();
-      const res = await fetch(PROJECT_DIR + encodeURIComponent(id) + ".md", { cache: "no-cache" });
+      const res = await fetch(PROJECT_DIR + encodeURIComponent(id) + ".md");
       if (!res.ok) throw new Error(`找不到專案「${id}」（HTTP ${res.status}）`);
       md = await res.text();
     } catch (e) { article.innerHTML = errorBox(e.message); FX.markReady(); return; }
@@ -1231,6 +1258,20 @@
     const p = data.projects.find((x) => x.id === id);
     if (p) {
       document.title = `${p.title} | 4yü.dev`;
+      // 每個專案自己的 description、canonical 與分享預覽（Google 會執行 JS 後讀到）
+      const url = `https://4yu.dev/project.html?id=${encodeURIComponent(p.id)}`;
+      const desc = `${p.tagline}。${p.tags.join(" / ")}`;
+      const image = p.cover ? `https://4yu.dev/${p.cover}` : "https://4yu.dev/content/img/profile/og.jpg";
+      const meta = (sel, attr, val) => { const el = $(sel); if (el) el.setAttribute(attr, val); };
+      meta('meta[name="description"]', "content", desc);
+      meta('link[rel="canonical"]', "href", url);
+      meta('meta[property="og:title"]', "content", document.title);
+      meta('meta[property="og:description"]', "content", desc);
+      meta('meta[property="og:url"]', "content", url);
+      meta('meta[property="og:image"]', "content", image);
+      meta('meta[name="twitter:title"]', "content", document.title);
+      meta('meta[name="twitter:description"]', "content", desc);
+      meta('meta[name="twitter:image"]', "content", image);
       $("#project-head").innerHTML = `
         <p class="meta">${parts(p.no && no(p.no), data.catTitle[p.category], p.year, p.team && "團隊專案")}</p>
         <h1>${esc(p.title)}</h1>
@@ -1247,10 +1288,12 @@
     }
 
     article.innerHTML = window.marked ? marked.parse(md, { gfm: true }) : `<pre>${esc(md)}</pre>`;
+    // 標題已經在頁首的 <h1>，內文 Markdown 的 H1 拿掉，整頁只留一個 h1（SEO 與螢幕閱讀器都比較清楚）
+    if (p) $(":scope > h1", article)?.remove();
     transformCallouts(article);
     enhanceCode(article);
     $$('a[href^="http"]', article).forEach((a) => { a.target = "_blank"; a.rel = "noopener"; });
-    $$("img", article).forEach((img) => { img.loading = "lazy"; });
+    $$("img", article).forEach((img) => { img.loading = "lazy"; img.decoding = "async"; });
     if (p?.cover) $$(`img[src="${CSS.escape(p.cover)}"]`, article).forEach((img) => img.remove());
     const headings = addAnchors(article);
     buildToc(headings);
@@ -1363,7 +1406,7 @@
   const today = new Date().toISOString().slice(0, 10);
 
   async function loadExperience() {
-    const res = await fetch(EXPERIENCE, { cache: "no-cache" });
+    const res = await fetch(EXPERIENCE);
     if (!res.ok) throw new Error(`讀不到 ${EXPERIENCE}（HTTP ${res.status}）`);
     const data = await res.json();
     data.items.forEach((x, i) => { x.key = `exp-${i}`; });
