@@ -23,7 +23,6 @@
 shiyu-portfolio/
 ├── AGENTS.md                 ← 本文件：專案規則的唯一真相來源
 ├── CLAUDE.md                 ← 只是指向 AGENTS.md，不要在裡面寫規則
-├── README.md                 ← 給人類看的簡介
 ├── index.html                ← 首頁：自我介紹 + 經歷前 10 筆 + 專案前 10 個（各有「更多」與「全部」）
 ├── projects.html             ← 專案頁：篩選 + 交錯 / 矩陣 / 表格三種檢視（JS 讀 projects.json 產生）
 ├── project.html              ← 專案介紹頁：project.html?id=<project-id>
