@@ -13,8 +13,10 @@
 </head>
 <body class="page-home">
   <div class="progress" aria-hidden="true"></div>
+  <div class="curtain" aria-hidden="true"><span class="wordmark"><span class="wordmark-path">~/</span>4yü</span></div>
+  <div class="cursor" aria-hidden="true"><span class="cursor-dot"></span><span class="cursor-ring"><span class="cursor-label"></span></span></div>
   <header class="site-header">
-    <a class="wordmark" href="index.html" aria-label="回到首頁"><img src="content/img/profile/mark.webp" alt="" width="32" height="32"><span>4yu.dev</span></a>
+    <a class="wordmark" href="index.html" aria-label="回到首頁"><span class="wordmark-path">~/</span>4yü</a>
     <nav class="nav" aria-label="主要連結">
       <span class="nav-hover" aria-hidden="true"></span>
       <a href="#projects">專案</a>
@@ -27,15 +29,23 @@
   <main>
     <section id="hero" class="hero" aria-label="自我介紹"></section>
 
+    <div class="marquee" aria-hidden="true"><div class="marquee-track"></div></div>
+
     <section id="projects" class="projects" aria-labelledby="projects-title">
       <div class="projects-head">
         <h2 id="projects-title">專案 <span id="project-count" class="meta"></span></h2>
-        <div id="filters" class="segmented" role="tablist" aria-label="依領域篩選"></div>
+        <div class="controls">
+          <div id="filters" class="segmented" role="tablist" aria-label="依領域篩選"></div>
+          <div id="views" class="segmented views" role="radiogroup" aria-label="顯示方式"></div>
+        </div>
       </div>
-      <div id="lead" class="lead"></div>
-      <div class="index-head" aria-hidden="true"><span>No.</span><span>專案</span><span>領域</span><span>年份</span></div>
-      <ol id="index" class="index"></ol>
-      <p id="empty" class="empty" hidden>這個領域還沒有其他專案</p>
+      <div id="view-rows" class="view lead" data-view="rows"></div>
+      <div id="view-grid" class="view grid" data-view="grid" hidden></div>
+      <div id="view-table" class="view" data-view="table" hidden>
+        <div class="index-head" aria-hidden="true"><span>No.</span><span>專案</span><span>領域</span><span>年份</span></div>
+        <ol id="index" class="index"></ol>
+      </div>
+      <p id="empty" class="empty" hidden>這個領域還沒有專案</p>
     </section>
   </main>
 
@@ -51,6 +61,8 @@
   <script src="assets/vendor/gsap.min.js" defer></script>
   <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
   <script src="assets/vendor/SplitText.min.js" defer></script>
+  <script src="assets/vendor/ScrambleTextPlugin.min.js" defer></script>
+  <script src="assets/vendor/lenis.min.js" defer></script>
   <script src="assets/vendor/Flip.min.js" defer></script>
   <script src="assets/app.js" defer></script>
 </body>
