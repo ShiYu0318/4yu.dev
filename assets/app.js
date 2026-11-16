@@ -261,6 +261,7 @@
         ty(-((e.clientY - hr.top) / hr.height - 0.5) * 34);
       });
       hero.addEventListener("pointerleave", () => { topo.leave(); tx(0); ty(0); });
+      hero.addEventListener("pointerdown", (e) => { if (!e.target.closest("a, button")) topo.burst(e.clientX, e.clientY); });
 
     },
 
@@ -287,6 +288,7 @@
           lerp(lerp(grad(P[AA + 1], x, y, z - 1), grad(P[BA + 1], x - 1, y, z - 1), u), lerp(grad(P[AB + 1], x, y - 1, z - 1), grad(P[BB + 1], x - 1, y - 1, z - 1), u), v), w);
       };
       const m = { x: 0, y: 0, on: false, k: 0 };   // 游標；k 是游標影響力（進出時漸變）
+      let bursts = [];                               // 點擊產生的衝擊波：{ x, y, r, life }
       const near = (x, y, r) => m.k ? Math.max(0, 1 - Math.hypot(x - m.x, y - m.y) / r) * m.k : 0;
       let w = 0, h = 0, dpr = 1;
       const clear = () => ctx.clearRect(0, 0, w, h);
@@ -294,19 +296,20 @@
       const SCENES = {
         contour: {
           label: "等高線",
-          init(s) { s.g = 14; s.t = Math.random() * 100; },
+          init(s) { s.g = 12; s.t = Math.random() * 100; },
           frame(s) {
             const g = s.g, cols = Math.ceil(w / g) + 1, rows = Math.ceil(h / g) + 1, f = new Float32Array(cols * rows);
             s.t += 0.004;
             for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
               const x = i * g, y = j * g;
               let v = noise(x * 0.0032, y * 0.0032, s.t) * 1.1 + noise(x * 0.0074, y * 0.0074, s.t * 1.4) * 0.35;
-              if (m.k) v += Math.exp(-((x - m.x) ** 2 + (y - m.y) ** 2) / 45000) * 0.9 * m.k;
+              if (m.k) v += Math.exp(-((x - m.x) ** 2 + (y - m.y) ** 2) / 60000) * 1.1 * m.k;
+              for (const b of bursts) v += Math.exp(-((Math.hypot(x - b.x, y - b.y) - b.r) ** 2) / 900) * 0.5 * b.life;
               f[j * cols + i] = v;
             }
             const dim = new Path2D(), lit = new Path2D();
-            for (let l = 0; l < 14; l++) {
-              const L = -0.7 + 1.6 * l / 13;
+            for (let l = 0; l < 20; l++) {
+              const L = -0.75 + 1.7 * l / 19;
               for (let j = 0; j < rows - 1; j++) for (let i = 0; i < cols - 1; i++) {
                 const a = f[j * cols + i], b = f[j * cols + i + 1], d = f[(j + 1) * cols + i], e = f[(j + 1) * cols + i + 1];
                 const k = (a > L) | ((b > L) << 1) | ((e > L) << 2) | ((d > L) << 3); if (k === 0 || k === 15) continue;
@@ -315,33 +318,34 @@
                 if ((b > L) !== (e > L)) pts.push([x + g, y + g * it(b, e)]);
                 if ((d > L) !== (e > L)) pts.push([x + g * it(d, e), y + g]);
                 if ((a > L) !== (d > L)) pts.push([x, y + g * it(a, d)]);
-                for (let n = 0; n + 1 < pts.length; n += 2) { const path = near(pts[n][0], pts[n][1], 220) > 0.2 ? lit : dim; path.moveTo(pts[n][0], pts[n][1]); path.lineTo(pts[n + 1][0], pts[n + 1][1]); }
+                for (let n = 0; n + 1 < pts.length; n += 2) { const path = near(pts[n][0], pts[n][1], 260) > 0.2 ? lit : dim; path.moveTo(pts[n][0], pts[n][1]); path.lineTo(pts[n + 1][0], pts[n + 1][1]); }
               }
             }
             clear(); ctx.lineWidth = 1;
-            ctx.strokeStyle = col(LINE, 0.14); ctx.stroke(dim);
-            ctx.strokeStyle = col(ACC, 0.75); ctx.stroke(lit);
+            ctx.strokeStyle = col(LINE, 0.2); ctx.stroke(dim);
+            ctx.strokeStyle = col(ACC, 0.85); ctx.stroke(lit);
           },
         },
         flow: {
           label: "流場粒子", trails: true,
-          init(s) { s.t = Math.random() * 100; s.p = Array.from({ length: Math.round(w * h / 420) }, () => ({ x: Math.random() * w, y: Math.random() * h, a: Math.random() * 400 })); },
+          init(s) { s.t = Math.random() * 100; s.p = Array.from({ length: Math.round(w * h / 240) }, () => ({ x: Math.random() * w, y: Math.random() * h, a: Math.random() * 400 })); },
           frame(s) {
             s.t += 0.004;
-            ctx.globalCompositeOperation = "destination-out"; ctx.fillStyle = "rgba(0,0,0,0.08)"; ctx.fillRect(0, 0, w, h);
+            ctx.globalCompositeOperation = "destination-out"; ctx.fillStyle = "rgba(0,0,0,0.06)"; ctx.fillRect(0, 0, w, h);
             ctx.globalCompositeOperation = "source-over";
             const dim = new Path2D(), lit = new Path2D();
             for (const p of s.p) {
               const ang = noise(p.x * 0.0025, p.y * 0.0025, s.t) * Math.PI * 3;
               let vx = Math.cos(ang), vy = Math.sin(ang);
-              const k = near(p.x, p.y, 180);
+              for (const b of bursts) { const dx = p.x - b.x, dy = p.y - b.y, d = Math.hypot(dx, dy) + 1; if (Math.abs(d - b.r) < 40) { p.x += dx / d * 6 * b.life; p.y += dy / d * 6 * b.life; } }
+              const k = near(p.x, p.y, 240);
               if (k) { const dx = p.x - m.x, dy = p.y - m.y, d = Math.hypot(dx, dy) + 1; vx += (-dy / d) * k * 4 - dx / d * k; vy += (dx / d) * k * 4 - dy / d * k; }
               const nx = p.x + vx * 1.3, ny = p.y + vy * 1.3, path = k > 0.1 ? lit : dim;
               path.moveTo(p.x, p.y); path.lineTo(nx, ny);
               p.x = nx; p.y = ny; p.a++;
               if (p.x < 0 || p.x > w || p.y < 0 || p.y > h || p.a > 600) { p.x = Math.random() * w; p.y = Math.random() * h; p.a = 0; }
             }
-            ctx.lineWidth = 1; ctx.strokeStyle = col(LINE, 0.3); ctx.stroke(dim); ctx.strokeStyle = col(ACC, 0.9); ctx.stroke(lit);
+            ctx.lineWidth = 1; ctx.strokeStyle = col(LINE, 0.42); ctx.stroke(dim); ctx.strokeStyle = col(ACC, 0.95); ctx.stroke(lit);
           },
         },
         ascii: {
@@ -352,11 +356,12 @@
             ctx.font = s.font; ctx.textBaseline = "top";
             const cw = 11, chh = 16, tick = (s.t * 60) | 0;
             for (let y = 0; y < h; y += chh) for (let x = 0; x < w; x += cw) {
-              const k = near(x, y, 130);
+              let k = near(x, y, 180);
+              for (const b of bursts) k = Math.max(k, Math.max(0, 1 - Math.abs(Math.hypot(x - b.x, y - b.y) - b.r) / 30) * b.life);
               if (k > 0.05) { ctx.fillStyle = col(ACC, 0.3 + k * 0.7); ctx.fillText(((x * 7 + y * 13 + tick) & 3) ? "1" : "0", x, y); continue; }
               const v = (noise(x * 0.01, y * 0.018, s.t) + 0.6) / 1.2;
               const i = Math.max(0, Math.min(s.chars.length - 1, (v * s.chars.length) | 0)); if (!i) continue;
-              ctx.fillStyle = col(LINE, 0.05 + v * 0.16); ctx.fillText(s.chars[i], x, y);
+              ctx.fillStyle = col(LINE, 0.07 + v * 0.24); ctx.fillText(s.chars[i], x, y);
             }
           },
         },
@@ -365,11 +370,12 @@
           init(s) {
             s.g = 10; s.cols = Math.ceil(w / s.g); s.rows = Math.ceil(h / s.g);
             s.a = new Uint8Array(s.cols * s.rows); s.age = new Float32Array(s.a.length); s.n = 0;
-            for (let i = 0; i < s.a.length; i++) s.a[i] = Math.random() < 0.12 ? 1 : 0;
+            for (let i = 0; i < s.a.length; i++) s.a[i] = Math.random() < 0.16 ? 1 : 0;
           },
+          burst(s, x, y) { const { cols, rows, g } = s; for (let k = 0; k < 160; k++) { const a = Math.random() * 7, r = Math.random() * 9; const i = (x / g + Math.cos(a) * r) | 0, j = (y / g + Math.sin(a) * r) | 0; if (i >= 0 && j >= 0 && i < cols && j < rows) { s.a[j * cols + i] = 1; s.age[j * cols + i] = 1; } } },
           frame(s) {
             const { cols, rows, g } = s;
-            if (m.k > 0.5) for (let k = 0; k < 5; k++) { const i = (m.x / g + (Math.random() - 0.5) * 6) | 0, j = (m.y / g + (Math.random() - 0.5) * 6) | 0; if (i >= 0 && j >= 0 && i < cols && j < rows) s.a[j * cols + i] = 1; }
+            if (m.k > 0.5) for (let k = 0; k < 9; k++) { const i = (m.x / g + (Math.random() - 0.5) * 8) | 0, j = (m.y / g + (Math.random() - 0.5) * 8) | 0; if (i >= 0 && j >= 0 && i < cols && j < rows) s.a[j * cols + i] = 1; }
             if (++s.n % 3 === 0) {
               const n = new Uint8Array(s.a.length); let alive = 0;
               for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
@@ -383,14 +389,14 @@
             clear();
             for (let id = 0; id < s.a.length; id++) {
               s.age[id] *= 0.94; if (!s.a[id] && s.age[id] < 0.05) continue;
-              ctx.fillStyle = s.age[id] > 0.3 ? col(ACC, 0.12 + s.age[id] * 0.4) : col(LINE, s.a[id] ? 0.08 : s.age[id] * 0.15);
+              ctx.fillStyle = s.age[id] > 0.3 ? col(ACC, 0.1 + s.age[id] * 0.38) : col(LINE, s.a[id] ? 0.1 : s.age[id] * 0.18);
               ctx.fillRect((id % cols) * g + 2, ((id / cols) | 0) * g + 2, g - 4, g - 4);
             }
           },
         },
         boids: {
           label: "鳥群演算法",
-          init(s) { s.b = Array.from({ length: Math.min(200, Math.round(w * h / 5000)) }, () => ({ x: Math.random() * w, y: Math.random() * h, vx: Math.random() * 2 - 1, vy: Math.random() * 2 - 1 })); },
+          init(s) { s.b = Array.from({ length: Math.min(320, Math.round(w * h / 3200)) }, () => ({ x: Math.random() * w, y: Math.random() * h, vx: Math.random() * 2 - 1, vy: Math.random() * 2 - 1 })); },
           frame(s) {
             clear(); ctx.lineWidth = 1.2;
             const dim = new Path2D(), lit = new Path2D();
@@ -398,14 +404,15 @@
               let ax = 0, ay = 0, cx = 0, cy = 0, sx = 0, sy = 0, n = 0;
               for (const q of s.b) { if (q === p) continue; const dx = q.x - p.x, dy = q.y - p.y, d2 = dx * dx + dy * dy; if (d2 > 3600) continue; n++; ax += q.vx; ay += q.vy; cx += q.x; cy += q.y; if (d2 < 400) { sx -= dx; sy -= dy; } }
               if (n) { p.vx += (ax / n - p.vx) * 0.05 + (cx / n - p.x) * 0.0008 + sx * 0.03; p.vy += (ay / n - p.vy) * 0.05 + (cy / n - p.y) * 0.0008 + sy * 0.03; }
-              const k = near(p.x, p.y, 150); if (k) { p.vx += (p.x - m.x) * 0.02 * k; p.vy += (p.y - m.y) * 0.02 * k; }
+              const k = near(p.x, p.y, 190); if (k) { p.vx += (p.x - m.x) * 0.02 * k; p.vy += (p.y - m.y) * 0.02 * k; }
+              for (const b of bursts) { const dx = p.x - b.x, dy = p.y - b.y, d = Math.hypot(dx, dy) + 1; if (d < b.r + 30) { p.vx += dx / d * 0.8 * b.life; p.vy += dy / d * 0.8 * b.life; } }
               const sp = Math.hypot(p.vx, p.vy), max = k ? 5 : 2.2; if (sp > max) { p.vx *= max / sp; p.vy *= max / sp; } if (sp < 1) { p.vx *= 1.2; p.vy *= 1.2; }
               p.x = (p.x + p.vx + w) % w; p.y = (p.y + p.vy + h) % h;
               const a = Math.atan2(p.vy, p.vx), L = 7, tx = p.x + Math.cos(a) * L, ty = p.y + Math.sin(a) * L, path = k > 0.05 ? lit : dim;
               path.moveTo(tx, ty); path.lineTo(p.x + Math.cos(a + 2.6) * L * 0.6, p.y + Math.sin(a + 2.6) * L * 0.6);
               path.moveTo(tx, ty); path.lineTo(p.x + Math.cos(a - 2.6) * L * 0.6, p.y + Math.sin(a - 2.6) * L * 0.6);
             }
-            ctx.strokeStyle = col(LINE, 0.3); ctx.stroke(dim); ctx.strokeStyle = col(ACC, 0.9); ctx.stroke(lit);
+            ctx.strokeStyle = col(LINE, 0.45); ctx.stroke(dim); ctx.strokeStyle = col(ACC, 0.95); ctx.stroke(lit);
           },
         },
         descent: {
@@ -414,8 +421,9 @@
           init(s) {
             s.t = 0; s.seed = Math.random() * 50; s.yaw = Math.random() * 6; s.pitch = 0.5;
             s.L = (x, y) => 0.18 * (x * x + y * y) + 0.9 * noise(x * 0.55 + s.seed, y * 0.55 + s.seed) + 0.35 * noise(x * 1.3 + s.seed, y * 1.3);
-            s.runs = [0, 1, 2].map((i) => this.descent.spawn(s, i));
+            s.runs = [0, 1, 2, 3, 4].map((i) => this.descent.spawn(s, i));
           },
+          burst(s) { s.runs.push(this.descent.spawn(s, 0)); if (s.runs.length > 8) s.runs.shift(); },
           spawn(s, i) {
             const a = Math.random() * Math.PI * 2, r = 3.2 + Math.random() * 0.8;
             return { x: Math.cos(a) * r, y: Math.sin(a) * r, vx: 0, vy: 0, step: 0, trail: [], done: 0, delay: i * 40 };
@@ -424,8 +432,8 @@
             s.t += 1;
             s.yaw += 0.0016 + (m.k ? (m.x / w - 0.5) * 0.012 * m.k : 0);
             s.pitch += ((m.k ? 0.3 + (m.y / h) * 0.5 : 0.5) - s.pitch) * 0.05;
-            const N = 36, R = 4.2, fov = Math.min(w, h) * 1.9, cy = Math.cos(s.yaw), sy = Math.sin(s.yaw), cp = Math.cos(s.pitch), sp = Math.sin(s.pitch);
-            const ox = w * 0.64, oy = h * 0.6;
+            const N = 44, R = 4.6, fov = Math.min(w, h) * 2.3, cy = Math.cos(s.yaw), sy = Math.sin(s.yaw), cp = Math.cos(s.pitch), sp = Math.sin(s.pitch);
+            const ox = w * 0.56, oy = h * 0.6;
             // 鏡頭：先繞垂直軸轉 yaw，再從斜上方以 pitch 俯視；越遠、越高的點在畫面上越上面
             const proj = (x, y, z) => {
               const rx = x * cy - y * sy, ry = x * sy + y * cy;
@@ -440,7 +448,7 @@
               if (i < N) { const x2 = x + 2 * R / N, q = proj(x2, y, Z(x2, y)); grid.moveTo(p[0], p[1]); grid.lineTo(q[0], q[1]); }
               if (j < N) { const y2 = y + 2 * R / N, q = proj(x, y2, Z(x, y2)); grid.moveTo(p[0], p[1]); grid.lineTo(q[0], q[1]); }
             }
-            ctx.strokeStyle = col(LINE, 0.09); ctx.stroke(grid);
+            ctx.strokeStyle = col(LINE, 0.15); ctx.stroke(grid);
             ctx.font = `12px ${cssVar("--font-mono")}`; ctx.textBaseline = "middle";
             s.runs.forEach((r, i) => {
               if (r.delay > 0) { r.delay--; return; }
@@ -464,6 +472,7 @@
       };
       SCENES.descent.init = SCENES.descent.init.bind(SCENES);
       SCENES.descent.frame = SCENES.descent.frame.bind(SCENES);
+      SCENES.descent.burst = SCENES.descent.burst.bind(SCENES);
       const ORDER = Object.keys(SCENES);
 
       // 依固定順序輪播；下次進站從下一種開始，不會每次都是同一種
@@ -505,12 +514,26 @@
         if (!visible || time - last < 1 / 30) return;   // 約 30fps
         const dt = time - last; last = time;
         m.k += ((m.on ? 1 : 0) - m.k) * 0.08; if (m.k < 0.01) m.k = 0;
+        bursts.forEach((b) => { b.r += 9; b.life *= 0.955; });
+        bursts = bursts.filter((b) => b.life > 0.04);
         SCENES[key].frame(state);
+        // 衝擊波本身：一圈擴散的電光藍細環
+        for (const b of bursts) {
+          ctx.strokeStyle = `rgba(${ACC},${0.55 * b.life})`; ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.stroke();
+        }
         since += dt; if (since > 24) next();
       });
       return {
         point: (cx, cy) => { const r = canvas.getBoundingClientRect(); m.x = cx - r.left; m.y = cy - r.top; m.on = true; },
         leave: () => { m.on = false; },
+        // 點擊：放出一圈衝擊波；生命遊戲撒一把細胞、梯度下降從點擊處附近多放一條路徑
+        burst: (cx, cy) => {
+          if (!motion) return;
+          const r = canvas.getBoundingClientRect(), x = cx - r.left, y = cy - r.top;
+          bursts.push({ x, y, r: 0, life: 1 });
+          SCENES[key].burst?.(state, x, y);
+        },
       };
     },
 
