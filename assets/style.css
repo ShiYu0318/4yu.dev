@@ -1,0 +1,272 @@
+/* =========================================================
+   ShiYu 作品集 — 全站唯一樣式表
+   配色取自 GitHub 頭像：深海軍藍帽 T × 冷白牆面（見 AGENTS.md §6）
+   規則：顏色一律使用 :root 變數，禁止在其他地方寫死色碼
+   ========================================================= */
+
+/* ---------- 1. 設計變數 ---------- */
+:root {
+  --bg: #081227;
+  --surface: #0e203a;
+  --surface-2: #13284a;
+  --border: #22365a;
+  --text: #dbdae0;
+  --muted: #8f9bb3;
+  --accent: #5b8cff;
+  --accent-2: #a8c4ff;
+  --accent-glow: rgba(91, 140, 255, .18);
+  --code-bg: #0a1830;
+  --shadow: rgba(0, 0, 0, .35);
+
+  --c-summary: #5b8cff;
+  --c-highlight: #a8c4ff;
+  --c-note: #8f9bb3;
+  --c-wip: #e8b45a;
+
+  --font-body: "Noto Sans TC", -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --radius: 14px;
+  --content-width: 780px;
+  color-scheme: dark;
+}
+
+/* ---------- 2. 基礎 ---------- */
+* { box-sizing: border-box; }
+html { scroll-padding-top: 80px; scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 600px at 85% -10%, var(--accent-glow), transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-2); }
+.loading { color: var(--muted); }
+::selection { background: var(--accent); color: var(--bg); }
+
+/* ---------- 3. 頁首 / 頁尾 ---------- */
+.site-header {
+  position: sticky; top: 0; z-index: 30;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 32px;
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.brand { font-family: var(--font-mono); font-weight: 600; color: var(--text); font-size: 16px; }
+.brand-mark { color: var(--accent); }
+.header-links { display: flex; align-items: center; gap: 22px; font-size: 15px; }
+.header-links a { color: var(--muted); }
+.header-links a:hover { color: var(--text); }
+.site-footer {
+  border-top: 1px solid var(--border);
+  color: var(--muted); font-size: 14px;
+  text-align: center; padding: 28px 24px; margin-top: 96px;
+}
+
+/* ---------- 4. 首頁：個人簡介 ---------- */
+.home { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
+.hero {
+  display: grid; grid-template-columns: auto 1fr; gap: 48px; align-items: center;
+  padding: 88px 0 72px;
+}
+.avatar {
+  width: 196px; height: 196px; border-radius: 50%; object-fit: cover; display: block;
+  border: 3px solid var(--surface-2);
+  box-shadow: 0 0 0 6px var(--bg), 0 0 0 7px var(--accent), 0 24px 60px var(--accent-glow);
+}
+.hero .handle { font-family: var(--font-mono); color: var(--accent); font-size: 15px; margin: 0 0 6px; }
+.hero h1 {
+  font-size: clamp(38px, 6vw, 60px); font-weight: 900; line-height: 1.15; margin: 0 0 8px;
+  background: linear-gradient(100deg, var(--text) 30%, var(--accent-2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.hero h1 small { font-size: .45em; font-weight: 500; color: var(--muted); -webkit-text-fill-color: var(--muted); margin-left: 10px; }
+.hero .tagline { font-size: 19px; color: var(--accent-2); margin: 0 0 16px; font-weight: 500; }
+.hero .bio { color: var(--muted); max-width: 640px; margin: 0 0 24px; }
+.hero-links { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 18px; border-radius: 999px; font-size: 15px; font-weight: 500;
+  border: 1px solid var(--border); color: var(--text); background: var(--surface);
+  transition: border-color .15s, background .15s;
+}
+.btn:hover { border-color: var(--accent); color: var(--text); background: var(--surface-2); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.btn.primary:hover { background: var(--accent-2); border-color: var(--accent-2); color: var(--bg); }
+.stats { display: flex; gap: 28px; margin-top: 28px; }
+.stat b { display: block; font-family: var(--font-mono); font-size: 26px; color: var(--text); line-height: 1.2; }
+.stat span { font-size: 13px; color: var(--muted); }
+
+/* ---------- 5. 首頁：專案區 ---------- */
+.section-head {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;
+  margin-bottom: 24px; padding-top: 16px; border-top: 1px solid var(--border);
+}
+.section-head h2 { font-family: var(--font-mono); font-size: 26px; margin: 0; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.filter {
+  font: inherit; font-size: 14px; cursor: pointer;
+  padding: 5px 14px; border-radius: 999px;
+  background: transparent; color: var(--muted); border: 1px solid var(--border);
+}
+.filter:hover { color: var(--text); border-color: var(--accent); }
+.filter[aria-selected="true"] { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 500; }
+
+.featured { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 20px; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.featured:empty, .grid:empty { display: none; }
+
+.card {
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  transition: transform .2s, border-color .2s, box-shadow .2s;
+}
+.card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 16px 40px var(--accent-glow); color: var(--text); }
+.card-cover { aspect-ratio: 16 / 9; background: var(--surface-2); overflow: hidden; position: relative; }
+.card-cover img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; transition: transform .4s; }
+.card:hover .card-cover img { transform: scale(1.04); }
+.cover-mono {
+  width: 100%; height: 100%; display: grid; place-items: center;
+  background:
+    radial-gradient(circle at 30% 20%, var(--accent-glow), transparent 55%),
+    linear-gradient(135deg, var(--surface-2), var(--bg));
+  font-family: var(--font-mono); font-weight: 600; font-size: 34px; color: var(--accent-2); letter-spacing: -.02em;
+}
+.card-body { padding: 18px 20px 20px; display: flex; flex-direction: column; flex: 1; }
+.card-meta { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.card h3 { margin: 4px 0 6px; font-size: 20px; line-height: 1.35; }
+.card p { margin: 0 0 14px; color: var(--muted); font-size: 15px; line-height: 1.6; flex: 1; }
+.featured .card h3 { font-size: 24px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag {
+  font-family: var(--font-mono); font-size: 12px;
+  background: var(--surface-2); color: var(--accent-2);
+  border: 1px solid var(--border); padding: 1px 9px; border-radius: 999px;
+}
+.badge-demo { color: var(--accent); }
+
+/* ---------- 6. 專案頁：頁首橫幅 ---------- */
+.project-hero { max-width: 1120px; margin: 0 auto; padding: 56px 32px 8px; }
+.project-hero .crumb { font-family: var(--font-mono); font-size: 13px; color: var(--accent); margin-bottom: 6px; }
+.project-hero h1 { font-size: clamp(32px, 5vw, 50px); font-weight: 900; line-height: 1.2; margin: 0 0 8px; }
+.project-hero .tagline { color: var(--muted); font-size: 18px; margin: 0 0 18px; }
+.project-hero .hero-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.project-hero .tags { margin-left: 6px; }
+
+/* ---------- 7. 專案頁：版面與目錄 ---------- */
+.project-layout {
+  display: grid; grid-template-columns: 220px minmax(0, var(--content-width));
+  gap: 56px; justify-content: center; padding: 32px 32px 0;
+}
+.toc {
+  position: sticky; top: 90px; align-self: start;
+  max-height: calc(100vh - 110px); overflow-y: auto; font-size: 14px; line-height: 1.6;
+}
+.toc-title { font-family: var(--font-mono); font-size: 12px; color: var(--muted); letter-spacing: .08em; margin-bottom: 10px; }
+.toc ol { list-style: none; margin: 0; padding: 0; }
+.toc a { display: block; padding: 4px 12px; color: var(--muted); border-left: 2px solid var(--border); }
+.toc li.lv3 a { padding-left: 26px; font-size: 13px; }
+.toc a:hover { color: var(--text); }
+.toc a.active { color: var(--accent-2); border-left-color: var(--accent); }
+.toc-toggle { display: none; }
+
+/* ---------- 8. 專案頁：內文（prose） ---------- */
+.prose > h1:first-child { display: none; } /* H1 已顯示在橫幅 */
+.prose h2 { font-size: 26px; margin: 56px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.prose h2::before { content: "## "; font-family: var(--font-mono); color: var(--accent); font-weight: 400; }
+.prose h3 { font-size: 20px; margin: 32px 0 12px; color: var(--accent-2); }
+.prose .anchor { opacity: 0; margin-left: 8px; font-weight: 400; color: var(--muted); }
+.prose h2:hover .anchor, .prose h3:hover .anchor { opacity: 1; }
+.prose p, .prose ul, .prose ol { margin: 0 0 16px; }
+.prose li { margin: 6px 0; }
+.prose li::marker { color: var(--accent); }
+.prose strong { color: var(--text); font-weight: 700; }
+.prose img {
+  display: block; max-width: 100%; margin: 8px 0 24px;
+  border-radius: var(--radius); border: 1px solid var(--border);
+  box-shadow: 0 16px 40px var(--shadow);
+}
+.prose :not(pre) > code {
+  font-family: var(--font-mono); font-size: .85em;
+  background: var(--surface-2); color: var(--accent-2);
+  padding: 2px 7px; border-radius: 6px;
+}
+.prose pre {
+  position: relative; background: var(--code-bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px 20px; overflow-x: auto;
+  font-size: 14px; line-height: 1.65; margin: 0 0 20px;
+}
+.prose pre code { font-family: var(--font-mono); background: none !important; padding: 0 !important; }
+.code-lang { position: absolute; top: 8px; right: 74px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; }
+.copy-btn {
+  position: absolute; top: 6px; right: 8px; cursor: pointer;
+  font: 12px var(--font-body); color: var(--muted);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 2px 10px;
+}
+.copy-btn:hover { color: var(--accent-2); border-color: var(--accent); }
+
+.prose table { width: 100%; border-collapse: collapse; margin: 0 0 24px; font-size: 15px; display: block; overflow-x: auto; }
+.prose th, .prose td { border: 1px solid var(--border); padding: 9px 14px; text-align: left; }
+.prose th { background: var(--surface-2); color: var(--accent-2); font-weight: 700; white-space: nowrap; }
+.prose td { background: color-mix(in srgb, var(--surface) 55%, transparent); }
+
+/* ---------- 9. 提示框（Callout）：SUMMARY / HIGHLIGHT / NOTE / WIP ---------- */
+.callout {
+  --c: var(--c-note);
+  background: color-mix(in srgb, var(--c) 9%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--c) 35%, var(--border));
+  border-left: 4px solid var(--c);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 14px 20px; margin: 0 0 24px;
+}
+.callout > :last-child { margin-bottom: 0; }
+.callout-title { font-weight: 700; color: var(--c); margin-bottom: 4px; display: flex; gap: 8px; align-items: center; }
+.callout-summary   { --c: var(--c-summary); font-size: 18px; }
+.callout-summary .callout-title { display: none; }
+.callout-highlight { --c: var(--c-highlight); }
+.callout-note      { --c: var(--c-note); }
+.callout-wip       { --c: var(--c-wip); }
+
+/* ---------- 10. 上一個 / 下一個 ---------- */
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 64px; }
+.pager a {
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px 20px; background: var(--surface); color: var(--text); font-weight: 500;
+}
+.pager a:hover { border-color: var(--accent); color: var(--text); }
+.pager small { display: block; color: var(--muted); font-size: 13px; font-family: var(--font-mono); font-weight: 400; }
+.pager .next { text-align: right; grid-column: 2; }
+.error-box { border: 1px solid var(--c-wip); background: var(--surface); padding: 16px 20px; border-radius: var(--radius); }
+
+/* ---------- 11. 響應式 ---------- */
+@media (max-width: 1000px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+  .project-layout { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .toc {
+    display: none; position: fixed; top: 58px; left: 0; right: 0; max-height: 60vh;
+    background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 24px; z-index: 25;
+  }
+  .toc.open { display: block; }
+  .toc-toggle {
+    display: inline-block; font: inherit; font-size: 14px; cursor: pointer;
+    background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 2px 12px;
+  }
+}
+@media (max-width: 720px) {
+  body { font-size: 16px; }
+  .site-header { padding: 12px 18px; }
+  .home, .project-layout, .project-hero { padding-left: 18px; padding-right: 18px; }
+  .hero { grid-template-columns: 1fr; gap: 28px; padding: 48px 0; text-align: left; }
+  .avatar { width: 128px; height: 128px; }
+  .featured, .grid { grid-template-columns: 1fr; }
+  .pager { grid-template-columns: 1fr; }
+  .pager .next { grid-column: 1; }
+}
