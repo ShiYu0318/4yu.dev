@@ -23,6 +23,8 @@
     right: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>',
   };
   const EASE = "expo.out";
+  // 同一個人的兩個網站：作品集與部落格，互相切換時用同一套換頁布幕
+  const SITES = ["4yu.dev", "www.4yu.dev", "blog.4yu.dev"];
 
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -96,15 +98,22 @@
           .to(mark, { opacity: 0, y: -12, duration: 0.25, ease: "power2.in" })
           .to(el, { scaleY: 0, duration: 0.6, ease: "expo.inOut" }, "-=0.05");
       }
+      // 從部落格（blog.4yu.dev）點回來時，也用布幕收起來接上，兩個網站像同一個
+      else if (document.referrer && SITES.includes(new URL(document.referrer).hostname) && new URL(document.referrer).hostname !== location.hostname) {
+        gsap.set(el, { scaleY: 1, transformOrigin: "50% 0%" });
+        gsap.set(mark, { opacity: 1 });
+        gsap.timeline().to(mark, { opacity: 0, y: -12, duration: 0.25, ease: "power2.in", delay: 0.1 }).to(el, { scaleY: 0, duration: 0.6, ease: "expo.inOut" }, "-=0.05");
+      }
       addEventListener("pageshow", (e) => { if (e.persisted) gsap.set(el, { scaleY: 0 }); });
       document.addEventListener("click", (e) => {
         const a = e.target.closest("a[href]");
         if (e.defaultPrevented || !a || a.target === "_blank" || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
         const url = new URL(a.href, location.href);
-        if (url.origin !== location.origin || !/\.html$|\/$/.test(url.pathname)) return;
+        const sibling = url.origin !== location.origin && SITES.includes(url.hostname);
+        if (!sibling && (url.origin !== location.origin || !/\.html$|\/$/.test(url.pathname))) return;
         if (url.pathname === location.pathname && url.search === location.search) return;
         e.preventDefault();
-        sessionStorage.setItem("curtain", "1");
+        if (!sibling) sessionStorage.setItem("curtain", "1");
         document.documentElement.classList.add("is-leaving");
         gsap.set(el, { transformOrigin: "50% 100%" });
         gsap.timeline({ onComplete: () => { location.href = url.href; } })
