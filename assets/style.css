@@ -1,5 +1,5 @@
 /* =========================================================
-   黃士育 · 專案 — 全站唯一樣式表
+   4yü · 專案 — 全站唯一樣式表
    方向：安靜、精確、像實驗室筆記；配色取自 GitHub 頭像（黑貓 × 電光藍）
    外框安靜，動態集中在幾個有意義的地方（見 AGENTS.md §6）
    ========================================================= */
@@ -480,7 +480,7 @@ html.lenis, html.lenis body { height: auto; }
 }
 
 /* ---------- 15. 經歷（content/experience.json，見 AGENTS.md §9） ---------- */
-/* 版面參考 vicwen.com：窄欄、分區標題 + 編號 + 細線，每列「圖示 / 標題與身分 / 右側日期」 */
+/* 窄欄；時間線（年 / 月 + 年級）為預設，分類與年級檢視用分區標題；每筆是履歷式排版 */
 .exp-preview { max-width: var(--page); margin: 160px auto 0; padding: 0 var(--gutter); }
 .exp-preview .projects-head { margin-bottom: 24px; }
 .exp-preview .exp-list { max-width: none; }
@@ -495,34 +495,50 @@ html.lenis, html.lenis body { height: auto; }
 .exp-group-head i { flex: 0 0 40px; height: 1px; background: var(--line-strong); }
 
 .exp-list { list-style: none; margin: 0; padding: 0; }
-.exp {
-  display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 16px; align-items: start;
-  padding: 20px 0; border-bottom: 1px solid var(--line);
-}
-.exp-mark {
-  width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px;
-  background: var(--surface); border: 1px solid var(--line); color: var(--text-2);
-  transition: color .2s var(--ease), border-color .2s var(--ease);
-}
-.exp-mark .icon { width: 18px; height: 18px; }
-.exp:hover .exp-mark { color: var(--accent); border-color: var(--line-strong); }
-.exp h3 { font-size: 16px; font-weight: 500; line-height: 1.5; margin: 0; color: var(--text); }
-.exp h3 a { color: inherit; text-decoration: none; display: inline-flex; align-items: baseline; gap: 6px; }
-.exp h3 a .icon { width: 14px; height: 14px; color: var(--muted); transform: translateY(2px); transition: color .2s var(--ease); }
+
+/* 一筆經歷（履歷排版）：日期 → 標題 ····· 身分 → ▫ 單位 / 標籤 · 成果 */
+.exp { padding: 20px 0; border-bottom: 1px solid var(--line); }
+.exp-list .exp:last-child { border-bottom: 0; }
+.exp-date { margin: 0 0 6px; font-size: 12px; display: flex; gap: 8px; align-items: baseline; }
+.exp-soon { color: var(--accent); }
+.exp-line { display: flex; align-items: baseline; gap: 12px; }
+.exp h3 { flex: 0 1 auto; font-size: 16px; font-weight: 500; line-height: 1.5; margin: 0; color: var(--text); }
+.exp h3 a { color: inherit; text-decoration: none; }
+.exp h3 a .icon { width: 14px; height: 14px; margin-left: 4px; color: var(--muted); vertical-align: -1px; transition: color .2s var(--ease); }
 .exp h3 a:hover, .exp h3 a:hover .icon { color: var(--accent); }
-.exp-sub { margin: 4px 0 0; font-size: 14px; color: var(--text-2); }
-.exp-result { margin: 8px 0 0; font-size: 14px; color: var(--text); display: flex; gap: 8px; align-items: baseline; }
-.exp-result::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 2px; background: var(--accent); transform: translateY(-2px); }
-.exp-side { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; text-align: right; padding-top: 2px; white-space: nowrap; }
-.exp-fields { font-size: 12px; }
+/* 標題與身分之間的虛線，像履歷的點線引導 */
+.exp-leader { flex: 1 1 24px; min-width: 24px; align-self: center; border-bottom: 1px dashed var(--line-strong); transform: translateY(2px); }
+.exp-role { flex: none; font-size: 15px; font-weight: 500; color: var(--text); white-space: nowrap; transition: color .2s var(--ease); }
+.exp:hover .exp-role { color: var(--accent); }
+.exp-detail { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-top: 6px; }
+.exp-org { margin: 0; font-size: 14px; color: var(--text-2); display: flex; gap: 10px; align-items: baseline; }
+.exp-org::before { content: ""; flex: none; width: 6px; height: 6px; border: 1px solid var(--muted); border-radius: 1px; transform: translateY(-2px); }
+.exp-tags { margin: 6px 0 0; font-size: 12px; }
+.exp-result { margin: 0; flex: none; max-width: 50%; text-align: right; font-size: 13px; color: var(--accent); }
+
+/* 時間線：左側一條細線，年份是大段落，月份節點附年級 */
+.exp-year + .exp-year { margin-top: 72px; }
+.exp-year-head { display: flex; align-items: baseline; gap: 12px; margin: 0 0 16px; font-family: var(--font-mono); font-size: 40px; font-weight: 400; letter-spacing: -.02em; color: var(--text); font-variant-numeric: tabular-nums; }
+.exp-year-head .meta { font-size: 12px; letter-spacing: 0; }
+.exp-month { position: relative; padding: 0 0 8px 32px; border-left: 1px solid var(--line-strong); margin-left: 5px; }
+.exp-month:last-child { padding-bottom: 0; }
+.exp-month-head { position: relative; margin: 0 0 0 -32px; padding: 4px 0 0 32px; font-family: var(--font-mono); font-size: 13px; font-weight: 400; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.exp-month-head span:not(.exp-node) { color: var(--muted); font-family: var(--font-sans); }
+.exp-node { position: absolute; left: -6px; top: 7px; width: 11px; height: 11px; border-radius: 50%; background: var(--bg); border: 1px solid var(--muted); transition: border-color .2s var(--ease), background-color .2s var(--ease); }
+.exp-month:hover .exp-node { border-color: var(--accent); background: var(--accent); }
+.exp-month .exp:first-child { padding-top: 12px; }
 
 @media (max-width: 760px) {
   .exp-preview { margin-top: 112px; }
   .exp-page { padding-top: 48px; }
   .exp-head { margin-bottom: 40px; }
-  .exp { grid-template-columns: 32px minmax(0, 1fr); gap: 12px; }
-  .exp-mark { width: 32px; height: 32px; border-radius: 8px; }
-  .exp-mark .icon { width: 16px; height: 16px; }
-  .exp-side { grid-column: 2; flex-direction: row; align-items: baseline; justify-content: flex-start; gap: 12px; text-align: left; padding: 0; }
+  .exp-line { flex-wrap: wrap; gap: 4px 12px; }
+  .exp-leader { display: none; }
+  .exp-role { flex-basis: 100%; font-size: 14px; }
+  .exp-detail { flex-direction: column; gap: 6px; }
+  .exp-result { max-width: none; text-align: left; }
+  .exp-year-head { font-size: 32px; }
+  .exp-month { padding-left: 20px; }
+  .exp-month-head { margin-left: -20px; padding-left: 20px; }
   .nav > a[href="#contact"] { display: none; }
 }
