@@ -478,3 +478,51 @@ html.lenis, html.lenis body { height: auto; }
 @media (max-width: 760px) {
   .marquee { margin-bottom: 64px; padding: 16px 0; }
 }
+
+/* ---------- 15. 經歷（content/experience.json，見 AGENTS.md §9） ---------- */
+/* 版面參考 vicwen.com：窄欄、分區標題 + 編號 + 細線，每列「圖示 / 標題與身分 / 右側日期」 */
+.exp-preview { max-width: var(--page); margin: 160px auto 0; padding: 0 var(--gutter); }
+.exp-preview .projects-head { margin-bottom: 24px; }
+.exp-preview .exp-list { max-width: none; }
+
+.exp-page { max-width: 880px; margin: 0 auto; padding: 80px var(--gutter) 0; }
+.exp-head { margin-bottom: 64px; }
+.exp-head h1 { font-size: clamp(40px, 6vw, 64px); font-weight: 500; letter-spacing: -.02em; margin: 12px 0 32px; }
+
+.exp-group + .exp-group { margin-top: 80px; }
+.exp-group-head { display: flex; align-items: center; gap: 12px; margin: 0 0 8px; font-size: 15px; font-weight: 500; color: var(--text-2); }
+.exp-group-head .meta { font-size: 12px; }
+.exp-group-head i { flex: 0 0 40px; height: 1px; background: var(--line-strong); }
+
+.exp-list { list-style: none; margin: 0; padding: 0; }
+.exp {
+  display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 16px; align-items: start;
+  padding: 20px 0; border-bottom: 1px solid var(--line);
+}
+.exp-mark {
+  width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px;
+  background: var(--surface); border: 1px solid var(--line); color: var(--text-2);
+  transition: color .2s var(--ease), border-color .2s var(--ease);
+}
+.exp-mark .icon { width: 18px; height: 18px; }
+.exp:hover .exp-mark { color: var(--accent); border-color: var(--line-strong); }
+.exp h3 { font-size: 16px; font-weight: 500; line-height: 1.5; margin: 0; color: var(--text); }
+.exp h3 a { color: inherit; text-decoration: none; display: inline-flex; align-items: baseline; gap: 6px; }
+.exp h3 a .icon { width: 14px; height: 14px; color: var(--muted); transform: translateY(2px); transition: color .2s var(--ease); }
+.exp h3 a:hover, .exp h3 a:hover .icon { color: var(--accent); }
+.exp-sub { margin: 4px 0 0; font-size: 14px; color: var(--text-2); }
+.exp-result { margin: 8px 0 0; font-size: 14px; color: var(--text); display: flex; gap: 8px; align-items: baseline; }
+.exp-result::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 2px; background: var(--accent); transform: translateY(-2px); }
+.exp-side { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; text-align: right; padding-top: 2px; white-space: nowrap; }
+.exp-fields { font-size: 12px; }
+
+@media (max-width: 760px) {
+  .exp-preview { margin-top: 112px; }
+  .exp-page { padding-top: 48px; }
+  .exp-head { margin-bottom: 40px; }
+  .exp { grid-template-columns: 32px minmax(0, 1fr); gap: 12px; }
+  .exp-mark { width: 32px; height: 32px; border-radius: 8px; }
+  .exp-mark .icon { width: 16px; height: 16px; }
+  .exp-side { grid-column: 2; flex-direction: row; align-items: baseline; justify-content: flex-start; gap: 12px; text-align: left; padding: 0; }
+  .nav > a[href="#contact"] { display: none; }
+}
