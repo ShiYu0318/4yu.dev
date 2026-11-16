@@ -15,10 +15,11 @@ AI 就會讀 repo、轉檔截圖、照範本寫介紹、登記到 `content/proje
 ## 結構
 
 ```
-index.html / project.html   兩個頁面，內容全部由 JS 從 content/ 讀取
+index.html / project.html / experience.html   三個頁面，內容全部由 JS 從 content/ 讀取
 assets/                     唯一的 style.css 與 app.js
 content/projects.json       個人資料、分類、專案清單
 content/projects/*.md       每個專案一篇介紹
+content/experience.json     經歷，每天從 Notion 同步「網站」打勾的列（scripts/sync_notion.py + GitHub Actions）
 content/img/<id>/           截圖（webp）
 templates/                  新專案介紹的範本
 scripts/check.py            規則檢查
