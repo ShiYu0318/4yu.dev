@@ -455,6 +455,13 @@ html.lenis, html.lenis body { height: auto; }
   position: absolute; z-index: 0; top: 0; bottom: 0; left: 50%; width: 100vw; height: 100%; transform: translateX(-50%); pointer-events: none;
   -webkit-mask-image: radial-gradient(ellipse 70% 80% at 65% 45%, #000 35%, transparent 80%); mask-image: radial-gradient(ellipse 70% 80% at 65% 45%, #000 35%, transparent 80%);
 }
+/* 背景名稱標籤：點一下換下一種背景 */
+.hero > .backdrop-label {
+  position: absolute; z-index: 2; right: var(--gutter); bottom: 28px;
+  display: inline-flex; gap: 8px; align-items: center; padding: 4px 8px; border: 0; border-radius: var(--r-tag);
+  background: transparent; color: var(--muted); font-size: 14px; cursor: pointer; transition: color 150ms var(--ease);
+}
+.hero > .backdrop-label:hover { color: var(--accent); }
 .portrait { perspective: 800px; }
 .portrait img { will-change: transform; }
 .hero h1 .char { display: inline-block; will-change: transform; }
