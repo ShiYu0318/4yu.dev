@@ -177,7 +177,7 @@
       const canvas = document.createElement("canvas");
       canvas.className = "hero-grid"; canvas.setAttribute("aria-hidden", "true");
       hero.prepend(canvas);
-      const topo = this.topography(canvas, hero);
+      const topo = this.backdrop(canvas, hero);
 
       if (!this.interactive) return;
       const img = $(".portrait img", hero);
@@ -194,16 +194,20 @@
     },
 
 
-    /* 等高線地形：3D Perlin noise 當高度場，用 marching squares 畫等高線；
-       游標位置加一座小山，附近的線變亮；畫面外或減少動態時停止更新 */
-    topography(canvas, host) {
+    /* Hero 背景：六種互動場景隨機播放（見 AGENTS.md §6.5）
+       等高線、流場粒子、ASCII 字元場、生命遊戲、鳥群、梯度下降。
+       每次進站隨機挑一種，約 24 秒換下一種（淡出淡入），右下角的標籤可以手動換。
+       減少動態時只畫一張靜止的等高線。 */
+    backdrop(canvas, host) {
       const ctx = canvas.getContext("2d");
-      const lineColor = cssVar("--line-strong"), hot = cssVar("--accent");
+      const rgb = (name) => { const v = cssVar(name).replace("#", ""); const n = parseInt(v.length === 3 ? v.replace(/./g, "$&$&") : v, 16); return `${n >> 16 & 255},${n >> 8 & 255},${n & 255}`; };
+      const LINE = rgb("--text"), ACC = rgb("--accent");
+      const col = (c, a) => `rgba(${c},${a})`;
       const P = new Uint8Array(512);
       { const p = [...Array(256).keys()]; for (let i = 255; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [p[i], p[j]] = [p[j], p[i]]; } for (let i = 0; i < 512; i++) P[i] = p[i & 255]; }
       const fade = (t) => t * t * t * (t * (t * 6 - 15) + 10), lerp = (a, b, t) => a + t * (b - a);
       const grad = (h, x, y, z) => { const u = (h & 15) < 8 ? x : y, v = (h & 15) < 4 ? y : (h & 15) === 12 || (h & 15) === 14 ? x : z; return ((h & 1) ? -u : u) + ((h & 2) ? -v : v); };
-      const noise = (x, y, z) => {
+      const noise = (x, y, z = 0) => {
         const X = Math.floor(x) & 255, Y = Math.floor(y) & 255, Z = Math.floor(z) & 255;
         x -= Math.floor(x); y -= Math.floor(y); z -= Math.floor(z);
         const u = fade(x), v = fade(y), w = fade(z);
@@ -211,84 +215,230 @@
         return lerp(lerp(lerp(grad(P[AA], x, y, z), grad(P[BA], x - 1, y, z), u), lerp(grad(P[AB], x, y - 1, z), grad(P[BB], x - 1, y - 1, z), u), v),
           lerp(lerp(grad(P[AA + 1], x, y, z - 1), grad(P[BA + 1], x - 1, y, z - 1), u), lerp(grad(P[AB + 1], x, y - 1, z - 1), grad(P[BB + 1], x - 1, y - 1, z - 1), u), v), w);
       };
-      const CELL = 14, LEVELS = 14, SCALE = 0.0032, HILL = 150;
-      let w = 0, h = 0, dpr = 1, cols = 0, rows = 0, field = new Float32Array(0);
-      let t = Math.random() * 100, pointer = null, hill = { v: 0 }, visible = true, last = 0;
+      const m = { x: 0, y: 0, on: false, k: 0 };   // 游標；k 是游標影響力（進出時漸變）
+      const near = (x, y, r) => m.k ? Math.max(0, 1 - Math.hypot(x - m.x, y - m.y) / r) * m.k : 0;
+      let w = 0, h = 0, dpr = 1;
+      const clear = () => ctx.clearRect(0, 0, w, h);
 
-      const sample = () => {
-        for (let j = 0; j <= rows; j++) for (let i = 0; i <= cols; i++) {
-          const x = i * CELL, y = j * CELL;
-          let v = noise(x * SCALE, y * SCALE, t) * 1.1 + noise(x * SCALE * 2.3, y * SCALE * 2.3, t * 1.4) * 0.35;
-          if (pointer && hill.v > 0.001) { const dx = x - pointer.x, dy = y - pointer.y; v += Math.exp(-(dx * dx + dy * dy) / (2 * HILL * HILL)) * 0.9 * hill.v; }
-          field[j * (cols + 1) + i] = v;
-        }
-      };
-      const contours = () => {
-        const path = new Path2D(), W = cols + 1;
-        for (let l = 0; l < LEVELS; l++) {
-          const iso = -0.7 + (1.6 * l) / (LEVELS - 1);
-          for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
-            const a = field[j * W + i], b = field[j * W + i + 1], c = field[(j + 1) * W + i + 1], d = field[(j + 1) * W + i];
-            const idx = (a > iso ? 8 : 0) | (b > iso ? 4 : 0) | (c > iso ? 2 : 0) | (d > iso ? 1 : 0);
-            if (idx === 0 || idx === 15) continue;
-            const x = i * CELL, y = j * CELL;
-            const top = [x + CELL * (iso - a) / (b - a), y], right = [x + CELL, y + CELL * (iso - b) / (c - b)];
-            const bottom = [x + CELL * (iso - d) / (c - d), y + CELL], left = [x, y + CELL * (iso - a) / (d - a)];
-            const seg = (p, q) => { path.moveTo(p[0], p[1]); path.lineTo(q[0], q[1]); };
-            switch (idx) {
-              case 1: case 14: seg(left, bottom); break;
-              case 2: case 13: seg(bottom, right); break;
-              case 3: case 12: seg(left, right); break;
-              case 4: case 11: seg(top, right); break;
-              case 5: seg(left, top); seg(bottom, right); break;
-              case 6: case 9: seg(top, bottom); break;
-              case 7: case 8: seg(left, top); break;
-              case 10: seg(top, right); seg(left, bottom); break;
+      const SCENES = {
+        contour: {
+          label: "等高線",
+          init(s) { s.g = 14; s.t = Math.random() * 100; },
+          frame(s) {
+            const g = s.g, cols = Math.ceil(w / g) + 1, rows = Math.ceil(h / g) + 1, f = new Float32Array(cols * rows);
+            s.t += 0.004;
+            for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+              const x = i * g, y = j * g;
+              let v = noise(x * 0.0032, y * 0.0032, s.t) * 1.1 + noise(x * 0.0074, y * 0.0074, s.t * 1.4) * 0.35;
+              if (m.k) v += Math.exp(-((x - m.x) ** 2 + (y - m.y) ** 2) / 45000) * 0.9 * m.k;
+              f[j * cols + i] = v;
             }
-          }
-        }
-        return path;
+            const dim = new Path2D(), lit = new Path2D();
+            for (let l = 0; l < 14; l++) {
+              const L = -0.7 + 1.6 * l / 13;
+              for (let j = 0; j < rows - 1; j++) for (let i = 0; i < cols - 1; i++) {
+                const a = f[j * cols + i], b = f[j * cols + i + 1], d = f[(j + 1) * cols + i], e = f[(j + 1) * cols + i + 1];
+                const k = (a > L) | ((b > L) << 1) | ((e > L) << 2) | ((d > L) << 3); if (k === 0 || k === 15) continue;
+                const x = i * g, y = j * g, pts = [], it = (p, q) => (L - p) / (q - p);
+                if ((a > L) !== (b > L)) pts.push([x + g * it(a, b), y]);
+                if ((b > L) !== (e > L)) pts.push([x + g, y + g * it(b, e)]);
+                if ((d > L) !== (e > L)) pts.push([x + g * it(d, e), y + g]);
+                if ((a > L) !== (d > L)) pts.push([x, y + g * it(a, d)]);
+                for (let n = 0; n + 1 < pts.length; n += 2) { const path = near(pts[n][0], pts[n][1], 220) > 0.2 ? lit : dim; path.moveTo(pts[n][0], pts[n][1]); path.lineTo(pts[n + 1][0], pts[n + 1][1]); }
+              }
+            }
+            clear(); ctx.lineWidth = 1;
+            ctx.strokeStyle = col(LINE, 0.14); ctx.stroke(dim);
+            ctx.strokeStyle = col(ACC, 0.75); ctx.stroke(lit);
+          },
+        },
+        flow: {
+          label: "流場粒子", trails: true,
+          init(s) { s.t = Math.random() * 100; s.p = Array.from({ length: Math.round(w * h / 420) }, () => ({ x: Math.random() * w, y: Math.random() * h, a: Math.random() * 400 })); },
+          frame(s) {
+            s.t += 0.004;
+            ctx.globalCompositeOperation = "destination-out"; ctx.fillStyle = "rgba(0,0,0,0.08)"; ctx.fillRect(0, 0, w, h);
+            ctx.globalCompositeOperation = "source-over";
+            const dim = new Path2D(), lit = new Path2D();
+            for (const p of s.p) {
+              const ang = noise(p.x * 0.0025, p.y * 0.0025, s.t) * Math.PI * 3;
+              let vx = Math.cos(ang), vy = Math.sin(ang);
+              const k = near(p.x, p.y, 180);
+              if (k) { const dx = p.x - m.x, dy = p.y - m.y, d = Math.hypot(dx, dy) + 1; vx += (-dy / d) * k * 4 - dx / d * k; vy += (dx / d) * k * 4 - dy / d * k; }
+              const nx = p.x + vx * 1.3, ny = p.y + vy * 1.3, path = k > 0.1 ? lit : dim;
+              path.moveTo(p.x, p.y); path.lineTo(nx, ny);
+              p.x = nx; p.y = ny; p.a++;
+              if (p.x < 0 || p.x > w || p.y < 0 || p.y > h || p.a > 600) { p.x = Math.random() * w; p.y = Math.random() * h; p.a = 0; }
+            }
+            ctx.lineWidth = 1; ctx.strokeStyle = col(LINE, 0.3); ctx.stroke(dim); ctx.strokeStyle = col(ACC, 0.9); ctx.stroke(lit);
+          },
+        },
+        ascii: {
+          label: "ASCII 字元場",
+          init(s) { s.t = Math.random() * 100; s.chars = " .:-=+*#%"; s.font = `13px ${cssVar("--font-mono")}`; },
+          frame(s) {
+            s.t += 0.006; clear();
+            ctx.font = s.font; ctx.textBaseline = "top";
+            const cw = 11, chh = 16, tick = (s.t * 60) | 0;
+            for (let y = 0; y < h; y += chh) for (let x = 0; x < w; x += cw) {
+              const k = near(x, y, 130);
+              if (k > 0.05) { ctx.fillStyle = col(ACC, 0.3 + k * 0.7); ctx.fillText(((x * 7 + y * 13 + tick) & 3) ? "1" : "0", x, y); continue; }
+              const v = (noise(x * 0.01, y * 0.018, s.t) + 0.6) / 1.2;
+              const i = Math.max(0, Math.min(s.chars.length - 1, (v * s.chars.length) | 0)); if (!i) continue;
+              ctx.fillStyle = col(LINE, 0.05 + v * 0.16); ctx.fillText(s.chars[i], x, y);
+            }
+          },
+        },
+        life: {
+          label: "生命遊戲",
+          init(s) {
+            s.g = 10; s.cols = Math.ceil(w / s.g); s.rows = Math.ceil(h / s.g);
+            s.a = new Uint8Array(s.cols * s.rows); s.age = new Float32Array(s.a.length); s.n = 0;
+            for (let i = 0; i < s.a.length; i++) s.a[i] = Math.random() < 0.12 ? 1 : 0;
+          },
+          frame(s) {
+            const { cols, rows, g } = s;
+            if (m.k > 0.5) for (let k = 0; k < 5; k++) { const i = (m.x / g + (Math.random() - 0.5) * 6) | 0, j = (m.y / g + (Math.random() - 0.5) * 6) | 0; if (i >= 0 && j >= 0 && i < cols && j < rows) s.a[j * cols + i] = 1; }
+            if (++s.n % 3 === 0) {
+              const n = new Uint8Array(s.a.length); let alive = 0;
+              for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+                let c = 0; for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if (dx || dy) c += s.a[((j + dy + rows) % rows) * cols + ((i + dx + cols) % cols)];
+                const id = j * cols + i, v = s.a[id] ? (c === 2 || c === 3) : c === 3; n[id] = v ? 1 : 0; alive += n[id];
+                if (v && !s.a[id]) s.age[id] = 1;
+              }
+              s.a = n;
+              if (alive < s.a.length * 0.03) for (let i = 0; i < s.a.length; i++) if (Math.random() < 0.08) s.a[i] = 1;
+            }
+            clear();
+            for (let id = 0; id < s.a.length; id++) {
+              s.age[id] *= 0.94; if (!s.a[id] && s.age[id] < 0.05) continue;
+              ctx.fillStyle = s.age[id] > 0.3 ? col(ACC, 0.12 + s.age[id] * 0.4) : col(LINE, s.a[id] ? 0.08 : s.age[id] * 0.15);
+              ctx.fillRect((id % cols) * g + 2, ((id / cols) | 0) * g + 2, g - 4, g - 4);
+            }
+          },
+        },
+        boids: {
+          label: "鳥群演算法",
+          init(s) { s.b = Array.from({ length: Math.min(200, Math.round(w * h / 5000)) }, () => ({ x: Math.random() * w, y: Math.random() * h, vx: Math.random() * 2 - 1, vy: Math.random() * 2 - 1 })); },
+          frame(s) {
+            clear(); ctx.lineWidth = 1.2;
+            const dim = new Path2D(), lit = new Path2D();
+            for (const p of s.b) {
+              let ax = 0, ay = 0, cx = 0, cy = 0, sx = 0, sy = 0, n = 0;
+              for (const q of s.b) { if (q === p) continue; const dx = q.x - p.x, dy = q.y - p.y, d2 = dx * dx + dy * dy; if (d2 > 3600) continue; n++; ax += q.vx; ay += q.vy; cx += q.x; cy += q.y; if (d2 < 400) { sx -= dx; sy -= dy; } }
+              if (n) { p.vx += (ax / n - p.vx) * 0.05 + (cx / n - p.x) * 0.0008 + sx * 0.03; p.vy += (ay / n - p.vy) * 0.05 + (cy / n - p.y) * 0.0008 + sy * 0.03; }
+              const k = near(p.x, p.y, 150); if (k) { p.vx += (p.x - m.x) * 0.02 * k; p.vy += (p.y - m.y) * 0.02 * k; }
+              const sp = Math.hypot(p.vx, p.vy), max = k ? 5 : 2.2; if (sp > max) { p.vx *= max / sp; p.vy *= max / sp; } if (sp < 1) { p.vx *= 1.2; p.vy *= 1.2; }
+              p.x = (p.x + p.vx + w) % w; p.y = (p.y + p.vy + h) % h;
+              const a = Math.atan2(p.vy, p.vx), L = 7, tx = p.x + Math.cos(a) * L, ty = p.y + Math.sin(a) * L, path = k > 0.05 ? lit : dim;
+              path.moveTo(tx, ty); path.lineTo(p.x + Math.cos(a + 2.6) * L * 0.6, p.y + Math.sin(a + 2.6) * L * 0.6);
+              path.moveTo(tx, ty); path.lineTo(p.x + Math.cos(a - 2.6) * L * 0.6, p.y + Math.sin(a - 2.6) * L * 0.6);
+            }
+            ctx.strokeStyle = col(LINE, 0.3); ctx.stroke(dim); ctx.strokeStyle = col(ACC, 0.9); ctx.stroke(lit);
+          },
+        },
+        descent: {
+          label: "梯度下降",
+          // 損失曲面：一個大碗加上雜訊做出的局部極小值；三條優化路徑（帶動量的梯度下降）往下滾，留下軌跡
+          init(s) {
+            s.t = 0; s.seed = Math.random() * 50; s.yaw = Math.random() * 6; s.pitch = 0.5;
+            s.L = (x, y) => 0.18 * (x * x + y * y) + 0.9 * noise(x * 0.55 + s.seed, y * 0.55 + s.seed) + 0.35 * noise(x * 1.3 + s.seed, y * 1.3);
+            s.runs = [0, 1, 2].map((i) => this.descent.spawn(s, i));
+          },
+          spawn(s, i) {
+            const a = Math.random() * Math.PI * 2, r = 3.2 + Math.random() * 0.8;
+            return { x: Math.cos(a) * r, y: Math.sin(a) * r, vx: 0, vy: 0, step: 0, trail: [], done: 0, delay: i * 40 };
+          },
+          frame(s) {
+            s.t += 1;
+            s.yaw += 0.0016 + (m.k ? (m.x / w - 0.5) * 0.012 * m.k : 0);
+            s.pitch += ((m.k ? 0.3 + (m.y / h) * 0.5 : 0.5) - s.pitch) * 0.05;
+            const N = 36, R = 4.2, fov = Math.min(w, h) * 1.9, cy = Math.cos(s.yaw), sy = Math.sin(s.yaw), cp = Math.cos(s.pitch), sp = Math.sin(s.pitch);
+            const ox = w * 0.64, oy = h * 0.6;
+            // 鏡頭：先繞垂直軸轉 yaw，再從斜上方以 pitch 俯視；越遠、越高的點在畫面上越上面
+            const proj = (x, y, z) => {
+              const rx = x * cy - y * sy, ry = x * sy + y * cy;
+              const up = z * cp + ry * sp, depth = ry * cp - z * sp + 16;
+              return [ox + rx * fov / depth, oy - up * fov / depth, depth];
+            };
+            const Z = (x, y) => s.L(x, y) * 0.8 - 1.6;   // 高度 = 損失，極小值在碗底
+            clear(); ctx.lineWidth = 1;
+            const grid = new Path2D();
+            for (let j = 0; j <= N; j++) for (let i = 0; i <= N; i++) {
+              const x = -R + 2 * R * i / N, y = -R + 2 * R * j / N, p = proj(x, y, Z(x, y));
+              if (i < N) { const x2 = x + 2 * R / N, q = proj(x2, y, Z(x2, y)); grid.moveTo(p[0], p[1]); grid.lineTo(q[0], q[1]); }
+              if (j < N) { const y2 = y + 2 * R / N, q = proj(x, y2, Z(x, y2)); grid.moveTo(p[0], p[1]); grid.lineTo(q[0], q[1]); }
+            }
+            ctx.strokeStyle = col(LINE, 0.09); ctx.stroke(grid);
+            ctx.font = `12px ${cssVar("--font-mono")}`; ctx.textBaseline = "middle";
+            s.runs.forEach((r, i) => {
+              if (r.delay > 0) { r.delay--; return; }
+              if (!r.done) {
+                const e = 1e-3, gx = (s.L(r.x + e, r.y) - s.L(r.x - e, r.y)) / (2 * e), gy = (s.L(r.x, r.y + e) - s.L(r.x, r.y - e)) / (2 * e);
+                r.vx = r.vx * 0.9 - gx * 0.012; r.vy = r.vy * 0.9 - gy * 0.012;
+                r.x += r.vx; r.y += r.vy; r.step++;
+                r.trail.push([r.x, r.y]);
+                if ((Math.hypot(gx, gy) < 0.02 && Math.hypot(r.vx, r.vy) < 0.002) || r.step > 900) r.done = 1;
+              } else if (++r.done > 180) { s.runs[i] = this.descent.spawn(s, 0); return; }
+              const tr = new Path2D();
+              r.trail.forEach(([x, y], n) => { const p = proj(x, y, Z(x, y)); n ? tr.lineTo(p[0], p[1]) : tr.moveTo(p[0], p[1]); });
+              ctx.strokeStyle = col(ACC, 0.7); ctx.lineWidth = 1.5; ctx.stroke(tr); ctx.lineWidth = 1;
+              const p = proj(r.x, r.y, Z(r.x, r.y));
+              ctx.fillStyle = col(ACC, 1); ctx.beginPath(); ctx.arc(p[0], p[1], 3, 0, 7); ctx.fill();
+              ctx.fillStyle = col(LINE, 0.45);
+              ctx.fillText(`step ${String(r.step).padStart(3, "0")}  loss ${s.L(r.x, r.y).toFixed(3)}`, p[0] + 10, p[1]);
+            });
+          },
+        },
       };
-      const draw = () => {
-        sample();
-        const path = contours();
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        ctx.clearRect(0, 0, w, h);
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = lineColor;
-        ctx.stroke(path);
-        if (pointer && hill.v > 0.01) {
-          ctx.save();
-          const g = ctx.createRadialGradient(pointer.x, pointer.y, 0, pointer.x, pointer.y, 220);
-          g.addColorStop(0, hot); g.addColorStop(1, "transparent");
-          ctx.globalAlpha = 0.9 * hill.v;
-          ctx.strokeStyle = g;
-          ctx.stroke(path);
-          ctx.restore();
-        }
+      SCENES.descent.init = SCENES.descent.init.bind(SCENES);
+      SCENES.descent.frame = SCENES.descent.frame.bind(SCENES);
+      const ORDER = Object.keys(SCENES);
+
+      // 每次進站隨機挑，避免和上一次相同
+      let prev = null; try { prev = sessionStorage.getItem("backdrop"); } catch { /* 無法使用時不管 */ }
+      const pick = (not) => { const pool = ORDER.filter((k) => k !== not); return pool[(Math.random() * pool.length) | 0]; };
+      let key = motion ? pick(prev) : "contour", state = {}, visible = true, last = 0, since = 0, switching = false;
+      const label = document.createElement("button");
+      label.type = "button"; label.className = "backdrop-label meta";
+      label.setAttribute("aria-label", "換一種背景");
+      host.appendChild(label);
+      const start = (k) => {
+        key = k; state = {}; SCENES[key].init(state); clear(); since = 0;
+        label.innerHTML = `<span>${esc(SCENES[key].label)}</span><span aria-hidden="true">↻</span>`;
+        try { sessionStorage.setItem("backdrop", key); } catch { /* 忽略 */ }
       };
+      const next = () => {
+        if (switching || !motion) return; switching = true;
+        gsap.to(canvas, { opacity: 0, duration: 0.6, ease: "power2.in", onComplete: () => {
+          start(pick(key));
+          gsap.to(canvas, { opacity: 1, duration: 0.9, ease: "power2.out", onComplete: () => { switching = false; } });
+        } });
+      };
+      label.addEventListener("click", next);
+      if (!motion) label.hidden = true;
+
       const size = () => {
         const r = canvas.getBoundingClientRect();
         w = r.width; h = r.height; dpr = Math.min(devicePixelRatio || 1, 2);
         canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
-        cols = Math.ceil(w / CELL); rows = Math.ceil(h / CELL);
-        field = new Float32Array((cols + 1) * (rows + 1));
-        draw();
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        start(key);
+        if (!motion) SCENES[key].frame(state);
       };
+      size();   // 先初始化一次，ticker 才不會在 ResizeObserver 回呼前畫到空的場景
       new ResizeObserver(size).observe(host);
       new IntersectionObserver((e) => { visible = e[0].isIntersecting; }).observe(host);
       if (motion) gsap.ticker.add((time) => {
-        if (!visible || time - last < 1 / 30) return;   // 約 30fps 就夠
-        last = time; t += 0.004 + hill.v * 0.002;
-        draw();
+        if (!visible || time - last < 1 / 30) return;   // 約 30fps
+        const dt = time - last; last = time;
+        m.k += ((m.on ? 1 : 0) - m.k) * 0.08; if (m.k < 0.01) m.k = 0;
+        SCENES[key].frame(state);
+        since += dt; if (since > 24) next();
       });
       return {
-        point: (cx, cy) => {
-          const r = canvas.getBoundingClientRect();
-          pointer = { x: cx - r.left, y: cy - r.top };
-          if (hill.v < 1 && !gsap.isTweening(hill)) gsap.to(hill, { v: 1, duration: 0.8, ease: "power2.out" });
-        },
-        leave: () => gsap.to(hill, { v: 0, duration: 1.2, ease: "power2.out" }),
+        point: (cx, cy) => { const r = canvas.getBoundingClientRect(); m.x = cx - r.left; m.y = cy - r.top; m.on = true; },
+        leave: () => { m.on = false; },
       };
     },
 
