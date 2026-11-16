@@ -1,32 +1,33 @@
 /* =========================================================
    黃士育 · 專案 — 全站唯一樣式表
-   方向：安靜、精確、像實驗室筆記。海軍藍與冷白取自頭像。
+   方向：安靜、精確、像實驗室筆記。配色取自 GitHub 頭像：黑貓 × 電光藍。
    規則見 AGENTS.md §6：只用下方變數、4px 格線、無漸層與光暈
    ========================================================= */
 
 /* ---------- 1. 設計變數 ---------- */
 :root {
-  /* 中性色階：帽 T 的海軍藍，由深到淺 */
-  --bg: #081227;
-  --surface: #0c1a31;
-  --raised: #12233f;
-  --line: rgba(230, 229, 234, .08);
-  --line-strong: rgba(230, 229, 234, .14);
+  /* 中性色階：黑貓的黑，帶一點耳機的靛色，由深到淺 */
+  --bg: #07081a;
+  --surface: #0d0f24;
+  --raised: #161a33;
+  --line: rgba(238, 240, 255, .08);
+  --line-strong: rgba(238, 240, 255, .14);
 
-  /* 文字三種角色：牆面的冷白 */
-  --text: #e6e5ea;
-  --text-2: #a7aec0;
-  --muted: #7d879e;
+  /* 文字三種角色：眼睛的白、字幕的淡藍白 */
+  --text: #eef0ff;
+  --text-2: #abb4dc;
+  --muted: #7c84ab;
 
-  /* 唯一的強調色：百葉窗的鋼藍，只用在少數地方 */
-  --accent: #8aa9e8;
-  --wip: #d9b26a;
+  /* 頭像背景的電光藍：只當填色（主要按鈕），上面放白字 */
+  --brand: #1533f3;
+  --brand-hover: #2a46ff;
+  --on-brand: #ffffff;
+  /* 同色系提亮，給文字用的強調色（hover、目錄目前位置、HIGHLIGHT） */
+  --accent: #7f93ff;
+  --wip: #e0b866;
 
-  /* 主要按鈕：冷白底、深色字 */
-  --button-bg: #e6e5ea;
-  --button-text: #081227;
-  --button-highlight: inset 0 1px 0 rgba(255, 255, 255, .5);
-  --image-shadow: 0 24px 48px rgba(2, 6, 16, .45);
+  --button-highlight: inset 0 1px 0 rgba(255, 255, 255, .18);
+  --image-shadow: 0 24px 48px rgba(0, 0, 8, .5);
 
   --font-sans: "IBM Plex Sans", "Noto Sans TC", -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
@@ -94,8 +95,8 @@ img { max-width: 100%; display: block; }
 }
 .button:hover { background: var(--raised); color: var(--text); }
 .button:active { transform: scale(.98); }
-.button.primary { background: var(--button-bg); color: var(--button-text); border-color: transparent; box-shadow: var(--button-highlight); }
-.button.primary:hover { background: var(--text-2); color: var(--button-text); }
+.button.primary { background: var(--brand); color: var(--on-brand); border-color: transparent; box-shadow: var(--button-highlight); }
+.button.primary:hover { background: var(--brand-hover); color: var(--on-brand); }
 .button svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .meta { color: var(--muted); font-family: var(--font-mono); font-size: 13px; font-variant-numeric: tabular-nums; }
 .stack { color: var(--muted); font-family: var(--font-mono); font-size: 13px; }
