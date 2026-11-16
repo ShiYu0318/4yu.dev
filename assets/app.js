@@ -41,6 +41,9 @@
   const no = (n) => `No. ${String(n).padStart(2, "0")}`;
   const external = (url, label, cls = "button") =>
     `<a class="${cls}" href="${esc(url)}" target="_blank" rel="noopener">${esc(label)}${ICON.out}</a>`;
+  // 自我介紹裡的 [文字](網址) 轉成連結（其他文字一律跳脫，不支援別的 Markdown）
+  const linkify = (text) => esc(text).replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,
+    (_, label, url) => `<a href="${url}" target="_blank" rel="noopener">${label}</a>`);
   // 平滑捲動：有 Lenis 用 Lenis，沒有就用瀏覽器的 smooth；減少動態時直接跳過去
   const smoothTo = (target, offset = 0) => {
     if (FX.lenis) { FX.lenis.scrollTo(target, { offset, duration: 1.4, easing: (t) => 1 - Math.pow(1 - t, 4) }); return; }
@@ -803,7 +806,7 @@
     $("#hero").innerHTML = `
       <div class="hero-text">
         <h1 class="sr-only">${esc(pf.name)}</h1>
-        <p class="bio">${esc(pf.bio)}</p>
+        <p class="bio">${linkify(pf.bio)}</p>
         <div class="hero-actions">
           <a class="button primary" href="#projects">查看專案${ICON.down}</a>
           ${pf.links.filter((l) => l.label === "CV").map((l) => external(l.url, l.label)).join("")}
