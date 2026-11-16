@@ -2,7 +2,7 @@
 
 黃士育（ShiYu）的 GitHub 專案作品集。
 
-視覺規則寫在 AGENTS.md §6，方向參考 [unslop](https://github.com/heydamir/unslop)（Damir Sokolovsky，CC BY 4.0）的原則：外框安靜、沒有漸層與光暈，顏色只留給照片與真實截圖。
+視覺規則寫在 AGENTS.md §6，方向參考 [unslop](https://github.com/heydamir/unslop)（Damir Sokolovsky，CC BY 4.0）的原則：外框安靜、沒有漸層與光暈，顏色只留給照片與真實截圖。配色取自 GitHub 頭像（黑貓 × 電光藍）。
 
 🔗 **網站**：<https://4yu.dev/NCCU-GenAI-HW/>
 
