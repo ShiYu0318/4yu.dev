@@ -103,7 +103,7 @@
           const target = document.getElementById(decodeURIComponent(url.hash.slice(1)));
           if (!target) return;
           e.preventDefault();
-          this.lenis.scrollTo(target, { offset: -72 });
+          this.lenis.scrollTo(target, { offset: 0 });   // 位移由 CSS 的 scroll-padding-top 決定，這裡不再重複加
           history.replaceState(null, "", url.hash);
         });
       }
@@ -808,7 +808,8 @@
         <h1 class="sr-only">${esc(pf.name)}</h1>
         <div class="bio">${pf.bio.split(/\n\s*\n/).map((para) => `<p>${linkify(para.trim())}</p>`).join("")}</div>
         <div class="hero-actions">
-          <a class="button primary" href="#projects">查看專案${ICON.down}</a>
+          <a class="button primary" href="#experience">經歷${ICON.down}</a>
+          <a class="button primary" href="#projects">專案${ICON.down}</a>
           ${pf.links.filter((l) => l.label === "CV").map((l) => external(l.url, l.label)).join("")}
           ${socialIcons(pf.links)}
         </div>
