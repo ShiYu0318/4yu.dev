@@ -383,7 +383,8 @@ main { display: block; }
 @media (max-width: 760px) {
   :root { --gutter: 20px; }
   .site-header .wordmark { font-size: 22px; }
-  .nav > a[href="#contact"], .nav > a[href^="https://4yu"] { display: none; }
+  /* 手機導覽列放不下：外部社群連結只留在頁尾 */
+  .nav > .nav-ext { display: none; }
   .search-trigger kbd { display: none; }
   .hero { grid-template-columns: 1fr; gap: 40px; padding: 48px var(--gutter) 80px; }
   .hero h1 { font-size: 35px; }
@@ -562,5 +563,4 @@ html.is-loading, html.is-loading body { overflow: hidden; }
   .exp-year-head { font-size: 35px; }
   .exp-month { padding-left: 20px; }
   .exp-month-head { margin-left: -20px; padding-left: 20px; }
-  .nav > a[href="#contact"] { display: none; }
 }
