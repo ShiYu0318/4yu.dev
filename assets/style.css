@@ -88,7 +88,9 @@ kbd {
   border-bottom: 1px solid var(--line);
 }
 .wordmark { font-family: var(--font-mono); font-size: 26px; line-height: 1; font-weight: 500; text-decoration: none; color: var(--text); letter-spacing: 0; }
-.wordmark-path { color: var(--accent); }
+.wordmark { display: inline-flex; align-items: center; gap: 10px; }
+.wordmark-logo { height: 30px; width: auto; display: block; }
+.wordmark-tld { color: var(--accent); }
 .wordmark:hover { color: var(--text); }
 .nav { position: relative; display: flex; align-items: center; gap: 4px; font-size: 18px; }
 .nav > a, .nav > button {
@@ -294,17 +296,22 @@ main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平
 
 /* ---------- 7. 搜尋面板（⌘K） ---------- */
 .palette {
-  width: min(560px, calc(100vw - 32px)); max-height: min(520px, 80vh); margin: 14vh auto 0; padding: 0;
+  width: min(720px, calc(100vw - 32px)); max-height: min(600px, 80vh); margin: 14vh auto 0; padding: 0;
   color: var(--text); background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--r-card);
   box-shadow: var(--float-shadow); overflow: hidden;
 }
 .palette[open] { display: flex; flex-direction: column; animation: palette-in 220ms var(--ease); }
 .palette::backdrop { background: var(--scrim); }
 @keyframes palette-in { from { opacity: 0; transform: translateY(-8px) scale(.98); } }
+/* 搜尋框：左邊放大鏡、右邊標出快捷鍵 ⌘K */
+.palette-field { display: flex; align-items: center; gap: 14px; padding: 0 20px; border-bottom: 1px solid var(--line); }
+.palette-field > .icon { width: 22px; height: 22px; color: var(--muted); }
 .palette input {
-  font: inherit; font-size: 20px; height: 56px; padding: 0 20px; color: var(--text);
-  background: transparent; border: 0; border-bottom: 1px solid var(--line); outline: none;
+  flex: 1; min-width: 0; font: inherit; font-size: 22px; height: 72px; padding: 0; color: var(--text);
+  background: transparent; border: 0; outline: none;
 }
+.palette input::-webkit-search-cancel-button { display: none; }
+.palette-kbd { flex: none; font-family: var(--font-mono); font-size: 15px; color: var(--text-2); padding: 4px 8px; border: 1px solid var(--line-strong); border-radius: var(--r-tag); }
 .palette input::placeholder { color: var(--muted); }
 .palette-list { list-style: none; margin: 0; padding: 8px; overflow-y: auto; flex: 1; }
 .palette-list a { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; padding: 10px 12px; border-radius: var(--r-control); text-decoration: none; color: var(--text); }
@@ -405,7 +412,8 @@ main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平
 }
 @media (max-width: 760px) {
   :root { --gutter: 20px; }
-  .site-header .wordmark { font-size: 22px; }
+  .site-header .wordmark { font-size: 22px; gap: 8px; }
+  .site-header .wordmark-logo { height: 26px; }
   .hero { grid-template-columns: 1fr; gap: 40px; padding: 40px var(--gutter) 104px; }
   .hero h1 { font-size: 35px; }
   .hero .bio { font-size: 16px; line-height: 1.7; }
@@ -463,7 +471,7 @@ html.lenis, html.lenis body { height: auto; }
 .cursor.is-label .cursor-label { opacity: 1; }
 .cursor.is-label .cursor-dot, .cursor.is-hidden .cursor-dot, .cursor.is-hidden .cursor-ring { opacity: 0; }
 
-/* 第一次進站的加載畫面：點陣聚合成 ~/4yü 再炸開（app.js 的 FX.loader） */
+/* 第一次進站的加載畫面：點陣聚合成 4yü.dev 再炸開（app.js 的 FX.loader） */
 html.is-loading::before { content: ""; position: fixed; inset: 0; z-index: 199; background: var(--bg); }
 html.is-loading, html.is-loading body { overflow: hidden; }
 .loader-screen { position: fixed; inset: 0; z-index: 200; background: var(--bg); pointer-events: none; }
@@ -474,7 +482,8 @@ html.is-loading, html.is-loading body { overflow: hidden; }
   position: fixed; inset: 0; z-index: 100; display: grid; place-items: center;
   background: var(--raised); transform: scaleY(0); transform-origin: 50% 100%; pointer-events: none;
 }
-.curtain .wordmark { font-size: 36px; opacity: 0; }
+.curtain .wordmark { font-size: 36px; opacity: 0; gap: 14px; }
+.curtain .wordmark-logo { height: 44px; }
 .is-leaving .curtain, .is-entering .curtain { pointer-events: all; }
 
 /* Hero 背景：會流動的等高線地形 */
