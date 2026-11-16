@@ -48,8 +48,7 @@ def check_manifest():
 
     cats = {c["id"] for c in data["categories"]}
     seen = set()
-    featured = 0
-    required = ["id", "title", "tagline", "category", "tags", "repo", "demo", "cover", "year", "featured", "team", "status", "updated"]
+    required = ["id", "title", "tagline", "category", "tags", "repo", "demo", "cover", "year", "team", "status", "updated"]
     for p in data["projects"]:
         pid = p.get("id", "<無 id>")
         where = f"projects.json[{pid}]"
@@ -87,14 +86,8 @@ def check_manifest():
                 err(where, f"cover 檔案不存在：{cover}")
             if not cover.startswith(f"content/img/{pid}/"):
                 err(where, f"cover 必須放在 content/img/{pid}/")
-        if p.get("featured") and p.get("status") == "published":
-            featured += 1
-            if not cover:
-                err(where, "featured 專案必須有 cover")
         if not (PROJECT_DIR / f"{pid}.md").is_file():
             err(where, f"找不到 content/projects/{pid}.md")
-    if featured > 3:
-        err("projects.json", f"featured 共 {featured} 個，最多 3 個")
 
     for md in PROJECT_DIR.glob("*.md"):
         if md.stem not in seen:
