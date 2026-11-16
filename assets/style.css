@@ -94,7 +94,7 @@ kbd {
 .wordmark:hover { color: var(--text); }
 .nav { position: relative; display: flex; align-items: center; gap: 4px; font-size: 18px; }
 .nav > a, .nav > button {
-  position: relative; z-index: 1; height: 32px; padding: 0 12px;
+  position: relative; z-index: 1; height: 32px; padding: 0 12px; white-space: nowrap;
   display: inline-flex; align-items: center; gap: 8px;
   color: var(--text-2); text-decoration: none; border-radius: var(--r-control);
   font: inherit; background: transparent; border: 0; cursor: pointer;
@@ -412,13 +412,18 @@ main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平
 }
 @media (max-width: 760px) {
   :root { --gutter: 20px; }
-  .site-header .wordmark { font-size: 22px; gap: 8px; }
-  .site-header .wordmark-logo { height: 26px; }
+  .site-header .wordmark { font-size: 18px; gap: 6px; }
+  .site-header .wordmark-logo { height: 22px; }
+  .nav { font-size: 16px; gap: 0; }
+  .nav > a, .nav > button { padding: 0 8px; }
+  .search-trigger { margin-left: 4px; width: 34px; }
   .hero { grid-template-columns: 1fr; gap: 40px; padding: 40px var(--gutter) 104px; }
   .hero h1 { font-size: 35px; }
   .hero .bio { font-size: 16px; line-height: 1.7; }
   .hero .bio-line + .bio-line { margin-top: 8px; }
   .hero .bio a { white-space: normal; }
+  /* 手機版文字在頭貼下方：上面全亮、文字那一段變淡 */
+  .hero-grid { --quiet-text: linear-gradient(180deg, #000 0%, #000 22%, rgba(0, 0, 0, .18) 34%, rgba(0, 0, 0, .18) 100%); }
   .portrait { justify-self: start; order: -1; }
   .portrait img { width: 120px; height: 120px; box-shadow: none; }
   .portrait figcaption { display: none; }
@@ -491,7 +496,11 @@ html.is-loading, html.is-loading body { overflow: hidden; }
 .hero > :not(.hero-grid) { position: relative; z-index: 1; }
 .hero-grid {
   position: absolute; z-index: 0; top: 0; bottom: 0; left: 50%; width: 100vw; height: 100%; transform: translateX(-50%); pointer-events: none;
-  -webkit-mask-image: radial-gradient(ellipse 130% 120% at 55% 45%, #000 55%, transparent 100%); mask-image: radial-gradient(ellipse 130% 120% at 55% 45%, #000 55%, transparent 100%);
+  /* 兩層遮罩取交集：①四周邊緣淡出 ②左邊自我介紹後面只留約 20% 亮度，往右（頭貼）漸漸恢復，文字不被動態干擾 */
+  --fade-edges: radial-gradient(ellipse 130% 120% at 55% 45%, #000 55%, transparent 100%);
+  --quiet-text: linear-gradient(90deg, rgba(0, 0, 0, .2) 0%, rgba(0, 0, 0, .2) 50%, #000 66%);
+  -webkit-mask-image: var(--fade-edges), var(--quiet-text); -webkit-mask-composite: source-in;
+  mask-image: var(--fade-edges), var(--quiet-text); mask-composite: intersect;
 }
 /* 首屏底部中間的往下箭頭：緩慢上下浮動，捲動後淡出 */
 .hero > .scroll-down {
