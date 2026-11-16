@@ -64,7 +64,6 @@
       "demo": null,
       "cover": "content/img/maijong/table.webp",
       "year": 2026,
-      "featured": true,
       "status": "published",
       "updated": "2026-11-16",
       "team": false
@@ -85,7 +84,6 @@
       "demo": "https://embaid-agent.vercel.app",
       "cover": "content/img/embaid-agent/hero.webp",
       "year": 2026,
-      "featured": true,
       "status": "published",
       "updated": "2026-11-16",
       "team": false
@@ -105,7 +103,6 @@
       "demo": null,
       "cover": "content/img/tqr/social-preview.webp",
       "year": 2026,
-      "featured": true,
       "status": "published",
       "updated": "2026-11-16",
       "team": false
@@ -126,7 +123,6 @@
       "demo": null,
       "cover": null,
       "year": 2026,
-      "featured": false,
       "status": "published",
       "updated": "2026-11-16",
       "team": false
@@ -146,7 +142,6 @@
       "demo": "https://codefest.yoyo899843.com/station-map",
       "cover": "content/img/codefest-taipei-maze/desktop-route.webp",
       "year": 2026,
-      "featured": false,
       "team": true,
       "status": "published",
       "updated": "2026-11-17"
@@ -164,9 +159,8 @@
       ],
       "repo": "https://github.com/ShiYu0318/AI-CUP-2026-ESG-Paper",
       "demo": null,
-      "cover": null,
+      "cover": "content/img/ai-cup-2026-esg-paper/hierarchy.webp",
       "year": 2026,
-      "featured": false,
       "team": true,
       "status": "published",
       "updated": "2026-11-17"
@@ -186,7 +180,6 @@
       "demo": null,
       "cover": "content/img/isaac-sim2sim-rl/g1-mujoco.webp",
       "year": 2026,
-      "featured": false,
       "status": "published",
       "updated": "2026-11-16",
       "team": false
@@ -206,7 +199,6 @@
       "demo": null,
       "cover": "content/img/ai-games-lab/lobby.webp",
       "year": 2026,
-      "featured": false,
       "status": "published",
       "updated": "2026-11-16",
       "team": false
@@ -226,7 +218,6 @@
       "demo": null,
       "cover": null,
       "year": 2026,
-      "featured": false,
       "status": "published",
       "updated": "2026-11-16",
       "team": false
@@ -245,7 +236,6 @@
       "demo": null,
       "cover": null,
       "year": 2026,
-      "featured": false,
       "team": false,
       "status": "published",
       "updated": "2026-11-17"
@@ -265,7 +255,6 @@
       "demo": "https://slides.com/shiyu/ai/",
       "cover": "content/img/ai-courses/camp-2026.webp",
       "year": 2026,
-      "featured": false,
       "status": "published",
       "updated": "2026-11-16",
       "team": false
@@ -284,7 +273,6 @@
       "demo": null,
       "cover": null,
       "year": 2026,
-      "featured": false,
       "status": "published",
       "updated": "2026-11-16",
       "team": false
