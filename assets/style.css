@@ -101,7 +101,8 @@ kbd {
 .nav > a:hover, .nav > button:hover { color: var(--text); }
 /* 流體 hover：一塊底色跟著游標滑到目前的連結 */
 .nav-hover { position: absolute; left: 0; top: 50%; height: 32px; width: 0; margin-top: -16px; border-radius: var(--r-control); background: var(--raised); opacity: 0; pointer-events: none; }
-.search-trigger { border: 1px solid var(--line-strong) !important; margin-left: 8px; }
+.search-trigger { border: 1px solid var(--line-strong) !important; margin-left: 8px; width: 38px; padding: 0 !important; justify-content: center; }
+.search-trigger .icon { width: 17px; height: 17px; }
 
 .site-footer { max-width: var(--page); margin: 160px auto 0; padding: 0 var(--gutter) 40px; }
 .contact {
@@ -117,7 +118,8 @@ kbd {
   transition: color 150ms var(--ease);
 }
 .contact-mail:hover { color: var(--accent); }
-.contact-links { grid-area: links; align-self: start; display: flex; gap: 24px; font-size: 18px; }
+.contact-links { grid-area: links; align-self: start; display: flex; flex-wrap: wrap; align-items: center; gap: 24px; font-size: 18px; }
+.contact-links .icon-btn:hover { color: var(--accent); }
 .contact-links a { color: var(--text-2); text-decoration: none; }
 .contact-links a:hover { color: var(--text); }
 
@@ -140,6 +142,16 @@ kbd {
 .button.primary { background: var(--brand); color: var(--on-brand); border-color: transparent; box-shadow: var(--button-highlight); }
 .button.primary:hover { background: var(--brand-hover); color: var(--on-brand); }
 .button svg, .icon { width: 16px; height: 16px; stroke: currentColor; stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* 只有圖示的按鈕：社群連結（GitHub、LinkedIn、Instagram） */
+.socials { display: inline-flex; gap: 8px; }
+.icon-btn {
+  width: 40px; height: 40px; display: inline-grid; place-items: center; flex: none;
+  border: 1px solid var(--line-strong); border-radius: var(--r-control); color: var(--text-2);
+  transition: color 150ms var(--ease), border-color 150ms var(--ease), background-color 150ms var(--ease);
+}
+.icon-btn .icon { width: 18px; height: 18px; }
+.icon-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--surface); }
 
 /* ---------- 5. 首頁：自我介紹 ---------- */
 main { display: block; }
@@ -383,9 +395,6 @@ main { display: block; }
 @media (max-width: 760px) {
   :root { --gutter: 20px; }
   .site-header .wordmark { font-size: 22px; }
-  /* 手機導覽列放不下：外部社群連結只留在頁尾 */
-  .nav > .nav-ext { display: none; }
-  .search-trigger kbd { display: none; }
   .hero { grid-template-columns: 1fr; gap: 40px; padding: 48px var(--gutter) 80px; }
   .hero h1 { font-size: 35px; }
   .hero .bio { font-size: 17px; }
