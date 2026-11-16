@@ -116,9 +116,14 @@
       const root = $(".cursor"), dot = $(".cursor-dot"), ring = $(".cursor-ring"), label = $(".cursor-label");
       if (!root) return;
       document.documentElement.classList.add("has-cursor");
+      root.classList.add("is-hidden");   // 第一次移動滑鼠前先藏起來，避免停在左上角
       const dx = gsap.quickTo(dot, "x", { duration: 0.1 }), dy = gsap.quickTo(dot, "y", { duration: 0.1 });
       const rx = gsap.quickTo(ring, "x", { duration: 0.45, ease: "power3" }), ry = gsap.quickTo(ring, "y", { duration: 0.45, ease: "power3" });
-      addEventListener("pointermove", (e) => { dx(e.clientX); dy(e.clientY); rx(e.clientX); ry(e.clientY); }, { passive: true });
+      let first = true;
+      addEventListener("pointermove", (e) => {
+        if (first) { first = false; gsap.set([dot, ring], { x: e.clientX, y: e.clientY }); root.classList.remove("is-hidden"); }
+        dx(e.clientX); dy(e.clientY); rx(e.clientX); ry(e.clientY);
+      }, { passive: true });
       document.addEventListener("pointerover", (e) => {
         const t = e.target;
         const tagged = t.closest("[data-cursor]");
@@ -155,7 +160,7 @@
     },
 
     // Hero：背景格點、照片 3D 傾斜、標題字被滑過時跳動、小字解碼
-    hero(hero, split) {
+    hero(hero) {
       this.scramble($(".hero-eyebrow", hero), undefined, 1.4);
       const canvas = document.createElement("canvas");
       canvas.className = "hero-grid"; canvas.setAttribute("aria-hidden", "true");
@@ -173,11 +178,7 @@
         ty(-((e.clientY - hr.top) / hr.height - 0.5) * 18);
       });
       hero.addEventListener("pointerleave", () => { topo.leave(); tx(0); ty(0); });
-      const hot = cssVar("--accent");
-      split?.chars.forEach((c) => c.addEventListener("pointerenter", () => {
-        if (gsap.isTweening(c)) return;
-        gsap.timeline().to(c, { y: -12, color: hot, duration: 0.18, ease: "power2.out" }).to(c, { y: 0, clearProps: "color", duration: 0.6, ease: "elastic.out(1, 0.35)" });
-      }));
+
     },
 
 
@@ -479,7 +480,8 @@
   function splitReveal(el, delay = 0) {
     if (!motion || !window.SplitText || !el) return null;
     const split = SplitText.create(el, { type: "lines,chars", linesClass: "line", charsClass: "char", mask: "lines" });
-    gsap.from(split.chars, { yPercent: 110, duration: 0.9, ease: EASE, stagger: 0.018, delay });
+    // 動畫結束後還原成原本的文字，複製時才不會變成一字一行
+    gsap.from(split.chars, { yPercent: 110, duration: 0.9, ease: EASE, stagger: 0.018, delay, onComplete: () => split.revert() });
     return split;
   }
 
@@ -520,7 +522,7 @@
     $("#hero").innerHTML = `
       <div class="hero-text">
         <p class="hero-eyebrow meta">${esc(pf.nameEn)} · ${esc(pf.tagline)}</p>
-        <h1>${esc(pf.headline).replace(/\n/g, "<br>")}</h1>
+        <h1 class="sr-only">${esc(pf.name)}</h1>
         <p class="bio">${esc(pf.bio)}</p>
         <div class="hero-actions">
           <a class="button primary" href="#projects">查看專案${ICON.down}</a>
@@ -532,10 +534,9 @@
         <img src="${esc(pf.portrait)}" alt="${esc(pf.name)} 的照片" width="800" height="800">
         <figcaption class="meta">${esc(pf.name)} · @${esc(pf.handle)}</figcaption>
       </figure>`;
-    const heroSplit = splitReveal($(".hero h1"), 0.1);
-    FX.hero($("#hero"), heroSplit);
+    FX.hero($("#hero"));
     if (motion) {
-      gsap.from([".hero-eyebrow", ".hero .bio", ".hero-actions"], { opacity: 0, y: 12, duration: 0.8, ease: EASE, stagger: 0.08, delay: 0.35 });
+      gsap.from([".hero-eyebrow", ".hero .bio", ".hero-actions"], { opacity: 0, y: 16, duration: 0.9, ease: EASE, stagger: 0.1, delay: 0.15 });
       gsap.from(".portrait", { opacity: 0, scale: 0.94, duration: 1, ease: EASE, delay: 0.2 });
     }
 
