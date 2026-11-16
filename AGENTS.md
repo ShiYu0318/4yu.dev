@@ -250,6 +250,7 @@ shiyu-portfolio/
 - 左上角回首頁的標誌是等寬字的 `~/4yü`（`~/` 用 `--accent`），不用本名、不放圖片；換頁布幕中間也用同一個標誌。
 
 - 英文 `Times New Roman`（沒有安裝的裝置用字形與寬度相同的 `Tinos`），中文 `LXGW WenKai TC`（霞鶩文楷）；編號、日期、技術清單用等寬的 `Courier Prime`。數字的 0 要是乾淨的橢圓，**不要換成有斜線或中間有點的等寬字**（例如 IBM Plex Mono、JetBrains Mono），那種 0 太像程式碼編輯器、有 AI 感。字體都從 Google Fonts 載入。
+- Times New Roman 的小寫字母偏矮，字級要比無襯線字大一號：最小的標籤不低於 14px，內文 17–18px，自我介紹 21–26px。
 - 頁尾最底下只寫 `© 2026 4yu.dev All Rights Reserved`。
 - 字重只用 400、500，600 以上不用。**不要 700 以上的粗標題**，層級靠大小與顏色。
 - 不用全大寫加寬字距的標籤，不用斜體強調。數字一律 `tabular-nums`。
