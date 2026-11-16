@@ -5,7 +5,7 @@
     "handle": "ShiYu0318",
     "avatar": "content/img/profile/avatar.webp",
     "tagline": "國立中央大學資訊工程學系",
-    "bio": "我是黃士育，主要做強化學習、RAG 與 AI Agent。這裡收錄我在 GitHub 上公開的專案：從台灣十六張麻將的 AI 平台、學術研究助理，到換個角度就是另一個 QR code 的 3D 列印物件。我也在 SCIST 與 GDG on Campus 教 AI，累積 43.5 小時、495+ 位學員。",
+    "bio": "我是黃士育，主要做強化學習、RAG 與 AI Agent。這裡收錄我在 GitHub 上的專案：從台灣十六張麻將的 AI 平台、學術研究助理、台北車站的室內導航，到換個角度就是另一個 QR code 的 3D 列印物件。我也在 SCIST 與 GDG on Campus 教 AI，累積 43.5 小時、495+ 位學員。",
     "links": [
       {
         "label": "GitHub",
@@ -21,7 +21,8 @@
       }
     ],
     "portrait": "content/img/profile/portrait.webp",
-    "headline": "把研究問題做成真的能用的系統"
+    "headline": "把研究問題做成真的能用的系統",
+    "email": "hi@4yu.dev"
   },
   "categories": [
     {
@@ -34,7 +35,11 @@
     },
     {
       "id": "research",
-      "title": "研究・實驗"
+      "title": "研究・論文"
+    },
+    {
+      "id": "city-campus",
+      "title": "城市・校園"
     },
     {
       "id": "teaching",
@@ -60,7 +65,8 @@
       "year": 2026,
       "featured": true,
       "status": "published",
-      "updated": "2026-11-16"
+      "updated": "2026-11-16",
+      "team": false
     },
     {
       "id": "embaid-agent",
@@ -80,7 +86,8 @@
       "year": 2026,
       "featured": true,
       "status": "published",
-      "updated": "2026-11-16"
+      "updated": "2026-11-16",
+      "team": false
     },
     {
       "id": "tqr",
@@ -99,7 +106,8 @@
       "year": 2026,
       "featured": true,
       "status": "published",
-      "updated": "2026-11-16"
+      "updated": "2026-11-16",
+      "team": false
     },
     {
       "id": "scholaragent",
@@ -119,7 +127,48 @@
       "year": 2026,
       "featured": false,
       "status": "published",
-      "updated": "2026-11-16"
+      "updated": "2026-11-16",
+      "team": false
+    },
+    {
+      "id": "codefest-taipei-maze",
+      "title": "北車不迷路",
+      "tagline": "在台北通裡穿過台北車站的室內導航",
+      "category": "city-campus",
+      "tags": [
+        "vue",
+        "dijkstra",
+        "townpass",
+        "i18n"
+      ],
+      "repo": "https://github.com/ShiYu0318/CodeFest-2026-Taipei-Maze",
+      "demo": "https://codefest.yoyo899843.com/station-map",
+      "cover": "content/img/codefest-taipei-maze/desktop-route.webp",
+      "year": 2026,
+      "featured": false,
+      "team": true,
+      "status": "published",
+      "updated": "2026-11-17"
+    },
+    {
+      "id": "ai-cup-2026-esg-paper",
+      "title": "ESG 承諾驗證論文",
+      "tagline": "不重新訓練，就保證 ESG 多欄位預測合法",
+      "category": "research",
+      "tags": [
+        "pytorch",
+        "nlp",
+        "statistics",
+        "reproducibility"
+      ],
+      "repo": "https://github.com/ShiYu0318/AI-CUP-2026-ESG-Paper",
+      "demo": null,
+      "cover": null,
+      "year": 2026,
+      "featured": false,
+      "team": true,
+      "status": "published",
+      "updated": "2026-11-17"
     },
     {
       "id": "isaac-sim2sim-rl",
@@ -138,7 +187,8 @@
       "year": 2026,
       "featured": false,
       "status": "published",
-      "updated": "2026-11-16"
+      "updated": "2026-11-16",
+      "team": false
     },
     {
       "id": "ai-games-lab",
@@ -157,7 +207,8 @@
       "year": 2026,
       "featured": false,
       "status": "published",
-      "updated": "2026-11-16"
+      "updated": "2026-11-16",
+      "team": false
     },
     {
       "id": "jevrag",
@@ -176,7 +227,27 @@
       "year": 2026,
       "featured": false,
       "status": "published",
-      "updated": "2026-11-16"
+      "updated": "2026-11-16",
+      "team": false
+    },
+    {
+      "id": "ncu-what2eat",
+      "title": "NCU What 2 Eat",
+      "tagline": "中央大學附近的美食隨機轉盤",
+      "category": "city-campus",
+      "tags": [
+        "nextjs",
+        "supabase",
+        "playwright"
+      ],
+      "repo": "https://github.com/ShiYu0318/NCU-What2Eat",
+      "demo": null,
+      "cover": null,
+      "year": 2026,
+      "featured": false,
+      "team": false,
+      "status": "published",
+      "updated": "2026-11-17"
     },
     {
       "id": "ai-courses",
@@ -195,7 +266,8 @@
       "year": 2026,
       "featured": false,
       "status": "published",
-      "updated": "2026-11-16"
+      "updated": "2026-11-16",
+      "team": false
     },
     {
       "id": "cp-code",
@@ -213,7 +285,8 @@
       "year": 2026,
       "featured": false,
       "status": "published",
-      "updated": "2026-11-16"
+      "updated": "2026-11-16",
+      "team": false
     }
   ]
 }
