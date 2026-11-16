@@ -123,11 +123,18 @@
         <nav class="contact-links" aria-label="其他連結">
           ${pf.links.map((l) => `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("")}
         </nav>
+        ${pf.githubAvatar ? `
+        <figure class="dotfield">
+          <div class="dotfield-frame"><img src="${esc(pf.githubAvatar)}" alt="" hidden><canvas role="img" aria-label="用點陣畫成的 GitHub 頭像：戴耳機的黑貓"></canvas></div>
+          <figcaption class="meta">GitHub 頭像 · 游標靠近試試</figcaption>
+        </figure>` : ""}
       </div>
       <div class="footer-base">
         <span>黃士育 · 2026</span>
         <span>內容與版面依 <a href="https://github.com/ShiYu0318/NCCU-GenAI-HW/blob/main/AGENTS.md">AGENTS.md</a> 維護</span>
       </div>`;
+    const field = $(".dotfield-frame", foot);
+    if (field) initDotField(field);
     const btn = $("[data-copy]", foot), status = $(".copy-status", foot);
     btn.addEventListener("click", async () => {
       try { await navigator.clipboard.writeText(btn.dataset.copy); status.textContent = "已複製到剪貼簿"; }
@@ -202,22 +209,15 @@
           ${others.filter((l) => l.label === "CV").map((l) => external(l.url, l.label)).join("")}
         </div>
       </div>
-      <figure class="portrait" data-mode="dots">
-        <div class="portrait-frame">
-          <img src="${esc(pf.portrait)}" alt="${esc(pf.name)} 的照片" width="800" height="1000">
-          <canvas aria-hidden="true"></canvas>
-        </div>
-        <figcaption>
-          <span class="meta">${esc(pf.name)} · @${esc(pf.handle)}</span>
-          <span class="toggle" role="group" aria-label="肖像顯示方式">
-            <button type="button" data-mode="dots" aria-pressed="true">點陣</button>
-            <button type="button" data-mode="photo" aria-pressed="false">照片</button>
-          </span>
-        </figcaption>
+      <figure class="portrait">
+        <img src="${esc(pf.portrait)}" alt="${esc(pf.name)} 的照片" width="800" height="800">
+        <figcaption class="meta">${esc(pf.name)} · @${esc(pf.handle)}</figcaption>
       </figure>`;
-    initPortrait($(".portrait"));
     splitReveal($(".hero h1"), 0.1);
-    if (motion) gsap.from([".hero-eyebrow", ".hero .bio", ".hero-actions", ".portrait figcaption"], { opacity: 0, y: 12, duration: 0.8, ease: EASE, stagger: 0.08, delay: 0.35 });
+    if (motion) {
+      gsap.from([".hero-eyebrow", ".hero .bio", ".hero-actions"], { opacity: 0, y: 12, duration: 0.8, ease: EASE, stagger: 0.08, delay: 0.35 });
+      gsap.from(".portrait", { opacity: 0, scale: 0.94, duration: 1, ease: EASE, delay: 0.2 });
+    }
 
     renderProjects(data);
   }
@@ -323,51 +323,47 @@
     addEventListener("scroll", hide, { passive: true });
   }
 
-  /* 點陣肖像：把人像照片取樣成點陣，亮處點大、暗處點小；
-     游標靠近時點被推開，離開後用彈簧拉回原位 */
-  function initPortrait(fig) {
-    const frame = $(".portrait-frame", fig), canvas = $("canvas", frame), photo = $("img", frame);
+  /* 點陣頭像：把 GitHub 頭像（電光藍背景上的黑貓）依顏色取樣成點陣。
+     藍色背景 → 電光藍點、白色的眼睛與背景字 → 白點、耳機 → 淡藍點、黑貓本身留空；
+     游標靠近時點被推開，離開後用彈簧拉回原位，捲到時點從四散聚合 */
+  function initDotField(frame) {
+    const canvas = $("canvas", frame), src = $("img", frame);
     const ctx = canvas.getContext("2d");
-    const colors = [cssVar("--brand"), cssVar("--accent"), cssVar("--muted")];
-    let dots = [], w = 0, h = 0, dpr = 1, raf = 0, pointer = null, active = false;
-
-    $$(".toggle button", fig).forEach((b) => b.addEventListener("click", () => {
-      fig.dataset.mode = b.dataset.mode;
-      $$(".toggle button", fig).forEach((x) => x.setAttribute("aria-pressed", x === b));
-    }));
+    const colors = [cssVar("--brand"), cssVar("--accent"), cssVar("--text")];
+    let dots = [], w = 0, h = 0, dpr = 1, raf = 0, pointer = null, active = false, built = false;
 
     const build = (intro) => {
       const rect = frame.getBoundingClientRect();
       w = rect.width; h = rect.height; dpr = Math.min(devicePixelRatio || 1, 2);
+      if (!w || !h) return;
       canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
-      const step = w < 360 ? 6 : 7;
+      const step = w < 300 ? 5 : 6;
       const cols = Math.floor(w / step), rows = Math.floor(h / step);
-      // object-fit: cover、object-position: 50% 30%
       const sample = document.createElement("canvas");
       sample.width = cols; sample.height = rows;
       const sctx = sample.getContext("2d", { willReadFrequently: true });
-      const iw = photo.naturalWidth, ih = photo.naturalHeight, scale = Math.max(cols / iw, rows / ih);
-      const dw = iw * scale, dh = ih * scale;
-      sctx.drawImage(photo, (cols - dw) * 0.5, (rows - dh) * 0.3, dw, dh);
+      sctx.drawImage(src, 0, 0, cols, rows);
       const px = sctx.getImageData(0, 0, cols, rows).data;
-      // 先算亮度並拉開對比（取 4% 與 96% 分位數）
-      const lums = new Float32Array(cols * rows);
-      for (let k = 0; k < lums.length; k++) lums[k] = (0.2126 * px[k * 4] + 0.7152 * px[k * 4 + 1] + 0.0722 * px[k * 4 + 2]) / 255;
-      const sorted = Float32Array.from(lums).sort();
-      const lo = sorted[Math.floor(sorted.length * 0.04)], hi = sorted[Math.floor(sorted.length * 0.96)];
+      const ox = (w - cols * step) / 2, oy = (h - rows * step) / 2;
       dots = [];
       for (let j = 0; j < rows; j++) {
         for (let i = 0; i < cols; i++) {
-          const lum = Math.min(Math.max((lums[j * cols + i] - lo) / (hi - lo || 1), 0), 1);
-          const ink = 1 - lum;                       // 暗處（頭髮、帽 T）點大，亮處點小
-          const r = (0.14 + 0.86 * Math.pow(ink, 1.6)) * step * 0.5;
-          const hx = i * step + step / 2, hy = j * step + step / 2;
-          const start = intro
-            ? { x: w / 2 + (Math.random() - 0.5) * w * 1.4, y: h / 2 + (Math.random() - 0.5) * h * 1.4 }
-            : { x: hx, y: hy };
-          dots.push({ hx, hy, x: start.x, y: start.y, vx: 0, vy: 0, r, c: ink > 0.66 ? 0 : ink > 0.4 ? 1 : 2 });
+          const k = (j * cols + i) * 4, R = px[k] / 255, G = px[k + 1] / 255, B = px[k + 2] / 255;
+          const lum = 0.2126 * R + 0.7152 * G + 0.0722 * B;
+          const blue = B - Math.max(R, G);
+          let c, size;
+          if (lum > 0.55) { c = 2; size = 0.42 + lum * 0.36; }          // 眼睛、背景字的白
+          else if (blue > 0.45) { c = 0; size = 0.3 + blue * 0.32; }     // 電光藍背景
+          else if (lum > 0.14 || blue > 0.2) { c = 1; size = 0.22 + lum * 0.6; } // 耳機、輪廓
+          else continue;                                                // 黑貓本身留空
+          const r = size * step * 0.62;
+          const hx = ox + i * step + step / 2, hy = oy + j * step + step / 2;
+          const a = Math.random() * Math.PI * 2, d = (0.5 + Math.random()) * w * 0.6;
+          const start = intro ? { x: w / 2 + Math.cos(a) * d, y: h / 2 + Math.sin(a) * d } : { x: hx, y: hy };
+          dots.push({ hx, hy, x: start.x, y: start.y, vx: 0, vy: 0, r, c });
         }
       }
+      built = true;
       wake();
     };
 
@@ -388,17 +384,17 @@
 
     const tick = () => {
       let energy = 0;
-      const R = 90, R2 = R * R;
+      const R = 70, R2 = R * R;
       for (const d of dots) {
         if (pointer) {
           const dx = d.x - pointer.x, dy = d.y - pointer.y, d2 = dx * dx + dy * dy;
           if (d2 < R2 && d2 > 0.01) {
-            const dist = Math.sqrt(d2), f = (1 - dist / R) * 3.2;
+            const dist = Math.sqrt(d2), f = (1 - dist / R) * 2.8;
             d.vx += (dx / dist) * f; d.vy += (dy / dist) * f;
           }
         }
-        d.vx = (d.vx + (d.hx - d.x) * 0.06) * 0.8;
-        d.vy = (d.vy + (d.hy - d.y) * 0.06) * 0.8;
+        d.vx = (d.vx + (d.hx - d.x) * 0.055) * 0.8;
+        d.vy = (d.vy + (d.hy - d.y) * 0.055) * 0.8;
         d.x += d.vx; d.y += d.vy;
         energy += Math.abs(d.vx) + Math.abs(d.vy) + Math.abs(d.hx - d.x) * 0.1;
       }
@@ -406,7 +402,10 @@
       if (energy > dots.length * 0.01 || pointer) raf = requestAnimationFrame(tick);
       else { raf = 0; active = false; }
     };
-    const wake = () => { if (reduced) { dots.forEach((d) => { d.x = d.hx; d.y = d.hy; }); draw(); return; } if (!active) { active = true; raf = requestAnimationFrame(tick); } };
+    const wake = () => {
+      if (reduced) { dots.forEach((d) => { d.x = d.hx; d.y = d.hy; }); draw(); return; }
+      if (!active) { active = true; raf = requestAnimationFrame(tick); }
+    };
 
     canvas.addEventListener("pointermove", (e) => {
       const r = canvas.getBoundingClientRect();
@@ -416,10 +415,13 @@
     canvas.addEventListener("pointerleave", () => { pointer = null; });
 
     const start = () => {
-      build(!reduced);
-      let t; new ResizeObserver(() => { clearTimeout(t); t = setTimeout(() => build(false), 150); }).observe(frame);
+      // 捲到頁尾才開始聚合
+      new IntersectionObserver((entries, obs) => {
+        if (entries.some((e) => e.isIntersecting)) { obs.disconnect(); build(!reduced); }
+      }, { rootMargin: "0px 0px -10% 0px" }).observe(frame);
+      let t; new ResizeObserver(() => { if (!built) return; clearTimeout(t); t = setTimeout(() => build(false), 150); }).observe(frame);
     };
-    if (photo.complete && photo.naturalWidth) start(); else photo.addEventListener("load", start, { once: true });
+    if (src.complete && src.naturalWidth) start(); else src.addEventListener("load", start, { once: true });
   }
 
   /* ================= 專案頁 ================= */
