@@ -39,7 +39,7 @@ shiyu-portfolio/
 │   ├── projects/
 │   │   └── <project-id>.md   ← 每個專案一個介紹檔
 │   └── img/
-│       ├── profile/          ← avatar.webp（favicon）、portrait.webp（首頁圓形照片）、github-avatar.webp（頁尾點陣用的黑貓頭像）
+│       ├── profile/          ← mark.webp（左上角回首頁的貓咪標誌，旁邊寫 `4yu.dev`，不用本名）、avatar.webp（favicon）、portrait.webp（首頁圓形照片）、github-avatar.webp（頁尾點陣用的黑貓頭像）
 │       └── <project-id>/     ← 該專案的截圖
 ├── templates/
 │   └── project-template.md   ← 新專案介紹的起手式
@@ -241,7 +241,7 @@ shiyu-portfolio/
 ### 6.3 字體與文字
 
 - 介面 `IBM Plex Sans` + `Noto Sans TC`，編號、日期、技術清單用 `IBM Plex Mono`。
-- 字重只用 400、500，600 只給文字 logo。**不要 700 以上的粗標題**，層級靠大小與顏色。
+- 字重只用 400、500，600 以上不用。**不要 700 以上的粗標題**，層級靠大小與顏色。
 - 不用全大寫加寬字距的標籤，不用斜體強調。數字一律 `tabular-nums`。
 - 技術標籤不做成膠囊，寫成等寬灰字 `python / fastapi / pytorch`。
 - 介面文字不用驚嘆號、不放 emoji；按鈕、標籤、標題結尾不加句號。
