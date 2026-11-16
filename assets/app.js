@@ -112,7 +112,7 @@
     },
 
     // 換頁布幕：點站內連結時布幕從下蓋上，新頁面載入後從上收起
-    /* 加載畫面：散落的點飛向中央、聚成點陣版的 ~/4yü（「~/」是電光藍），
+    /* 加載畫面：散落的點飛向中央、聚成點陣版的 4yü.dev（「.dev」是電光藍），
        資料載好後向四周炸開、底色淡掉。只在同一次瀏覽的第一頁出現；減少動態時不出現。 */
     loader() {
       const root = document.documentElement;
@@ -129,15 +129,15 @@
       const mono = cssVar("--font-mono"), text = cssVar("--text"), accent = cssVar("--accent");
       const fontReady = Promise.race([document.fonts?.load(`100px ${mono}`) ?? Promise.resolve(), new Promise((r) => setTimeout(r, 700))]);
       fontReady.then(() => {
-        const size = Math.min(W / 4.2, 220), g = W < 760 ? 5 : 7;
+        const size = Math.min(W / 5.4, 200), g = W < 760 ? 5 : 7;
         const off = document.createElement("canvas"), oc = off.getContext("2d");
         off.width = W; off.height = H;
         oc.font = `${size}px ${mono}`; oc.textAlign = "center"; oc.textBaseline = "middle"; oc.fillStyle = "#fff";
-        oc.fillText("~/4yü", W / 2, H / 2);
-        const split = W / 2 - oc.measureText("~/4yü").width / 2 + oc.measureText("~/").width;
+        oc.fillText("4yü.dev", W / 2, H / 2);
+        const split = W / 2 - oc.measureText("4yü.dev").width / 2 + oc.measureText("4yü").width;
         const px = oc.getImageData(0, 0, W, H).data, pts = [];
         for (let y = 0; y < H; y += g) for (let x = 0; x < W; x += g)
-          if (px[(y * W + x) * 4 + 3] > 128) pts.push({ tx: x, ty: y, x: Math.random() * W, y: Math.random() * H, acc: x < split });
+          if (px[(y * W + x) * 4 + 3] > 128) pts.push({ tx: x, ty: y, x: Math.random() * W, y: Math.random() * H, acc: x >= split });
         const s = Math.max(2, g * 0.42);
         const draw = () => {
           c.clearRect(0, 0, W, H);
@@ -664,6 +664,9 @@
   function initPalette(data) {
     const dlg = $("#palette"), input = $("#palette-input"), list = $("#palette-list");
     if (!dlg) return;
+    // 快捷鍵提示：Mac 顯示 ⌘K，其他系統顯示 Ctrl K
+    const mac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+    $$(".palette-kbd").forEach((k) => { k.textContent = mac ? "⌘K" : "Ctrl K"; k.setAttribute("aria-label", mac ? "快捷鍵 Command K" : "快捷鍵 Ctrl K"); });
     let sel = 0, results = [];
     const match = (p, q) => !q || [p.title, p.tagline, data.catTitle[p.category], ...p.tags].join(" ").toLowerCase().includes(q);
     const draw = () => {
@@ -722,7 +725,7 @@
         </figure>` : ""}
       </div>
       <div class="footer-base">
-        <span>© 2026 4yu.dev All Rights Reserved</span>
+        <span>© 2026 4yü.dev All Rights Reserved</span>
         <button class="to-top" type="button" aria-label="回到頂端" title="回到頂端">${ICON.up}</button>
       </div>`;
     $(".to-top", foot).addEventListener("click", () => smoothTo(0));
@@ -1227,7 +1230,7 @@
 
     const p = data.projects.find((x) => x.id === id);
     if (p) {
-      document.title = `4yü/${p.title}`;
+      document.title = `${p.title} | 4yü.dev`;
       $("#project-head").innerHTML = `
         <p class="meta">${parts(p.no && no(p.no), data.catTitle[p.category], p.year, p.team && "團隊專案")}</p>
         <h1>${esc(p.title)}</h1>
