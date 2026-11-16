@@ -507,6 +507,7 @@ html.is-loading, html.is-loading body { overflow: hidden; }
 .exp-preview + .projects { margin-top: 160px; }
 .exp-preview .projects-head { margin-bottom: 24px; }
 .exp-preview .exp-list { max-width: none; }
+.exp-more { display: flex; justify-content: center; margin-top: 40px; }
 
 .exp-page { max-width: 880px; margin: 0 auto; padding: 80px var(--gutter) 0; }
 .exp-head { margin-bottom: 64px; }
