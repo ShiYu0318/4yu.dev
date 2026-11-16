@@ -668,7 +668,7 @@
     foot.innerHTML = `
       <div class="contact">
         <div>
-          <p class="meta">合作、演講或實驗室聯絡</p>
+          <p class="meta">有合作機會或任何問題歡迎聯絡</p>
           <button class="contact-mail" type="button" data-cursor="複製" data-copy="${esc(pf.email)}" aria-label="複製 Email：${esc(pf.email)}">${esc(pf.email)}</button>
           <p class="meta copy-status" aria-live="polite"></p>
         </div>
