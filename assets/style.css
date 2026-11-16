@@ -488,7 +488,8 @@ html.lenis, html.lenis body { height: auto; }
 
 /* ---------- 15. 經歷（content/experience.json，見 AGENTS.md §9） ---------- */
 /* 窄欄；時間線（年 / 月 + 年級）為預設，分類與年級檢視用分區標題；每筆是履歷式排版 */
-.exp-preview { max-width: var(--page); margin: 160px auto 0; padding: 0 var(--gutter); }
+.exp-preview { max-width: var(--page); margin: 0 auto; padding: 0 var(--gutter); }
+.exp-preview + .projects { margin-top: 160px; }
 .exp-preview .projects-head { margin-bottom: 24px; }
 .exp-preview .exp-list { max-width: none; }
 
@@ -536,7 +537,7 @@ html.lenis, html.lenis body { height: auto; }
 .exp-month .exp:first-child { padding-top: 12px; }
 
 @media (max-width: 760px) {
-  .exp-preview { margin-top: 112px; }
+  .exp-preview + .projects { margin-top: 112px; }
   .exp-page { padding-top: 48px; }
   .exp-head { margin-bottom: 40px; }
   .exp-line { flex-wrap: wrap; gap: 4px 12px; }
