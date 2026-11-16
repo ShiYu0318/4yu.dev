@@ -170,6 +170,8 @@ main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 
 .hero .bio p { margin: 0; text-wrap: pretty; }
+/* 自我介紹一句一行；手機版一句折成兩行時，句與句之間多一點間距 */
+.hero .bio-line { display: block; }
 /* 連結名稱不要被拆到兩行 */
 .hero .bio a { white-space: nowrap; }
 .hero .bio p + p { margin-top: 0.9em; }
@@ -406,7 +408,8 @@ main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平
   .site-header .wordmark { font-size: 22px; }
   .hero { grid-template-columns: 1fr; gap: 40px; padding: 40px var(--gutter) 104px; }
   .hero h1 { font-size: 35px; }
-  .hero .bio { font-size: 17px; }
+  .hero .bio { font-size: 16px; line-height: 1.7; }
+  .hero .bio-line + .bio-line { margin-top: 8px; }
   .hero .bio a { white-space: normal; }
   .portrait { justify-self: start; order: -1; }
   .portrait img { width: 120px; height: 120px; box-shadow: none; }
