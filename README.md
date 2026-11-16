@@ -2,7 +2,9 @@
 
 黃士育（ShiYu）的 GitHub 專案作品集。
 
-🔗 **網站**：<https://shiyu0318.github.io/NCCU-GenAI-HW/>
+視覺規則寫在 AGENTS.md §6，方向參考 [unslop](https://github.com/heydamir/unslop)（Damir Sokolovsky，CC BY 4.0）的原則：外框安靜、沒有漸層與光暈，顏色只留給照片與真實截圖。
+
+🔗 **網站**：<https://4yu.dev/NCCU-GenAI-HW/>
 
 這是一個「**用規則驅動 AI 持續擴充**」的靜態網站：每個專案是一篇 Markdown，網站外觀與內容格式全部由 [`AGENTS.md`](./AGENTS.md) 規範。想新增作品時，只要對 AI 說：
 
