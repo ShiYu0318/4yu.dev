@@ -1,0 +1,21 @@
+{
+  "name": "4yü.dev",
+  "short_name": "4yü.dev",
+  "lang": "zh-Hant",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050b17",
+  "theme_color": "#050b17",
+  "icons": [
+    {
+      "src": "content/img/profile/favicon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "content/img/profile/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
