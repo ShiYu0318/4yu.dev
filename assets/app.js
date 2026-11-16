@@ -160,57 +160,123 @@
       const canvas = document.createElement("canvas");
       canvas.className = "hero-grid"; canvas.setAttribute("aria-hidden", "true");
       hero.prepend(canvas);
+      const topo = this.topography(canvas, hero);
+
+      if (!this.interactive) return;
+      const img = $(".portrait img", hero);
+      const tx = gsap.quickTo(img, "rotationY", { duration: 0.6, ease: "power3" });
+      const ty = gsap.quickTo(img, "rotationX", { duration: 0.6, ease: "power3" });
+      hero.addEventListener("pointermove", (e) => {
+        topo.point(e.clientX, e.clientY);
+        const hr = hero.getBoundingClientRect();
+        tx(((e.clientX - hr.left) / hr.width - 0.5) * 18);
+        ty(-((e.clientY - hr.top) / hr.height - 0.5) * 18);
+      });
+      hero.addEventListener("pointerleave", () => { topo.leave(); tx(0); ty(0); });
+      const hot = cssVar("--accent");
+      split?.chars.forEach((c) => c.addEventListener("pointerenter", () => {
+        if (gsap.isTweening(c)) return;
+        gsap.timeline().to(c, { y: -12, color: hot, duration: 0.18, ease: "power2.out" }).to(c, { y: 0, clearProps: "color", duration: 0.6, ease: "elastic.out(1, 0.35)" });
+      }));
+    },
+
+
+    /* 等高線地形：3D Perlin noise 當高度場，用 marching squares 畫等高線；
+       游標位置加一座小山，附近的線變亮；畫面外或減少動態時停止更新 */
+    topography(canvas, host) {
       const ctx = canvas.getContext("2d");
-      const base = cssVar("--muted"), hot = cssVar("--accent");
-      let w = 0, h = 0, dpr = 1, pointer = { x: -999, y: -999 }, strength = { v: 0 };
-      const GAP = 28, R = 180;
-      const draw = () => {
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        ctx.clearRect(0, 0, w, h);
-        const ox = (w % GAP) / 2, oy = (h % GAP) / 2;
-        for (let y = oy; y < h; y += GAP) {
-          for (let x = ox; x < w; x += GAP) {
-            const ddx = pointer.x - x, ddy = pointer.y - y, d = Math.sqrt(ddx * ddx + ddy * ddy);
-            const k = Math.max(0, 1 - d / R) * strength.v;
-            const px = x + ddx * k * 0.12, py = y + ddy * k * 0.12;
-            ctx.globalAlpha = 0.22 + k * 0.78;
-            ctx.fillStyle = k > 0.05 ? hot : base;
-            ctx.beginPath(); ctx.arc(px, py, 1 + k * 2.4, 0, Math.PI * 2); ctx.fill();
+      const lineColor = cssVar("--line-strong"), hot = cssVar("--accent");
+      const P = new Uint8Array(512);
+      { const p = [...Array(256).keys()]; for (let i = 255; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [p[i], p[j]] = [p[j], p[i]]; } for (let i = 0; i < 512; i++) P[i] = p[i & 255]; }
+      const fade = (t) => t * t * t * (t * (t * 6 - 15) + 10), lerp = (a, b, t) => a + t * (b - a);
+      const grad = (h, x, y, z) => { const u = (h & 15) < 8 ? x : y, v = (h & 15) < 4 ? y : (h & 15) === 12 || (h & 15) === 14 ? x : z; return ((h & 1) ? -u : u) + ((h & 2) ? -v : v); };
+      const noise = (x, y, z) => {
+        const X = Math.floor(x) & 255, Y = Math.floor(y) & 255, Z = Math.floor(z) & 255;
+        x -= Math.floor(x); y -= Math.floor(y); z -= Math.floor(z);
+        const u = fade(x), v = fade(y), w = fade(z);
+        const A = P[X] + Y, AA = P[A] + Z, AB = P[A + 1] + Z, B = P[X + 1] + Y, BA = P[B] + Z, BB = P[B + 1] + Z;
+        return lerp(lerp(lerp(grad(P[AA], x, y, z), grad(P[BA], x - 1, y, z), u), lerp(grad(P[AB], x, y - 1, z), grad(P[BB], x - 1, y - 1, z), u), v),
+          lerp(lerp(grad(P[AA + 1], x, y, z - 1), grad(P[BA + 1], x - 1, y, z - 1), u), lerp(grad(P[AB + 1], x, y - 1, z - 1), grad(P[BB + 1], x - 1, y - 1, z - 1), u), v), w);
+      };
+      const CELL = 14, LEVELS = 14, SCALE = 0.0032, HILL = 150;
+      let w = 0, h = 0, dpr = 1, cols = 0, rows = 0, field = new Float32Array(0);
+      let t = Math.random() * 100, pointer = null, hill = { v: 0 }, visible = true, last = 0;
+
+      const sample = () => {
+        for (let j = 0; j <= rows; j++) for (let i = 0; i <= cols; i++) {
+          const x = i * CELL, y = j * CELL;
+          let v = noise(x * SCALE, y * SCALE, t) * 1.1 + noise(x * SCALE * 2.3, y * SCALE * 2.3, t * 1.4) * 0.35;
+          if (pointer && hill.v > 0.001) { const dx = x - pointer.x, dy = y - pointer.y; v += Math.exp(-(dx * dx + dy * dy) / (2 * HILL * HILL)) * 0.9 * hill.v; }
+          field[j * (cols + 1) + i] = v;
+        }
+      };
+      const contours = () => {
+        const path = new Path2D(), W = cols + 1;
+        for (let l = 0; l < LEVELS; l++) {
+          const iso = -0.7 + (1.6 * l) / (LEVELS - 1);
+          for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+            const a = field[j * W + i], b = field[j * W + i + 1], c = field[(j + 1) * W + i + 1], d = field[(j + 1) * W + i];
+            const idx = (a > iso ? 8 : 0) | (b > iso ? 4 : 0) | (c > iso ? 2 : 0) | (d > iso ? 1 : 0);
+            if (idx === 0 || idx === 15) continue;
+            const x = i * CELL, y = j * CELL;
+            const top = [x + CELL * (iso - a) / (b - a), y], right = [x + CELL, y + CELL * (iso - b) / (c - b)];
+            const bottom = [x + CELL * (iso - d) / (c - d), y + CELL], left = [x, y + CELL * (iso - a) / (d - a)];
+            const seg = (p, q) => { path.moveTo(p[0], p[1]); path.lineTo(q[0], q[1]); };
+            switch (idx) {
+              case 1: case 14: seg(left, bottom); break;
+              case 2: case 13: seg(bottom, right); break;
+              case 3: case 12: seg(left, right); break;
+              case 4: case 11: seg(top, right); break;
+              case 5: seg(left, top); seg(bottom, right); break;
+              case 6: case 9: seg(top, bottom); break;
+              case 7: case 8: seg(left, top); break;
+              case 10: seg(top, right); seg(left, bottom); break;
+            }
           }
         }
-        ctx.globalAlpha = 1;
+        return path;
+      };
+      const draw = () => {
+        sample();
+        const path = contours();
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, w, h);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = lineColor;
+        ctx.stroke(path);
+        if (pointer && hill.v > 0.01) {
+          ctx.save();
+          const g = ctx.createRadialGradient(pointer.x, pointer.y, 0, pointer.x, pointer.y, 220);
+          g.addColorStop(0, hot); g.addColorStop(1, "transparent");
+          ctx.globalAlpha = 0.9 * hill.v;
+          ctx.strokeStyle = g;
+          ctx.stroke(path);
+          ctx.restore();
+        }
       };
       const size = () => {
         const r = canvas.getBoundingClientRect();
         w = r.width; h = r.height; dpr = Math.min(devicePixelRatio || 1, 2);
         canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+        cols = Math.ceil(w / CELL); rows = Math.ceil(h / CELL);
+        field = new Float32Array((cols + 1) * (rows + 1));
         draw();
       };
-      new ResizeObserver(size).observe(hero);
-      if (!this.interactive) return;
-
-      let queued = false;
-      const queue = () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; draw(); }); } };
-      const img = $(".portrait img", hero);
-      const tx = gsap.quickTo(img, "rotationY", { duration: 0.6, ease: "power3" });
-      const ty = gsap.quickTo(img, "rotationX", { duration: 0.6, ease: "power3" });
-      hero.addEventListener("pointermove", (e) => {
-        const r = canvas.getBoundingClientRect();
-        pointer = { x: e.clientX - r.left, y: e.clientY - r.top };
-        if (strength.v < 1 && !gsap.isTweening(strength)) gsap.to(strength, { v: 1, duration: 0.4, onUpdate: queue });
-        queue();
-        const hr = hero.getBoundingClientRect();
-        tx(((e.clientX - hr.left) / hr.width - 0.5) * 18);
-        ty(-((e.clientY - hr.top) / hr.height - 0.5) * 18);
+      new ResizeObserver(size).observe(host);
+      new IntersectionObserver((e) => { visible = e[0].isIntersecting; }).observe(host);
+      if (motion) gsap.ticker.add((time) => {
+        if (!visible || time - last < 1 / 30) return;   // 約 30fps 就夠
+        last = time; t += 0.004 + hill.v * 0.002;
+        draw();
       });
-      hero.addEventListener("pointerleave", () => {
-        gsap.to(strength, { v: 0, duration: 0.6, onUpdate: queue });
-        tx(0); ty(0);
-      });
-      split?.chars.forEach((c) => c.addEventListener("pointerenter", () => {
-        if (gsap.isTweening(c)) return;
-        gsap.timeline().to(c, { y: -12, color: hot, duration: 0.18, ease: "power2.out" }).to(c, { y: 0, clearProps: "color", duration: 0.6, ease: "elastic.out(1, 0.35)" });
-      }));
+      return {
+        point: (cx, cy) => {
+          const r = canvas.getBoundingClientRect();
+          pointer = { x: cx - r.left, y: cy - r.top };
+          if (hill.v < 1 && !gsap.isTweening(hill)) gsap.to(hill, { v: 1, duration: 0.8, ease: "power2.out" });
+        },
+        leave: () => gsap.to(hill, { v: 0, duration: 1.2, ease: "power2.out" }),
+      };
     },
 
     // 跑馬燈：所有專案用到的技術；捲動越快跑越快，方向跟著捲動方向
@@ -457,7 +523,7 @@
         <h1>${esc(pf.headline).replace(/\n/g, "<br>")}</h1>
         <p class="bio">${esc(pf.bio)}</p>
         <div class="hero-actions">
-          <a class="button primary" href="#projects">看 ${data.published.length} 個專案${ICON.down}</a>
+          <a class="button primary" href="#projects">查看專案${ICON.down}</a>
           ${external("https://github.com/ShiYu0318", "GitHub")}
           ${others.filter((l) => l.label === "CV").map((l) => external(l.url, l.label)).join("")}
         </div>
@@ -533,7 +599,7 @@
     const href = (p) => `project.html?id=${encodeURIComponent(p.id)}`;
 
     $("#view-rows").innerHTML = list.map((p) => `
-      <a class="feature item" data-flip-id="${esc(p.id)}" data-cursor="開啟" data-cat="${esc(p.category)}" href="${href(p)}">
+      <a class="feature item" data-flip-id="${esc(p.id)}" data-cat="${esc(p.category)}" href="${href(p)}">
         <div class="feature-shot">${coverHTML(p, data)}</div>
         <div class="feature-text">
           <p class="meta">${meta(p)}</p>
@@ -545,7 +611,7 @@
       </a>`).join("");
 
     $("#view-grid").innerHTML = list.map((p) => `
-      <a class="tile item" data-flip-id="${esc(p.id)}" data-cursor="開啟" data-cat="${esc(p.category)}" href="${href(p)}">
+      <a class="tile item" data-flip-id="${esc(p.id)}" data-cat="${esc(p.category)}" href="${href(p)}">
         <div class="tile-shot">${coverHTML(p, data)}</div>
         <div class="tile-text">
           <p class="meta">${String(p.no).padStart(2, "0")} · ${esc(data.catTitle[p.category])}${p.team ? " · 團隊" : ""}</p>
@@ -555,7 +621,7 @@
       </a>`).join("");
 
     $("#index").innerHTML = list.map((p) => `
-      <li class="item" data-flip-id="${esc(p.id)}" data-cat="${esc(p.category)}"><a data-cursor="開啟" href="${href(p)}" ${p.cover ? `data-cover="${esc(p.cover)}"` : ""}>
+      <li class="item" data-flip-id="${esc(p.id)}" data-cat="${esc(p.category)}"><a href="${href(p)}" ${p.cover ? `data-cover="${esc(p.cover)}"` : ""}>
         <span class="meta no">${String(p.no).padStart(2, "0")}</span>
         <span><span class="title">${esc(p.title)}${p.team ? `<span class="team">團隊</span>` : ""}</span><span class="tagline">${esc(p.tagline)}</span></span>
         <span class="cat">${esc(data.catTitle[p.category])}</span>
