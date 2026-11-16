@@ -7,12 +7,20 @@
     "bio": "我是 4yü，國立中央大學資訊工程學系二年級，目前在 IISR 實驗室做專題。研究方向是自然語言處理與深度強化學習。高中時是競賽程式選手，曾任 SCIST 南臺灣學生資訊社群第 5 屆總召；現在是 GDG on Campus NCU 的技術組長，有約 3 年、累計超過 500 小時的教學經驗。",
     "links": [
       {
+        "label": "Blog",
+        "url": "https://blog.4yu.dev"
+      },
+      {
         "label": "GitHub",
         "url": "https://github.com/ShiYu0318"
       },
       {
-        "label": "Blog",
-        "url": "https://4yu.dev"
+        "label": "LinkedIn",
+        "url": "https://www.linkedin.com/in/shiyu0318"
+      },
+      {
+        "label": "Instagram",
+        "url": "https://www.instagram.com/4yu.dev.318"
       },
       {
         "label": "CV",
