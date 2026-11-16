@@ -451,8 +451,7 @@
         </figure>` : ""}
       </div>
       <div class="footer-base">
-        <span>4yü 2026</span>
-        <span>內容與版面依 <a href="https://github.com/ShiYu0318/NCCU-GenAI-HW/blob/main/AGENTS.md">AGENTS.md</a> 維護</span>
+        <span>© 2026 4yu.dev All Rights Reserved</span>
       </div>`;
     const field = $(".dotfield-frame", foot);
     if (field) initDotField(field);
