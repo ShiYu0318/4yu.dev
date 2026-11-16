@@ -85,7 +85,8 @@ kbd {
   background: var(--bg);
   border-bottom: 1px solid var(--line);
 }
-.wordmark { font-size: 17px; font-weight: 600; text-decoration: none; letter-spacing: .02em; }
+.wordmark { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 15px; font-weight: 500; text-decoration: none; color: var(--text); }
+.wordmark img { width: 32px; height: 32px; border-radius: var(--r-control); border: 1px solid var(--line-strong); }
 .wordmark:hover { color: var(--text); }
 .nav { position: relative; display: flex; align-items: center; gap: 4px; font-size: 15px; }
 .nav > a, .nav > button {
@@ -194,7 +195,7 @@ main { display: block; }
 .feature p { color: var(--text-2); margin: 0 0 20px; font-size: 17px; }
 .feature .stack { margin: 0 0 28px; }
 .read-more { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; color: var(--text); }
-.read-more .icon { transition: transform 180ms var(--ease); }
+.read-more .icon { }
 .read-more span { border-bottom: 1px solid var(--line-strong); padding-bottom: 2px; transition: border-color 150ms var(--ease), color 150ms var(--ease); }
 .feature:hover .read-more { color: var(--accent); }
 .feature:hover .read-more span { border-color: var(--accent); }
