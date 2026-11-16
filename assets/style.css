@@ -1,5 +1,5 @@
 /* =========================================================
-   4yü · 專案 — 全站唯一樣式表
+   4yü/專案：全站唯一樣式表
    方向：安靜、精確、像實驗室筆記；配色取自 GitHub 頭像（黑貓 × 電光藍）
    外框安靜，動態集中在幾個有意義的地方（見 AGENTS.md §6）
    ========================================================= */
@@ -67,6 +67,7 @@ kbd {
   padding: 3px 6px; border-radius: 4px; color: var(--text-2);
   background: var(--raised); border: 1px solid var(--line-strong);
 }
+.part + .part { margin-left: 12px; }
 .meta { color: var(--muted); font-family: var(--font-mono); font-size: 13px; font-variant-numeric: tabular-nums; }
 .stack { color: var(--muted); font-family: var(--font-mono); font-size: 13px; }
 .loading { color: var(--muted); }
@@ -500,7 +501,7 @@ html.lenis, html.lenis body { height: auto; }
 
 .exp-list { list-style: none; margin: 0; padding: 0; }
 
-/* 一筆經歷（履歷排版）：日期 → 標題 ····· 身分 → ▫ 單位 / 標籤 · 成果 */
+/* 一筆經歷（履歷排版）：日期 → 標題 - - - 身分 → ▫ 單位、標籤，右側成果 */
 .exp { padding: 20px 0; border-bottom: 1px solid var(--line); }
 .exp-list .exp:last-child { border-bottom: 0; }
 .exp-date { margin: 0 0 6px; font-size: 12px; display: flex; gap: 8px; align-items: baseline; }
