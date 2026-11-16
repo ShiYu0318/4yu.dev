@@ -21,6 +21,10 @@
     out:   '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>',
     down:  '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>',
     right: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>',
+    // 社群圖示：lucide-static 0.460.0（ISC），新版 lucide 已移除品牌圖示
+    GitHub: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>',
+    LinkedIn: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>',
+    Instagram: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>',
   };
   const EASE = "expo.out";
   // 同一個人的兩個網站：作品集與部落格，互相切換時用同一套換頁布幕
@@ -35,6 +39,9 @@
   const no = (n) => `No. ${String(n).padStart(2, "0")}`;
   const external = (url, label, cls = "button") =>
     `<a class="${cls}" href="${esc(url)}" target="_blank" rel="noopener">${esc(label)}${ICON.out}</a>`;
+  // 社群連結（profile.links 裡有圖示的那幾個）做成只有圖示的按鈕
+  const socialIcons = (links) => `<div class="socials">${links.filter((l) => ICON[l.label]).map((l) =>
+    `<a class="icon-btn" href="${esc(l.url)}" target="_blank" rel="noopener" aria-label="${esc(l.label)}" title="${esc(l.label)}">${ICON[l.label]}</a>`).join("")}</div>`;
   const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -655,7 +662,8 @@
           <p class="meta copy-status" aria-live="polite"></p>
         </div>
         <nav class="contact-links" aria-label="其他連結">
-          ${pf.links.map((l) => SITES.includes(new URL(l.url).hostname) ? `<a href="${esc(l.url)}">${esc(l.label)}</a>` : `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("")}
+          ${socialIcons(pf.links)}
+          ${pf.links.filter((l) => !ICON[l.label]).map((l) => SITES.includes(new URL(l.url).hostname) ? `<a href="${esc(l.url)}">${esc(l.label)}</a>` : `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("")}
         </nav>
         ${pf.githubAvatar ? `
         <figure class="dotfield">
@@ -750,15 +758,14 @@
     renderFooter(data);
 
     const pf = data.profile;
-    const others = pf.links.filter((l) => l.label !== "GitHub");
     $("#hero").innerHTML = `
       <div class="hero-text">
         <h1 class="sr-only">${esc(pf.name)}</h1>
         <p class="bio">${esc(pf.bio)}</p>
         <div class="hero-actions">
           <a class="button primary" href="#projects">查看專案${ICON.down}</a>
-          ${external("https://github.com/ShiYu0318", "GitHub")}
-          ${others.filter((l) => l.label === "CV").map((l) => external(l.url, l.label)).join("")}
+          ${pf.links.filter((l) => l.label === "CV").map((l) => external(l.url, l.label)).join("")}
+          ${socialIcons(pf.links)}
         </div>
       </div>
       <figure class="portrait">
