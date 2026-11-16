@@ -479,7 +479,7 @@ html.is-loading, html.is-loading body { overflow: hidden; }
 .hero > :not(.hero-grid) { position: relative; z-index: 1; }
 .hero-grid {
   position: absolute; z-index: 0; top: 0; bottom: 0; left: 50%; width: 100vw; height: 100%; transform: translateX(-50%); pointer-events: none;
-  -webkit-mask-image: radial-gradient(ellipse 70% 80% at 65% 45%, #000 35%, transparent 80%); mask-image: radial-gradient(ellipse 70% 80% at 65% 45%, #000 35%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 130% 120% at 55% 45%, #000 55%, transparent 100%); mask-image: radial-gradient(ellipse 130% 120% at 55% 45%, #000 55%, transparent 100%);
 }
 /* 首屏底部中間的往下箭頭：緩慢上下浮動，捲動後淡出 */
 .hero > .scroll-down {
