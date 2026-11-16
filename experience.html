@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>黃士育 · 經歷</title>
+  <meta name="description" content="黃士育（ShiYu0318）的經歷：研究、社群、競賽、教學與活動籌辦。">
+  <meta name="theme-color" content="#07081a">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="content/img/profile/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="content/img/profile/favicon-180.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="page-experience">
+  <div class="progress" aria-hidden="true"></div>
+  <div class="curtain" aria-hidden="true"><span class="wordmark"><span class="wordmark-path">~/</span>4yü</span></div>
+  <div class="cursor" aria-hidden="true"><span class="cursor-dot"></span><span class="cursor-ring"><span class="cursor-label"></span></span></div>
+  <header class="site-header">
+    <a class="wordmark" href="index.html" aria-label="回到首頁"><span class="wordmark-path">~/</span>4yü</a>
+    <nav class="nav" aria-label="主要連結">
+      <span class="nav-hover" aria-hidden="true"></span>
+      <a href="index.html#projects">專案</a>
+      <a href="experience.html" aria-current="page">經歷</a>
+      <a href="#contact">聯絡</a>
+      <a href="https://4yu.dev" target="_blank" rel="noopener">Blog</a>
+      <button class="search-trigger" type="button" data-palette-open aria-label="搜尋專案">搜尋 <kbd>⌘K</kbd></button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="exp-page" aria-labelledby="exp-page-title">
+      <header class="exp-head">
+        <p class="meta" id="exp-meta"></p>
+        <h1 id="exp-page-title">經歷</h1>
+        <div class="controls">
+          <div id="exp-fields" class="segmented" role="tablist" aria-label="依領域篩選"></div>
+          <div id="exp-views" class="segmented" role="radiogroup" aria-label="分組方式"></div>
+        </div>
+      </header>
+      <div id="exp-groups" class="exp-groups"></div>
+      <p id="exp-empty" class="empty" hidden>這個領域還沒有經歷</p>
+    </section>
+  </main>
+
+  <footer id="contact" class="site-footer"></footer>
+
+  <dialog id="palette" class="palette" aria-label="搜尋專案">
+    <input id="palette-input" type="search" placeholder="搜尋專案" autocomplete="off" aria-controls="palette-list">
+    <ul id="palette-list" class="palette-list" role="listbox"></ul>
+    <p class="palette-hint meta"><kbd>↑</kbd><kbd>↓</kbd> 選擇　<kbd>Enter</kbd> 開啟　<kbd>Esc</kbd> 關閉</p>
+  </dialog>
+
+  <script src="assets/vendor/gsap.min.js" defer></script>
+  <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
+  <script src="assets/vendor/SplitText.min.js" defer></script>
+  <script src="assets/vendor/ScrambleTextPlugin.min.js" defer></script>
+  <script src="assets/vendor/lenis.min.js" defer></script>
+  <script src="assets/vendor/Flip.min.js" defer></script>
+  <script src="assets/app.js" defer></script>
+</body>
+</html>
