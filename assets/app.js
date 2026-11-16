@@ -174,7 +174,6 @@
 
     // Hero：背景格點、照片 3D 傾斜、標題字被滑過時跳動、小字解碼
     hero(hero) {
-      this.scramble($(".hero-eyebrow", hero), undefined, 1.4);
       const canvas = document.createElement("canvas");
       canvas.className = "hero-grid"; canvas.setAttribute("aria-hidden", "true");
       hero.prepend(canvas);
@@ -549,7 +548,6 @@
     const others = pf.links.filter((l) => l.label !== "GitHub");
     $("#hero").innerHTML = `
       <div class="hero-text">
-        <p class="hero-eyebrow meta">${esc(pf.nameEn)}　${esc(pf.tagline)}</p>
         <h1 class="sr-only">${esc(pf.name)}</h1>
         <p class="bio">${esc(pf.bio)}</p>
         <div class="hero-actions">
@@ -564,7 +562,7 @@
       </figure>`;
     FX.hero($("#hero"));
     if (motion) {
-      gsap.from([".hero-eyebrow", ".hero .bio", ".hero-actions"], { opacity: 0, y: 16, duration: 0.9, ease: EASE, stagger: 0.1, delay: 0.15 });
+      gsap.from([".hero .bio", ".hero-actions"], { opacity: 0, y: 16, duration: 0.9, ease: EASE, stagger: 0.1, delay: 0.15 });
       gsap.from(".portrait", { opacity: 0, scale: 0.94, duration: 1, ease: EASE, delay: 0.2 });
     }
 
