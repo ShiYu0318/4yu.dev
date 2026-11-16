@@ -655,7 +655,7 @@
           <p class="meta copy-status" aria-live="polite"></p>
         </div>
         <nav class="contact-links" aria-label="其他連結">
-          ${pf.links.map((l) => `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("")}
+          ${pf.links.map((l) => SITES.includes(new URL(l.url).hostname) ? `<a href="${esc(l.url)}">${esc(l.label)}</a>` : `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("")}
         </nav>
         ${pf.githubAvatar ? `
         <figure class="dotfield">
