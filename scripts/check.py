@@ -42,14 +42,14 @@ def check_manifest():
     for key in ("avatar", "portrait"):
         if not (ROOT / data["profile"].get(key, "")).is_file():
             err(f"profile.{key}", "圖片檔案不存在")
-    for key in ("name", "headline", "tagline", "bio"):
+    for key in ("name", "headline", "tagline", "bio", "email"):
         if not data["profile"].get(key):
             err("profile", f"缺少 `{key}`")
 
     cats = {c["id"] for c in data["categories"]}
     seen = set()
     featured = 0
-    required = ["id", "title", "tagline", "category", "tags", "repo", "demo", "cover", "year", "featured", "status", "updated"]
+    required = ["id", "title", "tagline", "category", "tags", "repo", "demo", "cover", "year", "featured", "team", "status", "updated"]
     for p in data["projects"]:
         pid = p.get("id", "<無 id>")
         where = f"projects.json[{pid}]"
@@ -71,6 +71,8 @@ def check_manifest():
                 err(where, f"tag `{t}` 必須是小寫 kebab-case")
         if not str(p.get("repo", "")).startswith("https://github.com/"):
             err(where, "repo 必須是 GitHub 網址")
+        if not isinstance(p.get("team"), bool):
+            err(where, "team 必須是 true 或 false")
         if p.get("status") not in ("published", "draft"):
             err(where, "status 只能是 published 或 draft")
         try:
@@ -156,6 +158,8 @@ def check_markdown(p):
     if f"<{p['repo']}>" not in body and p["repo"] not in body:
         err(where, "「連結」章節必須包含 repo 網址")
 
+    if p.get("team") and "### 我負責的部分" not in body:
+        err(where, "團隊專案必須在「技術亮點」加上 ### 我負責的部分")
     plain = re.sub(r"`[^`]*`", "", body)  # 行內程式碼中的文字不算
     for bad in ("<script", "<style", "style="):
         if bad in plain:
