@@ -39,7 +39,7 @@ def check_manifest():
     if errors:
         return None
 
-    for key in ("avatar", "portrait", "githubAvatar"):
+    for key in ("portrait", "githubAvatar"):
         if not (ROOT / data["profile"].get(key, "")).is_file():
             err(f"profile.{key}", "圖片檔案不存在")
     for key in ("name", "headline", "tagline", "bio", "email"):
