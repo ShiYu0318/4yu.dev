@@ -26,6 +26,7 @@ shiyu-portfolio/
 ├── README.md                 ← 給人類看的簡介
 ├── index.html                ← 首頁：自我介紹 + 專案（交錯 / 矩陣 / 表格三種檢視，JS 讀 projects.json 產生）
 ├── project.html              ← 專案介紹頁：project.html?id=<project-id>
+├── favicon.ico               ← 分頁圖示（GitHub 頭像的黑貓，16/32/48px）
 ├── .nojekyll                 ← 讓 GitHub Pages 不要跑 Jekyll
 ├── assets/
 │   ├── style.css             ← 全站唯一的樣式表
@@ -39,7 +40,7 @@ shiyu-portfolio/
 │   ├── projects/
 │   │   └── <project-id>.md   ← 每個專案一個介紹檔
 │   └── img/
-│       ├── profile/          ← avatar.webp（favicon）、portrait.webp（首頁圓形照片）、github-avatar.webp（頁尾點陣用的黑貓頭像）
+│       ├── profile/          ← favicon-32.png、favicon-180.png（分頁圖示，取自 GitHub 頭像的黑貓）、portrait.webp（首頁圓形照片）、github-avatar.webp（頁尾點陣用的黑貓頭像）
 │       └── <project-id>/     ← 該專案的截圖
 ├── templates/
 │   └── project-template.md   ← 新專案介紹的起手式
@@ -84,7 +85,6 @@ shiyu-portfolio/
 {
   "profile": {                       // 首頁上方個人簡介，通常不用動
     "name": "黃士育", "nameEn": "ShiYu Huang", "handle": "ShiYu0318",
-    "avatar": "content/img/profile/avatar.webp",      // 方形小圖，當 favicon
     "portrait": "content/img/profile/portrait.webp",  // 首頁右側的圓形照片（正方形原圖，顯示 280px）
     "githubAvatar": "content/img/profile/github-avatar.webp", // GitHub 頭像，頁尾用點陣畫出來
     "tagline": "國立中央大學資訊工程學系",              // 標題上方那行小字
