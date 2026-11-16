@@ -127,7 +127,7 @@ kbd {
 .dotfield { grid-area: field; margin: 0; }
 .dotfield-frame { position: relative; aspect-ratio: 1; border-radius: var(--r-card); overflow: hidden; border: 1px solid var(--line); background: var(--bg); }
 .dotfield canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; }
-.footer-base { margin-top: 64px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; color: var(--muted); font-size: 17px; }
+.footer-base { margin-top: 64px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; color: var(--muted); font-size: 17px; }
 .footer-base a { color: var(--text-2); }
 
 /* ---------- 4. 按鈕 ---------- */
@@ -155,9 +155,11 @@ kbd {
 
 /* ---------- 5. 首頁：自我介紹 ---------- */
 main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平捲軸 */
+/* 首屏：導覽列以下剛好填滿一個畫面高度 */
 .hero {
-  max-width: var(--page); margin: 0 auto; padding: 96px var(--gutter) 128px;
-  display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 64px; align-items: center;
+  max-width: var(--page); margin: 0 auto; padding: 64px var(--gutter) 112px;
+  min-height: calc(100vh - 64px); min-height: calc(100svh - 64px);
+  display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 64px; align-items: center; align-content: center;
 }
 .hero h1 {
   font-size: clamp(40px, 5.3vw, 66px); line-height: 1.15; font-weight: 500;
@@ -395,7 +397,7 @@ main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平
 @media (max-width: 760px) {
   :root { --gutter: 20px; }
   .site-header .wordmark { font-size: 22px; }
-  .hero { grid-template-columns: 1fr; gap: 40px; padding: 48px var(--gutter) 80px; }
+  .hero { grid-template-columns: 1fr; gap: 40px; padding: 40px var(--gutter) 104px; }
   .hero h1 { font-size: 35px; }
   .hero .bio { font-size: 17px; }
   .portrait { justify-self: start; order: -1; }
@@ -471,6 +473,29 @@ html.is-loading, html.is-loading body { overflow: hidden; }
   position: absolute; z-index: 0; top: 0; bottom: 0; left: 50%; width: 100vw; height: 100%; transform: translateX(-50%); pointer-events: none;
   -webkit-mask-image: radial-gradient(ellipse 70% 80% at 65% 45%, #000 35%, transparent 80%); mask-image: radial-gradient(ellipse 70% 80% at 65% 45%, #000 35%, transparent 80%);
 }
+/* 首屏底部中間的往下箭頭：緩慢上下浮動，捲動後淡出 */
+.hero > .scroll-down {
+  position: absolute; z-index: 2; left: 50%; bottom: 24px; transform: translateX(-50%);
+  width: 40px; height: 40px; display: grid; place-items: center; padding: 0;
+  border: 1px solid var(--line-strong); border-radius: 50%; background: transparent; color: var(--text-2); cursor: pointer;
+  transition: color 150ms var(--ease), border-color 150ms var(--ease), opacity 300ms var(--ease);
+}
+.hero > .scroll-down .icon { animation: scroll-bob 1.8s var(--ease) infinite; }
+.hero > .scroll-down:hover { color: var(--accent); border-color: var(--accent); }
+.hero > .scroll-down.is-hidden { opacity: 0; pointer-events: none; }
+@keyframes scroll-bob { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(3px); } }
+@media (prefers-reduced-motion: reduce) { .hero > .scroll-down .icon { animation: none; } }
+
+/* 頁尾的回到頂端 */
+.to-top {
+  width: 40px; height: 40px; display: grid; place-items: center; padding: 0;
+  border: 1px solid var(--line-strong); border-radius: 50%; background: transparent; color: var(--text-2); cursor: pointer;
+  transition: color 150ms var(--ease), border-color 150ms var(--ease);
+}
+.to-top .icon { transition: transform 300ms var(--ease); }
+.to-top:hover { color: var(--accent); border-color: var(--accent); }
+.to-top:hover .icon { transform: translateY(-3px); }
+
 /* 背景的「下一個」小圖示 */
 .hero > .backdrop-next {
   position: absolute; z-index: 2; right: var(--gutter); bottom: 24px;
