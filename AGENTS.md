@@ -27,6 +27,8 @@ shiyu-portfolio/
 ├── index.html                ← 首頁：自我介紹 + 專案（交錯 / 矩陣 / 表格三種檢視，JS 讀 projects.json 產生）
 ├── project.html              ← 專案介紹頁：project.html?id=<project-id>
 ├── experience.html           ← 經歷頁：時間線 / 分類 / 年級三種分組 + 領域篩選（JS 讀 experience.json 產生，見 §9）
+├── 404.html                  ← 找不到頁面：舊部落格網址（4yu.dev/post/...）轉到 blog.4yu.dev 同路徑；/NCCU-GenAI-HW/... 轉成去掉前綴的網址
+├── NCCU-GenAI-HW/index.html  ← 作業繳交時的舊網址 4yu.dev/NCCU-GenAI-HW/，轉到首頁，不要刪
 ├── favicon.ico               ← 分頁圖示（GitHub 頭像的黑貓，16/32/48px）
 ├── .nojekyll                 ← 讓 GitHub Pages 不要跑 Jekyll
 ├── assets/
@@ -276,7 +278,7 @@ shiyu-portfolio/
 | 全站捲動 | Lenis 平滑捲動，與 ScrollTrigger 同步；站內錨點也用 Lenis 捲過去 |
 | 游標 | 自訂游標：小點緊跟、圓圈延遲跟隨；移到連結與專案時圓圈放大、移到信箱變成電光藍的「複製」標籤 |
 | 按鈕與連結 | 磁吸：游標靠近時被吸過去一點，離開後彈回 |
-| 換頁 | 布幕從下蓋上、中間出現 `~/4yü`，新頁面載入後布幕往上收 |
+| 換頁 | 布幕從下蓋上、中間出現 `~/4yü`，新頁面載入後布幕往上收；點到部落格（blog.4yu.dev）也先蓋布幕再同分頁前往，從部落格點回來時布幕收起（`SITES` 清單） |
 | 導覽列 | 流體 hover：底色滑到游標所在的連結 |
 | 頂端進度條 | 2px 電光藍，跟著捲動 / 閱讀進度 |
 | Hero 背景 | 等高線地形：Perlin noise 高度場用 marching squares 畫成細線，約 30fps 緩慢流動；游標處隆起一座小山、附近的線變成 `--accent`；邊緣用 mask 淡出，畫面外暫停 |
