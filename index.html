@@ -3,40 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>黃士育 ShiYu · 作品集</title>
-  <meta name="description" content="黃士育（ShiYu0318）的 GitHub 專案作品集：強化學習、RAG、AI Agent、研究與教學。">
+  <title>黃士育 · 專案</title>
+  <meta name="description" content="黃士育（ShiYu0318）的公開專案：強化學習、RAG、AI Agent、研究與教學。">
   <meta name="theme-color" content="#081227">
   <link rel="icon" href="content/img/profile/avatar.webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body class="page-home">
   <header class="site-header">
-    <a class="brand" href="index.html"><span class="brand-mark">~/</span>shiyu</a>
-    <nav class="header-links">
-      <a href="#projects">Projects</a>
-      <a href="https://github.com/ShiYu0318" target="_blank" rel="noopener">GitHub</a>
+    <a class="wordmark" href="index.html">黃士育</a>
+    <nav class="nav" aria-label="主要連結">
+      <a href="#projects">專案</a>
+      <a href="https://4yu.dev" target="_blank" rel="noopener">Blog</a>
+      <a class="nav-button" href="https://github.com/ShiYu0318" target="_blank" rel="noopener">GitHub</a>
     </nav>
   </header>
 
-  <main class="home">
-    <section id="hero" class="hero" aria-label="個人簡介">
-      <p class="loading">載入中…</p>
-    </section>
+  <main>
+    <section id="hero" class="hero" aria-label="自我介紹"></section>
 
-    <section id="projects" class="projects" aria-label="專案列表">
-      <div class="section-head">
-        <h2>Projects</h2>
-        <div id="filters" class="filters" role="tablist" aria-label="依分類篩選"></div>
+    <section id="projects" class="projects" aria-labelledby="projects-title">
+      <div class="projects-head">
+        <h2 id="projects-title">專案</h2>
+        <div id="filters" class="segmented" role="tablist" aria-label="依領域篩選"></div>
       </div>
-      <div id="featured" class="featured"></div>
-      <div id="grid" class="grid"></div>
+      <div id="lead" class="lead"></div>
+      <div id="index-head" class="index-head"></div>
+      <ol id="index" class="index"></ol>
     </section>
   </main>
 
   <footer class="site-footer">
-    <p>© 2026 黃士育 ShiYu · 本站以 <a href="https://github.com/ShiYu0318/NCCU-GenAI-HW/blob/main/AGENTS.md">AGENTS.md</a> 規範由 AI 協作維護</p>
+    <span>黃士育 · 2026</span>
+    <span>內容與版面依 <a href="https://github.com/ShiYu0318/NCCU-GenAI-HW/blob/main/AGENTS.md">AGENTS.md</a> 維護</span>
   </footer>
 
   <script src="assets/app.js"></script>
