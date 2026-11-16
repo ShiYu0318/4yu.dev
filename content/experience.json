@@ -1,0 +1,968 @@
+{
+  "updated": "2026-11-16",
+  "items": [
+    {
+      "title": "GDG on Campus @NCU：Deep Reinforcement Learning 深度強化學習基礎理論與遊戲實作",
+      "role": "講師",
+      "result": null,
+      "org": "GDG on Campus @NCU",
+      "type": "教學",
+      "fields": [
+        "AI"
+      ],
+      "priority": 0,
+      "grade": "大二",
+      "start": "2026-12-03",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "IISR Lab 蔡宗翰實驗室",
+      "role": "專題生",
+      "result": null,
+      "org": "國立中央大學",
+      "type": "研究",
+      "fields": [
+        "AI"
+      ],
+      "priority": 0,
+      "grade": "大二",
+      "start": "2026-10-31",
+      "end": null,
+      "link": "https://iisr.csie.ncu.edu.tw/"
+    },
+    {
+      "title": "GDGoC @NCU 中央大學 Google 學生開發者社群 26’27 Coreteam",
+      "role": "技術組長",
+      "result": "Tech Lead",
+      "org": "GDGoC @NCU",
+      "type": "社群",
+      "fields": [
+        "AI",
+        "開發"
+      ],
+      "priority": 0,
+      "grade": "大二",
+      "start": "2026-09-01",
+      "end": "2027-08-31",
+      "link": null
+    },
+    {
+      "title": "NCUCP 中央大學競技程式讀書會 115 學年度",
+      "role": "負責人",
+      "result": null,
+      "org": "NCUCP",
+      "type": "社群",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 0,
+      "grade": "大二",
+      "start": "2026-09-01",
+      "end": "2027-08-31",
+      "link": null
+    },
+    {
+      "title": "[NTCIR-19 Oral] Hierarchical Projection as a Validity Layer for Multilingual ESG Promise Verification",
+      "role": "共同作者",
+      "result": "NTCIR-19 Oral",
+      "org": null,
+      "type": "研究",
+      "fields": [
+        "AI"
+      ],
+      "priority": 0,
+      "grade": "大一",
+      "start": "2026-08-31",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "AI CUP 2026 春季 ESG 永續承諾驗證競賽",
+      "role": "參賽者",
+      "result": "前標・Rk 19/642・TEAM_10537",
+      "org": "AI CUP",
+      "type": "競賽",
+      "fields": [
+        "AI"
+      ],
+      "priority": 0,
+      "grade": "大一",
+      "start": "2026-07-23",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "AI CUP 2026 春季 基於時序資料之桌球戰術與結果預測競賽",
+      "role": "參賽者",
+      "result": "佳作・Rk 13/1144・TEAM_10097",
+      "org": "AI CUP",
+      "type": "競賽",
+      "fields": [
+        "AI"
+      ],
+      "priority": 0,
+      "grade": "大一",
+      "start": "2026-07-17",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "GDGoC @NCU：GenAI 實戰 LLM x RAG 應用開發",
+      "role": "講師",
+      "result": null,
+      "org": "GDGoC @NCU",
+      "type": "教學",
+      "fields": [
+        "AI"
+      ],
+      "priority": 0,
+      "grade": "大一",
+      "start": "2026-05-21",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "教育部生成式 AI 應用競賽計畫辦公室",
+      "role": "實習生",
+      "result": null,
+      "org": "AI CUP 計畫辦公室",
+      "type": "工作",
+      "fields": [
+        "開發"
+      ],
+      "priority": 0,
+      "grade": "大一",
+      "start": "2026-05-19",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "CYSHIRC 嘉義高中資訊研究社 AI 系列社課：RL 遊戲設計與模型訓練",
+      "role": "講師",
+      "result": null,
+      "org": "CYSHIRC 嘉義高中資訊研究社",
+      "type": "教學",
+      "fields": [
+        "AI"
+      ],
+      "priority": 0,
+      "grade": "大一",
+      "start": "2026-05-13",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "CYSHIRC 嘉義高中資訊研究社 AI 系列社課：Diffusion 圖像生成原理與應用",
+      "role": "講師",
+      "result": null,
+      "org": "CYSHIRC 嘉義高中資訊研究社",
+      "type": "教學",
+      "fields": [
+        "AI"
+      ],
+      "priority": 0,
+      "grade": "大一",
+      "start": "2026-04-22",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "南 5 校資訊社聯合社課：AI 影像辨識與生成之原理與實作",
+      "role": "講師",
+      "result": null,
+      "org": "臺南女中 x 臺南二中 x 嘉義高中 x 嘉義女中 x 大灣高中",
+      "type": "教學",
+      "fields": [
+        "AI"
+      ],
+      "priority": 0,
+      "grade": "大一",
+      "start": "2026-04-12",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "CYSHIRC 嘉義高中資訊研究社 AI 系列社課：AI/ML 初探與 MNIST 實作",
+      "role": "講師",
+      "result": null,
+      "org": "CYSHIRC 嘉義高中資訊研究社",
+      "type": "教學",
+      "fields": [
+        "AI"
+      ],
+      "priority": 0,
+      "grade": "大一",
+      "start": "2026-04-01",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "SCIST S6 x SCAICT x 成大電機 聯合寒訓 Camp 2026【閃電 4 連編】",
+      "role": "講師",
+      "result": "AI 系列課程",
+      "org": "SCIST",
+      "type": "教學",
+      "fields": [
+        "AI"
+      ],
+      "priority": 0,
+      "grade": "大一",
+      "start": "2026-02-05",
+      "end": "2026-02-08",
+      "link": null
+    },
+    {
+      "title": "中央大學 Python 程式設計基礎營",
+      "role": "助教",
+      "result": null,
+      "org": "國立中央大學",
+      "type": "教學",
+      "fields": [],
+      "priority": 0,
+      "grade": "大一",
+      "start": "2025-12-13",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "GDGoC @NCU：AI 概論與 ML 實作課程",
+      "role": "講師",
+      "result": null,
+      "org": "GDGoC @NCU",
+      "type": "教學",
+      "fields": [
+        "AI"
+      ],
+      "priority": 0,
+      "grade": "大一",
+      "start": "2025-11-20",
+      "end": "2025-11-27",
+      "link": null
+    },
+    {
+      "title": "2025 南十校聯合迎新 經驗分享講座",
+      "role": "講師",
+      "result": null,
+      "org": null,
+      "type": "教學",
+      "fields": [],
+      "priority": 0,
+      "grade": "大一",
+      "start": "2025-10-26",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "GDGoC @NCU 中央大學 Google 學生開發者社群 25’26 Coreteam",
+      "role": "AI PM",
+      "result": "Tech 組 AI PM",
+      "org": "GDGoC @NCU",
+      "type": "社群",
+      "fields": [
+        "AI"
+      ],
+      "priority": 0,
+      "grade": "大一",
+      "start": "2025-09-01",
+      "end": "2026-08-31",
+      "link": null
+    },
+    {
+      "title": "SCIST S5 x NHDK 四校聯合初學者程式設計練習賽 演算法季末賽",
+      "role": "命題者",
+      "result": null,
+      "org": "SCIST",
+      "type": "籌辦",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 0,
+      "grade": "高三",
+      "start": "2025-08-06",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "2025 北四校聯合工作坊 AI/ML 講座",
+      "role": "講師",
+      "result": null,
+      "org": "數位實中 x 師大附中 x 政大附中 x 松山高中",
+      "type": "教學",
+      "fields": [
+        "AI"
+      ],
+      "priority": 0,
+      "grade": "高三",
+      "start": "2025-03-01",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "2025 Fun AI Winter Camp",
+      "role": "學員",
+      "result": "RL 競賽第 3 名",
+      "org": null,
+      "type": "學習",
+      "fields": [
+        "AI"
+      ],
+      "priority": 0,
+      "grade": "高三",
+      "start": "2025-02-04",
+      "end": "2025-02-07",
+      "link": null
+    },
+    {
+      "title": "SCIST S5 x NHDK 四校聯合初學者程式設計練習賽 演算法季中賽",
+      "role": "命題者",
+      "result": null,
+      "org": "SCIST",
+      "type": "籌辦",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 0,
+      "grade": "高三",
+      "start": "2025-02-01",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "SCIST S5 x 南 15 校資訊社 聯合寒訓 Camp 2025【資深玩家】",
+      "role": "講師",
+      "result": "財務・公關・AI/ML 主題課程講師",
+      "org": "SCIST",
+      "type": "籌辦",
+      "fields": [
+        "AI"
+      ],
+      "priority": 0,
+      "grade": "高三",
+      "start": "2025-01-24",
+      "end": "2025-01-26",
+      "link": null
+    },
+    {
+      "title": "113 學年度高中數理及資訊學科能力競賽 第四區複賽 資訊科",
+      "role": "參賽者",
+      "result": "佳作",
+      "org": "教育部",
+      "type": "競賽",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 0,
+      "grade": "高三",
+      "start": "2024-11-05",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "APCS 大學程式設計先修檢測",
+      "role": "考生",
+      "result": "觀念 5 級分 + 實作 5 級分",
+      "org": null,
+      "type": "檢定",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 4,
+      "grade": "高三",
+      "start": "2024-10-20",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "SCIST 南臺灣學生資訊社群 第 5 屆 演算法推廣課程",
+      "role": "講師",
+      "result": null,
+      "org": "SCIST",
+      "type": "教學",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 3,
+      "grade": "高三",
+      "start": "2024-09-15",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "SCIST 南臺灣學生資訊社群 第 5 屆 資訊安全推廣課程",
+      "role": "助教",
+      "result": null,
+      "org": "SCIST",
+      "type": "教學",
+      "fields": [
+        "資安"
+      ],
+      "priority": 0,
+      "grade": "高三",
+      "start": "2024-09-14",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "AIS3 Junior 新型態資安暑期課程",
+      "role": "學員",
+      "result": "結業・最佳專題獎",
+      "org": "教育部資訊安全人才培育計畫",
+      "type": "學習",
+      "fields": [
+        "資安"
+      ],
+      "priority": 3,
+      "grade": "高二",
+      "start": "2024-08-15",
+      "end": "2024-08-18",
+      "link": null
+    },
+    {
+      "title": "IONCamp 2024 清大暑期程式競賽集訓營",
+      "role": "學員",
+      "result": null,
+      "org": "國立清華大學",
+      "type": "學習",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 2,
+      "grade": "高二",
+      "start": "2024-07-28",
+      "end": "2024-08-01",
+      "link": null
+    },
+    {
+      "title": "SCIST 南臺灣學生資訊社群 第 5 屆 演算法",
+      "role": "總召",
+      "result": null,
+      "org": "SCIST",
+      "type": "社群",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 4,
+      "grade": "高三",
+      "start": "2024-07-01",
+      "end": "2025-06-30",
+      "link": null
+    },
+    {
+      "title": "APCS 大學程式設計先修檢測",
+      "role": "考生",
+      "result": "觀念 4 級分 + 實作 4 級分",
+      "org": null,
+      "type": "檢定",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 4,
+      "grade": "高二",
+      "start": "2024-06-16",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "校內高二專題研究 AI 人工智慧課程",
+      "role": "講師",
+      "result": null,
+      "org": null,
+      "type": "教學",
+      "fields": [
+        "AI"
+      ],
+      "priority": 3,
+      "grade": "高二",
+      "start": "2024-06-11",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "2024 南四校聯合社課",
+      "role": "副召",
+      "result": "AI 入門課程講師",
+      "org": "臺南一中 x 臺南二中 x 臺南女中 x 南大附中",
+      "type": "籌辦",
+      "fields": [
+        "AI"
+      ],
+      "priority": 3,
+      "grade": "高二",
+      "start": "2024-06-09",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "一日資訊體驗營 2024 臺中場 Python 程式設計課程",
+      "role": "講師",
+      "result": null,
+      "org": null,
+      "type": "教學",
+      "fields": [
+        "開發"
+      ],
+      "priority": 3,
+      "grade": "高二",
+      "start": "2024-06-08",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "一日資訊體驗營 2024 臺北場 資訊安全與網路維運課程",
+      "role": "助教",
+      "result": null,
+      "org": null,
+      "type": "教學",
+      "fields": [
+        "資安"
+      ],
+      "priority": 2,
+      "grade": "高二",
+      "start": "2024-06-01",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "Hour of Code 一小時學程式 屏東場",
+      "role": "助教",
+      "result": "偏鄉小學義教",
+      "org": null,
+      "type": "教學",
+      "fields": [],
+      "priority": 3,
+      "grade": "高二",
+      "start": "2024-05-27",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "一日資訊體驗營 2024 臺南場 Python 程式設計課程",
+      "role": "講師",
+      "result": null,
+      "org": null,
+      "type": "教學",
+      "fields": [
+        "開發"
+      ],
+      "priority": 3,
+      "grade": "高二",
+      "start": "2024-05-26",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "一日資訊體驗營 2024",
+      "role": "總召",
+      "result": null,
+      "org": null,
+      "type": "籌辦",
+      "fields": [],
+      "priority": 4,
+      "grade": "高二",
+      "start": "2024-05-25",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "AIS3 MyFirstCTF 2024",
+      "role": "參賽者",
+      "result": null,
+      "org": null,
+      "type": "競賽",
+      "fields": [
+        "資安"
+      ],
+      "priority": 2,
+      "grade": "高二",
+      "start": "2024-05-25",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "2024 國立成功大學暑期高中生程式設計邀請賽",
+      "role": "參賽者",
+      "result": "晉級決賽",
+      "org": "國立成功大學",
+      "type": "競賽",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 3,
+      "grade": "高二",
+      "start": "2024-04-14",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "TOI 資訊奧林匹亞競賽 初選",
+      "role": "參賽者",
+      "result": null,
+      "org": null,
+      "type": "競賽",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 1,
+      "grade": "高二",
+      "start": "2024-03-10",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "2024 資訊之芽培訓計劃 南區算法班",
+      "role": "學員",
+      "result": null,
+      "org": "資訊之芽",
+      "type": "學習",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 3,
+      "grade": "高二",
+      "start": "2024-02-24",
+      "end": "2024-06-29",
+      "link": null
+    },
+    {
+      "title": "SCIST S4 x 南九校資訊社 x 成大資工 聯合寒訓 Camp 2024【資得其樂】",
+      "role": "副召",
+      "result": null,
+      "org": "SCIST",
+      "type": "籌辦",
+      "fields": [],
+      "priority": 5,
+      "grade": "高二",
+      "start": "2024-02-05",
+      "end": "2024-02-07",
+      "link": null
+    },
+    {
+      "title": "2024 Fun AI Winter Camp",
+      "role": "學員",
+      "result": "表現特優・研習證明",
+      "org": null,
+      "type": "學習",
+      "fields": [
+        "AI"
+      ],
+      "priority": 4,
+      "grade": "高二",
+      "start": "2024-01-02",
+      "end": "2024-01-04",
+      "link": null
+    },
+    {
+      "title": "112 學年度高中數理及資訊學科能力競賽 資訊科 全國模擬賽",
+      "role": "參賽者",
+      "result": "排名 49/149",
+      "org": null,
+      "type": "競賽",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 3,
+      "grade": "高二",
+      "start": "2023-12-03",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "112 學年度高中數理及資訊學科能力競賽 第四區複賽 資訊科",
+      "role": "參賽者",
+      "result": "佳作",
+      "org": "教育部",
+      "type": "競賽",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 4,
+      "grade": "高二",
+      "start": "2023-11-15",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "SCIST 南臺灣學生資訊社群 第 4 屆 演算法培訓課程",
+      "role": "學員",
+      "result": "結訓",
+      "org": "SCIST",
+      "type": "學習",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 2,
+      "grade": "高二",
+      "start": "2023-10-29",
+      "end": "2024-06-15",
+      "link": null
+    },
+    {
+      "title": "APCS 大學程式設計先修檢測",
+      "role": "考生",
+      "result": "觀念 3 級分・實作 3 級分",
+      "org": null,
+      "type": "檢定",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 3,
+      "grade": "高二",
+      "start": "2023-10-22",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "HP Codewars 2023 全國大學高中校園程式爭霸賽",
+      "role": "參賽者",
+      "result": null,
+      "org": null,
+      "type": "競賽",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 1,
+      "grade": "高二",
+      "start": "2023-10-21",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "陽明交大中學人才培育計畫 人工智慧與深度學習（2023 資訊人才培育秋季班）",
+      "role": "學員",
+      "result": "通過實體考核結業",
+      "org": "國立陽明交通大學",
+      "type": "學習",
+      "fields": [
+        "AI"
+      ],
+      "priority": 3,
+      "grade": "高二",
+      "start": "2023-10-16",
+      "end": "2024-01-14",
+      "link": null
+    },
+    {
+      "title": "第 18 屆資安技能金盾獎",
+      "role": "參賽者",
+      "result": null,
+      "org": null,
+      "type": "競賽",
+      "fields": [
+        "資安"
+      ],
+      "priority": 1,
+      "grade": "高二",
+      "start": "2023-10-14",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "高二多元選修 Python 課程",
+      "role": "講師",
+      "result": "代理講師",
+      "org": null,
+      "type": "教學",
+      "fields": [
+        "開發"
+      ],
+      "priority": 3,
+      "grade": "高二",
+      "start": "2023-10-01",
+      "end": "2023-12-31",
+      "link": null
+    },
+    {
+      "title": "2023 第四屆高中生量子電腦微課程",
+      "role": "學員",
+      "result": null,
+      "org": "國立成功大學 前沿量子科技研究中心",
+      "type": "學習",
+      "fields": [
+        "量子計算"
+      ],
+      "priority": 0,
+      "grade": "高一",
+      "start": "2023-08-05",
+      "end": "2023-08-06",
+      "link": null
+    },
+    {
+      "title": "SCIST 南臺灣學生資訊社群 第 4 屆",
+      "role": "幹部",
+      "result": "行政組小編",
+      "org": "SCIST",
+      "type": "社群",
+      "fields": [],
+      "priority": 3,
+      "grade": "高二",
+      "start": "2023-08-01",
+      "end": "2024-07-31",
+      "link": null
+    },
+    {
+      "title": "IONCamp 2023 清大暑期程式競賽集訓營",
+      "role": "學員",
+      "result": null,
+      "org": "國立清華大學",
+      "type": "學習",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 1,
+      "grade": "高一",
+      "start": "2023-07-23",
+      "end": "2023-07-27",
+      "link": null
+    },
+    {
+      "title": "第十一屆高一生程式設計排名賽 實體組",
+      "role": "參賽者",
+      "result": "第 8 名",
+      "org": null,
+      "type": "競賽",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 4,
+      "grade": "高一",
+      "start": "2023-07-09",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "南大附中資訊研究社 NFIRC 第 1 屆",
+      "role": "創辦人",
+      "result": "創社社長・社課講師・助教・期末程式競賽命題",
+      "org": "南大附中",
+      "type": "社群",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 5,
+      "grade": "高一",
+      "start": "2023-06-30",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "高一多元選修 C++ 課程",
+      "role": "助教",
+      "result": null,
+      "org": null,
+      "type": "教學",
+      "fields": [
+        "開發"
+      ],
+      "priority": 2,
+      "grade": "高一",
+      "start": "2023-05-01",
+      "end": "2023-06-30",
+      "link": null
+    },
+    {
+      "title": "110 學年度 貓咪盃 Scratch 程式設計競賽 嘉義縣複賽 國中動畫組",
+      "role": "參賽者",
+      "result": "特優・嘉義縣代表隊晉級全國賽",
+      "org": null,
+      "type": "競賽",
+      "fields": [],
+      "priority": 0,
+      "grade": "國三",
+      "start": "2022-01-25",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "110 學年度 第 3 屆科技教育創意實作競賽 嘉義縣賽 資訊科技組",
+      "role": "參賽者",
+      "result": "特優・嘉義縣代表隊晉級全國賽",
+      "org": null,
+      "type": "競賽",
+      "fields": [],
+      "priority": 0,
+      "grade": "國三",
+      "start": "2022-01-06",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "2021 全國中學生遙控帆船 STEAM 創客大賽 南區賽",
+      "role": "參賽者",
+      "result": null,
+      "org": null,
+      "type": "競賽",
+      "fields": [],
+      "priority": 0,
+      "grade": "國三",
+      "start": "2021-10-09",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "嘉義縣竹崎高中（國中部）科技社 第 1 屆",
+      "role": "創辦人",
+      "result": "創始社長・資訊校隊",
+      "org": "嘉義縣竹崎高中",
+      "type": "社群",
+      "fields": [],
+      "priority": 0,
+      "grade": "國三",
+      "start": "2021-09-01",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "109 學年度 貓咪盃 Scratch 程式設計競賽 全國賽 硬體組",
+      "role": "參賽者",
+      "result": null,
+      "org": null,
+      "type": "競賽",
+      "fields": [],
+      "priority": 0,
+      "grade": "國二",
+      "start": "2021-04-23",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "109 學年度 第 2 屆科技教育創意實作競賽 全國賽 資訊科技應用組",
+      "role": "參賽者",
+      "result": null,
+      "org": null,
+      "type": "競賽",
+      "fields": [],
+      "priority": 0,
+      "grade": "國二",
+      "start": "2021-04-18",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "109 學年度 貓咪盃 Scratch 程式設計競賽 嘉義縣賽 國中硬體組",
+      "role": "參賽者",
+      "result": "特優・嘉義縣代表隊晉級全國賽",
+      "org": null,
+      "type": "競賽",
+      "fields": [],
+      "priority": 0,
+      "grade": "國二",
+      "start": "2021-03-04",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "109 學年度 第 2 屆科技教育創意實作競賽 嘉義縣賽 資訊科技組",
+      "role": "參賽者",
+      "result": "特優・縣代表隊晉級全國賽",
+      "org": null,
+      "type": "競賽",
+      "fields": [],
+      "priority": 0,
+      "grade": "國二",
+      "start": "2021-01-07",
+      "end": null,
+      "link": null
+    }
+  ]
+}
