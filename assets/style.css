@@ -545,7 +545,15 @@ html.is-loading, html.is-loading body { overflow: hidden; }
 .exp-preview .projects-head { margin-bottom: 24px; }
 .exp-preview .exp-list { max-width: none; }
 /* 首頁區塊底下：置中的「更多」（主要按鈕）與右邊的「全部」 */
-.section-more { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 56px; }
+.section-more { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 16px; margin-top: 64px; }
+/* 比一般按鈕大一號，讓人一眼看到；數字是還沒顯示的筆數與總數 */
+.section-more .button { height: 56px; padding: 0 32px; font-size: 20px; border-radius: 12px; gap: 10px; }
+.section-more .button .icon { width: 20px; height: 20px; transition: transform 300ms var(--ease); }
+.section-more .count { font-family: var(--font-mono); font-size: 16px; font-weight: 400; opacity: .75; }
+.section-more .button.primary:hover .icon { transform: translateY(3px); }
+.section-more .button-all { border-color: var(--accent); color: var(--accent); background: transparent; }
+.section-more .button-all:hover { background: var(--surface); color: var(--text); border-color: var(--text); }
+.section-more .button-all:hover .icon { transform: translateX(4px); }
 .section-more .button.primary[hidden] { display: none; }
 
 /* 專案頁、經歷頁左上的返回首頁 */
