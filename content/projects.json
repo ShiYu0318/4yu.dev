@@ -1,0 +1,149 @@
+{
+  "profile": {
+    "name": "黃士育",
+    "nameEn": "ShiYu Huang",
+    "handle": "ShiYu0318",
+    "avatar": "content/img/profile/avatar.webp",
+    "tagline": "中央大學資工 ・ AI × 全端 × 競程",
+    "bio": "我喜歡把研究問題做成真的能用的系統：從強化學習麻將平台、學術研究助理 RAG，到會依角度顯示不同 QR code 的 3D 列印物件。也在 GDGoC NCU、SCIST 與高中資訊社教 AI，累積 40+ 小時授課。",
+    "links": [
+      { "label": "GitHub", "url": "https://github.com/ShiYu0318" },
+      { "label": "Blog", "url": "https://4yu.dev" },
+      { "label": "CV", "url": "https://github.com/ShiYu0318/ShiYu-CV/blob/main/ShiYu_CV.pdf" }
+    ]
+  },
+  "categories": [
+    { "id": "games-rl", "title": "遊戲・強化學習" },
+    { "id": "ai-rag", "title": "LLM・RAG・Agent" },
+    { "id": "research", "title": "研究・實驗" },
+    { "id": "teaching", "title": "教學・社群" }
+  ],
+  "projects": [
+    {
+      "id": "maijong",
+      "title": "mAIjong 麥醬",
+      "tagline": "台灣十六張麻將的線上遊戲、AI 練習場與強化學習研究平台",
+      "category": "games-rl",
+      "tags": ["python", "fastapi", "nextjs", "pytorch", "pixijs"],
+      "repo": "https://github.com/ShiYu0318/mAIjong",
+      "demo": null,
+      "cover": "content/img/maijong/table.webp",
+      "year": 2026,
+      "featured": true,
+      "status": "published",
+      "updated": "2026-11-16"
+    },
+    {
+      "id": "scholaragent",
+      "title": "ScholaRAGent",
+      "tagline": "Agentic AI 驅動的開源學術研究助理平台",
+      "category": "ai-rag",
+      "tags": ["rag", "fastapi", "react", "knowledge-graph", "agent"],
+      "repo": "https://github.com/ShiYu0318/ScholaRAGent",
+      "demo": null,
+      "cover": null,
+      "year": 2026,
+      "featured": true,
+      "status": "published",
+      "updated": "2026-11-16"
+    },
+    {
+      "id": "embaid-agent",
+      "title": "EmbAId Agent",
+      "tagline": "一行 <script> 就能嵌進網站的自架 AI 助理",
+      "category": "ai-rag",
+      "tags": ["rag", "fastapi", "nextjs", "typescript", "pgvector"],
+      "repo": "https://github.com/ShiYu0318/EmbAId-Agent",
+      "demo": "https://embaid-agent.vercel.app",
+      "cover": "content/img/embaid-agent/hero.webp",
+      "year": 2026,
+      "featured": true,
+      "status": "published",
+      "updated": "2026-11-16"
+    },
+    {
+      "id": "tqr",
+      "title": "TQR",
+      "tagline": "換個角度看，就是另一個 QR code 的 3D 列印物件",
+      "category": "research",
+      "tags": ["python", "optimization", "3d-printing", "react-three-fiber"],
+      "repo": "https://github.com/ShiYu0318/TQR",
+      "demo": null,
+      "cover": "content/img/tqr/social-preview.webp",
+      "year": 2026,
+      "featured": true,
+      "status": "published",
+      "updated": "2026-11-16"
+    },
+    {
+      "id": "isaac-sim2sim-rl",
+      "title": "Isaac Sim2Sim RL",
+      "tagline": "Isaac Lab 訓練、MuJoCo 驗證的人形機器人行走策略",
+      "category": "games-rl",
+      "tags": ["isaac-lab", "mujoco", "ppo", "robotics"],
+      "repo": "https://github.com/ShiYu0318/Isaac-Sim2Sim-RL",
+      "demo": null,
+      "cover": "content/img/isaac-sim2sim-rl/g1-mujoco.webp",
+      "year": 2026,
+      "featured": false,
+      "status": "published",
+      "updated": "2026-11-16"
+    },
+    {
+      "id": "ai-games-lab",
+      "title": "AI Games Lab",
+      "tagline": "20 款經典遊戲，每一款都是一種 AI 演算法的視覺化",
+      "category": "games-rl",
+      "tags": ["java", "javafx", "reinforcement-learning", "search"],
+      "repo": "https://github.com/ShiYu0318/AI-Games-Lab-JavaFX",
+      "demo": null,
+      "cover": "content/img/ai-games-lab/lobby.webp",
+      "year": 2026,
+      "featured": false,
+      "status": "published",
+      "updated": "2026-11-16"
+    },
+    {
+      "id": "jevrag",
+      "title": "JevRAG",
+      "tagline": "讓輸出機率的小型決策模型接管 RAG 中的判斷步驟",
+      "category": "research",
+      "tags": ["rag", "calibration", "python", "zh-tw"],
+      "repo": "https://github.com/ShiYu0318/JevRAG",
+      "demo": null,
+      "cover": null,
+      "year": 2026,
+      "featured": false,
+      "status": "published",
+      "updated": "2026-11-16"
+    },
+    {
+      "id": "ai-courses",
+      "title": "AI 授課紀錄與教材",
+      "tagline": "10 場、43.5 小時、495+ 位學員的 AI 課程",
+      "category": "teaching",
+      "tags": ["teaching", "jupyter", "llm", "rag"],
+      "repo": "https://github.com/ShiYu0318/ShiYu-AI-Courses-Archive",
+      "demo": "https://slides.com/shiyu/ai/",
+      "cover": "content/img/ai-courses/camp-2026.webp",
+      "year": 2026,
+      "featured": false,
+      "status": "published",
+      "updated": "2026-11-16"
+    },
+    {
+      "id": "cp-code",
+      "title": "CP-Code",
+      "tagline": "20+ 個 OJ、800+ 份 C++ 競程題解",
+      "category": "teaching",
+      "tags": ["cpp", "competitive-programming", "apcs"],
+      "repo": "https://github.com/ShiYu0318/CP-Code",
+      "demo": null,
+      "cover": null,
+      "year": 2026,
+      "featured": false,
+      "status": "published",
+      "updated": "2026-11-16"
+    }
+  ]
+}
