@@ -159,17 +159,19 @@ main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平
 .hero {
   max-width: var(--page); margin: 0 auto; padding: 64px var(--gutter) 112px;
   min-height: calc(100vh - 64px); min-height: calc(100svh - 64px);
-  display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 64px; align-items: center; align-content: center;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 80px; align-items: center; align-content: center;
 }
 .hero h1 {
   font-size: clamp(40px, 5.3vw, 66px); line-height: 1.15; font-weight: 500;
   letter-spacing: -0.02em; margin: 0 0 28px;
 }
 .hero h1 .line { overflow: hidden; padding-bottom: .06em; }
-.hero .bio { font-size: clamp(18px, 1.5vw, 20px); line-height: 1.8; color: var(--text); max-width: 36rem; margin: 0 0 40px; }
+.hero .bio { font-size: clamp(18px, 1.5vw, 20px); line-height: 1.8; color: var(--text); max-width: 48rem; text-wrap: pretty; margin: 0 0 40px; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 
-.hero .bio p { margin: 0; }
+.hero .bio p { margin: 0; text-wrap: pretty; }
+/* 連結名稱不要被拆到兩行 */
+.hero .bio a { white-space: nowrap; }
 .hero .bio p + p { margin-top: 0.9em; }
 .hero .bio a { color: var(--text); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 5px; transition: color 150ms var(--ease), text-decoration-color 150ms var(--ease); }
 .hero .bio a:hover { color: var(--accent); text-decoration-color: var(--accent); }
@@ -405,6 +407,7 @@ main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平
   .hero { grid-template-columns: 1fr; gap: 40px; padding: 40px var(--gutter) 104px; }
   .hero h1 { font-size: 35px; }
   .hero .bio { font-size: 17px; }
+  .hero .bio a { white-space: normal; }
   .portrait { justify-self: start; order: -1; }
   .portrait img { width: 120px; height: 120px; box-shadow: none; }
   .portrait figcaption { display: none; }
