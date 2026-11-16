@@ -166,11 +166,37 @@ def check_markdown(p):
         warn(where, "有中英文 / 數字之間沒加空格的地方")
 
 
+EXP_KEYS = {"title", "role", "result", "org", "type", "fields", "priority", "grade", "start", "end", "link"}
+
+
+def check_experience():
+    """經歷只能有公開欄位（AGENTS.md §9）。"""
+    path = ROOT / "content" / "experience.json"
+    where = "content/experience.json"
+    if not path.exists():
+        return 0
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        err(where, f"不是合法 JSON：{e}")
+        return 0
+    for i, x in enumerate(data.get("items", [])):
+        extra = set(x) - EXP_KEYS
+        if extra:
+            err(where, f"第 {i + 1} 筆有非公開欄位：{', '.join(sorted(extra))}")
+        if not x.get("title") or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", x.get("start") or ""):
+            err(where, f"第 {i + 1} 筆缺少標題或開始日期")
+        if "notion." in json.dumps(x):
+            err(where, f"第 {i + 1} 筆含有 Notion 網址")
+    return len(data.get("items", []))
+
+
 def main():
     data = check_manifest()
     if data:
         for p in data["projects"]:
             check_markdown(p)
+    ne = check_experience()
     for w in warnings:
         print(w)
     for e in errors:
@@ -179,7 +205,7 @@ def main():
     if errors:
         print(f"\n檢查失敗：{len(errors)} 個錯誤、{len(warnings)} 個警告")
         sys.exit(1)
-    print(f"✓ 檢查通過：{n} 個專案、{len(warnings)} 個警告")
+    print(f"✓ 檢查通過：{n} 個專案、{ne} 筆經歷、{len(warnings)} 個警告")
 
 
 if __name__ == "__main__":
