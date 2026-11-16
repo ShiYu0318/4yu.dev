@@ -93,7 +93,7 @@ shiyu-portfolio/
     "name": "4yü", "nameEn": "ShiYu Huang", "handle": "ShiYu0318",
     "portrait": "content/img/profile/portrait.webp",  // 首頁右側的圓形照片（正方形原圖，顯示 280px）
     "githubAvatar": "content/img/profile/github-avatar.webp", // GitHub 頭像，頁尾用點陣畫出來
-    "tagline": "國立中央大學資訊工程學系",              // 標題上方那行小字
+    "tagline": "國立中央大學資訊工程學系",              // 學校與系所；首頁不顯示，自我介紹上方不放小字
     "bio": "...",                                     // 自我介紹，見下方規則 5
     "email": "hi@4yu.dev",                            // 頁尾的大字聯絡信箱，點擊會複製
     "links": [{ "label": "GitHub", "url": "https://github.com/ShiYu0318" }]
@@ -252,7 +252,7 @@ shiyu-portfolio/
 - 左上角回首頁的標誌是等寬字的 `~/4yü`（`~/` 用 `--accent`），不用本名、不放圖片；換頁布幕中間也用同一個標誌。
 
 - 英文 `Times New Roman`（沒有安裝的裝置用字形與寬度相同的 `Tinos`），中文 `Noto Sans TC`（思源黑體，台灣字形；不要換成香港字形的昭源系列）；編號、日期、技術清單用等寬的 `Courier Prime`。數字的 0 要是乾淨的橢圓，**不要換成有斜線或中間有點的等寬字**（例如 IBM Plex Mono、JetBrains Mono），那種 0 太像程式碼編輯器、有 AI 感。字體都從 Google Fonts 載入。
-- Times New Roman 的小寫字母偏矮，字級要比無襯線字大一號：最小的標籤不低於 14px，內文 17–18px，自我介紹 21–26px。
+- Times New Roman 的小寫字母偏矮，字級要比無襯線字大一號：最小的標籤不低於 14px，內文 17–18px，自我介紹 18–20px。
 - 頁尾最底下只寫 `© 2026 4yu.dev All Rights Reserved`。
 - 字重只用 400、500，600 以上不用。**不要 700 以上的粗標題**，層級靠大小與顏色。
 - 不用全大寫加寬字距的標籤，不用斜體強調。數字一律 `tabular-nums`。
@@ -283,7 +283,7 @@ shiyu-portfolio/
 | 頂端進度條 | 2px 電光藍，跟著捲動 / 閱讀進度 |
 | Hero 背景 | 等高線地形：Perlin noise 高度場用 marching squares 畫成細線，約 30fps 緩慢流動；游標處隆起一座小山、附近的線變成 `--accent`；邊緣用 mask 淡出，畫面外暫停 |
 | Hero 照片 | 依游標位置做 3D 傾斜；載入時淡入放大 |
-| Hero 文字 | 上方小字用 ScrambleText 解碼出現，自我介紹與按鈕依序淡入上移 |
+| Hero 文字 | 自我介紹與按鈕依序淡入上移 |
 | 跑馬燈 | 所有專案的技術標籤；捲動越快跑越快，方向跟著捲動方向 |
 | 專案數量 | 捲到時從 0 數到總數 |
 | 篩選 / 檢視切換 | 選取底色滑動；篩選用 Flip 重排；切換檢視時舊版面先淡出上移，再換成新版面、畫面內的項目依序浮現（兩種版面的文字不會疊在一起） |
