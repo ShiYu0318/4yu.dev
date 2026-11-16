@@ -511,6 +511,26 @@
       };
     },
 
+    // 交錯檢視的每一列：截圖視差、編號解碼、3D 傾斜（首頁按「更多」新加的列也要綁）
+    features(list) {
+      list.forEach((f) => {
+        const shot = $(".feature-shot", f), img = shot.firstElementChild, meta = $(".meta", f);
+        if (motion && window.ScrollTrigger) {
+          gsap.fromTo(img, { yPercent: -5 }, { yPercent: 5, ease: "none", scrollTrigger: { trigger: shot, start: "top bottom", end: "bottom top", scrub: true } });
+          ScrollTrigger.create({ trigger: f, start: "top 80%", once: true, onEnter: () => this.scramble(meta) });
+        }
+        if (!this.interactive) return;
+        const rx = gsap.quickTo(shot, "rotationX", { duration: 0.5, ease: "power3" }), ry = gsap.quickTo(shot, "rotationY", { duration: 0.5, ease: "power3" });
+        gsap.set(shot, { transformPerspective: 1000 });
+        shot.addEventListener("pointermove", (e) => {
+          const r = shot.getBoundingClientRect();
+          ry(((e.clientX - r.left) / r.width - 0.5) * 22); rx(-((e.clientY - r.top) / r.height - 0.5) * 16);
+        });
+        shot.addEventListener("pointerleave", () => { rx(0); ry(0); });
+      });
+      window.ScrollTrigger?.refresh();
+    },
+
     // 跑馬燈：所有專案用到的技術；捲動越快跑越快，方向跟著捲動方向
     marquee(data) {
       const track = $(".marquee-track");
@@ -541,21 +561,7 @@
         ScrollTrigger.create({ trigger: countEl, start: "top 90%", once: true, onEnter: () =>
           gsap.to(o, { v: total, duration: 1.2, ease: "power2.out", onUpdate: () => { countEl.textContent = String(Math.round(o.v)).padStart(2, "0"); } }) });
       }
-      $$(".feature").forEach((f) => {
-        const shot = $(".feature-shot", f), img = shot.firstElementChild, meta = $(".meta", f);
-        if (motion && window.ScrollTrigger) {
-          gsap.fromTo(img, { yPercent: -5 }, { yPercent: 5, ease: "none", scrollTrigger: { trigger: shot, start: "top bottom", end: "bottom top", scrub: true } });
-          ScrollTrigger.create({ trigger: f, start: "top 80%", once: true, onEnter: () => this.scramble(meta) });
-        }
-        if (!this.interactive) return;
-        const rx = gsap.quickTo(shot, "rotationX", { duration: 0.5, ease: "power3" }), ry = gsap.quickTo(shot, "rotationY", { duration: 0.5, ease: "power3" });
-        gsap.set(shot, { transformPerspective: 1000 });
-        shot.addEventListener("pointermove", (e) => {
-          const r = shot.getBoundingClientRect();
-          ry(((e.clientX - r.left) / r.width - 0.5) * 22); rx(-((e.clientY - r.top) / r.height - 0.5) * 16);
-        });
-        shot.addEventListener("pointerleave", () => { rx(0); ry(0); });
-      });
+      this.features($$(".feature"));
       // 矩陣的卡片也跟著游標傾斜
       if (this.interactive) $$(".tile").forEach((tile) => {
         const shot = $(".tile-shot", tile);
@@ -757,6 +763,13 @@
     onVisible(els, (batch) => gsap.to(batch, { opacity: 1, y: 0, duration: 1.1, ease: EASE, stagger: 0.07, delay: FX.introWait(), overwrite: "auto", ...opts }));
   }
 
+  // 交錯檢視的列：截圖從自己那一側、文字從另一側滑入
+  function revealFeatures(features) {
+    const even = (el) => [...el.parentElement.children].indexOf(el) % 2 === 1;
+    revealShots(features.map((f) => $(".feature-shot", f)), (el) => even(el.closest(".feature")) ? 140 : -140);
+    slideIn(features.map((f) => $(".feature-text", f)), (el) => even(el.closest(".feature")) ? -90 : 90);
+  }
+
   // 從左右滑入：dir(el) 回傳起始的水平位移（負數從左邊、正數從右邊）
   function slideIn(els, dir) {
     if (!motion || !els.length) return;
@@ -814,7 +827,42 @@
       gsap.from(".portrait", { opacity: 0, scale: 0.94, duration: 1, ease: EASE, delay: 0.2 + FX.introDelay });
     }
 
+    FX.marquee(data);
+    renderHomeProjects(data);
+  }
+
+  // 首頁的專案區：先放前 4 個，「更多」每次再加 4 個，全部放完就藏起來；「全部」連到專案頁
+  function renderHomeProjects(data) {
+    const box = $("#home-projects"), more = $("#projects-more"), list = data.published, STEP = 4;
+    $("#project-count").textContent = String(list.length).padStart(2, "0");
+    let shown = 0;
+    const add = (first) => {
+      const next = list.slice(shown, shown + STEP);
+      box.insertAdjacentHTML("beforeend", next.map((p) => featureHTML(p, data)).join(""));
+      const added = [...box.children].slice(shown);
+      shown += next.length;
+      revealFeatures(added);
+      if (first) FX.projects(); else FX.features(added);
+      FX.magnetize(box);
+      if (shown >= list.length) more.hidden = true;
+    };
+    add(true);
+    more.addEventListener("click", () => add(false));
+  }
+
+  // 專案頁：篩選 + 交錯 / 矩陣 / 表格
+  async function renderProjectsPage() {
+    let data;
+    try { data = await loadManifest(); }
+    catch (e) { $("#view-rows").innerHTML = errorBox(e.message); FX.markReady(); return; }
+    FX.markReady();
+    initPalette(data);
+    renderFooter(data);
     renderProjects(data);
+    if (motion) {
+      splitReveal($("#projects-title"), FX.introDelay);
+      gsap.from([".projects-page .controls", ".back-link"], { opacity: 0, y: 12, duration: 0.8, ease: EASE, stagger: 0.08, delay: 0.1 + FX.introDelay });
+    }
   }
 
   // 封面：有截圖用截圖；沒有的話用程式畫一張專案資訊卡（不是假截圖）
@@ -826,6 +874,20 @@
          <span class="gc-stack">${p.tags.map(esc).join(" / ")}</span>
          <span class="gc-no">${String(p.no).padStart(2, "0")}</span>
        </div>`;
+
+  // 交錯檢視的一列（首頁的專案區與專案頁共用）
+  const projectHref = (p) => `project.html?id=${encodeURIComponent(p.id)}`;
+  const featureHTML = (p, data) => `
+      <a class="feature item" data-flip-id="${esc(p.id)}" data-cat="${esc(p.category)}" href="${projectHref(p)}">
+        <div class="feature-shot">${coverHTML(p, data)}</div>
+        <div class="feature-text">
+          <p class="meta">${parts(no(p.no), data.catTitle[p.category], p.year, p.team && "團隊")}</p>
+          <h3>${esc(p.title)}</h3>
+          <p>${esc(p.tagline)}</p>
+          <p class="stack">${p.tags.map(esc).join(" / ")}</p>
+          <span class="read-more"><span>閱讀介紹</span>${ICON.right}</span>
+        </div>
+      </a>`;
 
   // 分段控制：選取底色滑到被點的按鈕
   function segmented(box, onChange) {
@@ -873,17 +935,7 @@
     const meta = (p) => parts(no(p.no), data.catTitle[p.category], p.year, p.team && "團隊");
     const href = (p) => `project.html?id=${encodeURIComponent(p.id)}`;
 
-    $("#view-rows").innerHTML = list.map((p) => `
-      <a class="feature item" data-flip-id="${esc(p.id)}" data-cat="${esc(p.category)}" href="${href(p)}">
-        <div class="feature-shot">${coverHTML(p, data)}</div>
-        <div class="feature-text">
-          <p class="meta">${meta(p)}</p>
-          <h3>${esc(p.title)}</h3>
-          <p>${esc(p.tagline)}</p>
-          <p class="stack">${p.tags.map(esc).join(" / ")}</p>
-          <span class="read-more"><span>閱讀介紹</span>${ICON.right}</span>
-        </div>
-      </a>`).join("");
+    $("#view-rows").innerHTML = list.map((p) => featureHTML(p, data)).join("");
 
     $("#view-grid").innerHTML = list.map((p) => `
       <a class="tile item" data-flip-id="${esc(p.id)}" data-cat="${esc(p.category)}" href="${href(p)}">
@@ -973,12 +1025,10 @@
 
     // 專案從左右滑入：交錯檢視的截圖從自己那一側、文字從另一側；矩陣依所在的半邊；表格一列左一列右
     const even = (el) => [...el.parentElement.children].indexOf(el) % 2 === 1;
-    revealShots($$(".feature-shot"), (el) => even(el.closest(".feature")) ? 140 : -140);
-    slideIn($$(".feature-text"), (el) => even(el.closest(".feature")) ? -90 : 90);
+    revealFeatures($$("#view-rows .feature"));
     slideIn($$(".tile"), (el) => (el.offsetLeft + el.offsetWidth / 2 < el.parentElement.offsetWidth / 2 ? -80 : 80));
     slideIn($$("#index li"), (el) => even(el) ? 60 : -60);
     initPreview(data);
-    FX.marquee(data);
     FX.projects();
   }
 
@@ -1335,10 +1385,21 @@
     try { data = await loadExperience(); }
     catch { $("#experience").hidden = true; return; }
     $("#exp-count").textContent = String(data.items.length).padStart(2, "0");
-    box.innerHTML = data.items.slice(0, 5).map(expRow).join("");
-    riseIn($$(".exp", box));
+    // 先放最近 5 筆，「更多」每次再加 5 筆；「全部」連到經歷頁
+    const more = $("#exp-more"), STEP = 5;
+    let shown = 0;
+    const add = () => {
+      const next = data.items.slice(shown, shown + STEP);
+      box.insertAdjacentHTML("beforeend", next.map(expRow).join(""));
+      riseIn([...box.children].slice(shown));
+      shown += next.length;
+      if (shown >= data.items.length) more.hidden = true;
+    };
+    add();
+    more.addEventListener("click", add);
     FX.magnetize($("#experience"));
   }
+
 
   // 經歷頁：分類 / 時間 / 年級三種分組 + 領域篩選
   async function renderExperience() {
@@ -1444,7 +1505,7 @@
   }
 
   function errorBox(msg) {
-    return `<div class="error-box">${esc(msg)}<br><a href="index.html">回到所有專案</a></div>`;
+    return `<div class="error-box">${esc(msg)}<br><a href="projects.html">回到所有專案</a></div>`;
   }
 
   FX.init();
@@ -1452,5 +1513,6 @@
   initProgress();
   if (document.body.classList.contains("page-home")) { renderHome(); renderExperiencePreview(); }
   if (document.body.classList.contains("page-experience")) renderExperience();
+  if (document.body.classList.contains("page-projects")) renderProjectsPage();
   if (document.body.classList.contains("page-project")) renderProject();
 })();
