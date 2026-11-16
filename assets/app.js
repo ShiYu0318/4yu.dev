@@ -1008,14 +1008,14 @@
   const EXPERIENCE = "content/experience.json";
   // 類型 → 分區標題；順序 = 「分類」檢視的分區順序
   const EXP_TYPES = [
-    ["研究", "研究、論文"],
+    ["研究", "研究 / 論文"],
     ["工作", "工作"],
-    ["社群", "社群、領導"],
+    ["社群", "社群 / 領導"],
     ["競賽", "競賽"],
     ["檢定", "檢定"],
-    ["教學", "教學、演講"],
+    ["教學", "教學 / 演講"],
     ["籌辦", "活動籌辦"],
-    ["學習", "營隊、課程"],
+    ["學習", "營隊 / 課程"],
   ];
   const EXP_TYPE = Object.fromEntries(EXP_TYPES.map(([id, title], i) => [id, { title, order: i }]));
   const GRADES = ["大四", "大三", "大二", "大一", "高三", "高二", "高一", "國三", "國二", "國一"];
@@ -1041,7 +1041,7 @@
     const title = x.link
       ? `<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.title)}${ICON.out}</a>`
       : esc(x.title);
-    const tags = [t.title, ...x.fields].map(esc).join(" / ");
+    const tags = parts(t.title, x.fields.join(" / "));
     return `
       <li class="exp" data-flip-id="${x.key}">
         <p class="meta exp-date">${expDate(x)}${x.start > today ? `<span class="exp-soon">即將</span>` : ""}</p>
