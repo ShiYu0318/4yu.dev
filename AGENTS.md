@@ -281,7 +281,7 @@ shiyu-portfolio/
 | 換頁 | 布幕從下蓋上、中間出現 `~/4yü`，新頁面載入後布幕往上收；點到部落格（blog.4yu.dev）也先蓋布幕再同分頁前往，從部落格點回來時布幕收起（`SITES` 清單） |
 | 導覽列 | 流體 hover：底色滑到游標所在的連結 |
 | 頂端進度條 | 2px 電光藍，跟著捲動 / 閱讀進度 |
-| Hero 背景 | 等高線地形：Perlin noise 高度場用 marching squares 畫成細線，約 30fps 緩慢流動；游標處隆起一座小山、附近的線變成 `--accent`；邊緣用 mask 淡出，畫面外暫停 |
+| Hero 背景 | 六種互動場景隨機播放（`FX.backdrop` 的 `SCENES`）：等高線、流場粒子、ASCII 字元場、生命遊戲、鳥群演算法、梯度下降（3D 損失曲面上三條帶動量的優化路徑往下滾，標出 step 與 loss）。每次進站隨機挑一種（不和上次相同），約 24 秒淡出換下一種；右下角等寬小字顯示目前名稱，點一下換下一種。游標會影響每一種場景；約 30fps，畫面外暫停，邊緣用 mask 淡出。減少動態時只畫一張靜止的等高線、不顯示標籤 |
 | Hero 照片 | 依游標位置做 3D 傾斜；載入時淡入放大 |
 | Hero 文字 | 自我介紹與按鈕依序淡入上移 |
 | 跑馬燈 | 所有專案的技術標籤；捲動越快跑越快，方向跟著捲動方向 |
@@ -301,7 +301,7 @@ shiyu-portfolio/
 
 - 曲線用 `expo.out`（CSS 用 `--ease`），彈回用 `elastic.out`。hover 120–300ms，滑動指示 350–450ms，進場 600–1200ms。
 - 只動 `transform`、`opacity`、`clip-path`、顏色；不要動 `width`、`top` 等版面屬性，也不要 `transition: all`。
-- 一定要尊重 `prefers-reduced-motion: reduce`：Lenis、游標、磁吸、布幕與所有 GSAP 動態都關閉，等高線與點陣靜止不動，跑馬燈靜止。
+- 一定要尊重 `prefers-reduced-motion: reduce`：Lenis、游標、磁吸、布幕與所有 GSAP 動態都關閉，背景只畫一張靜止的等高線、點陣靜止不動，跑馬燈靜止。
 - 觸控裝置（沒有 `hover: hover` 與 `pointer: fine`）不做游標、磁吸、傾斜、hover 預覽與等高線的游標互動。
 - 「捲到時出現」一律用 IntersectionObserver 判斷元素實際位置，不要用 ScrollTrigger 在載入時算好的捲動位置（切換檢視、圖片載入後頁面高度會變，算好的位置會失效，元素就永遠不出現）。
 - GSAP 或 Lenis 沒載入時，內容要完整顯示；初始隱藏狀態只能由 JS 在確定要播動畫時設定。
