@@ -328,7 +328,7 @@
         },
         flow: {
           label: "流場粒子", trails: true,
-          init(s) { s.t = Math.random() * 100; s.p = Array.from({ length: Math.round(w * h / 240) }, () => ({ x: Math.random() * w, y: Math.random() * h, a: Math.random() * 400 })); },
+          init(s) { s.t = Math.random() * 100; s.p = Array.from({ length: Math.round(w * h / 400) }, () => ({ x: Math.random() * w, y: Math.random() * h, a: Math.random() * 400 })); },
           frame(s) {
             s.t += 0.004;
             ctx.globalCompositeOperation = "destination-out"; ctx.fillStyle = "rgba(0,0,0,0.06)"; ctx.fillRect(0, 0, w, h);
@@ -396,7 +396,7 @@
         },
         boids: {
           label: "鳥群演算法",
-          init(s) { s.b = Array.from({ length: Math.min(320, Math.round(w * h / 3200)) }, () => ({ x: Math.random() * w, y: Math.random() * h, vx: Math.random() * 2 - 1, vy: Math.random() * 2 - 1 })); },
+          init(s) { s.b = Array.from({ length: Math.min(520, Math.round(w * h / 2000)) }, () => ({ x: Math.random() * w, y: Math.random() * h, vx: Math.random() * 2 - 1, vy: Math.random() * 2 - 1 })); },
           frame(s) {
             clear(); ctx.lineWidth = 1.2;
             const dim = new Path2D(), lit = new Path2D();
