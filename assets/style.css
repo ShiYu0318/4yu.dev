@@ -541,7 +541,21 @@ html.is-loading, html.is-loading body { overflow: hidden; }
 .exp-preview + .projects { margin-top: 160px; }
 .exp-preview .projects-head { margin-bottom: 24px; }
 .exp-preview .exp-list { max-width: none; }
-.exp-more { display: flex; justify-content: center; margin-top: 40px; }
+/* 首頁區塊底下：置中的「更多」（主要按鈕）與右邊的「全部」 */
+.section-more { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 56px; }
+.section-more .button.primary[hidden] { display: none; }
+
+/* 專案頁、經歷頁左上的返回首頁 */
+.back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; font-size: 16px; margin-bottom: 24px; transition: color 150ms var(--ease); }
+.back-link:hover { color: var(--accent); }
+.back-link .icon { transition: transform 300ms var(--ease); }
+.back-link:hover .icon { transform: translateX(-3px); }
+
+/* 專案頁 */
+.projects-page { padding-top: 80px; }
+.projects-page .projects-head { border-top: 0; padding-top: 0; }
+.projects-head h1 { font-size: clamp(44px, 6.6vw, 70px); font-weight: 500; letter-spacing: -.02em; margin: 0; display: flex; align-items: baseline; gap: 16px; }
+.projects-head h1 .meta { font-size: 18px; letter-spacing: 0; }
 
 .exp-page { max-width: 880px; margin: 0 auto; padding: 80px var(--gutter) 0; }
 .exp-head { margin-bottom: 64px; }
