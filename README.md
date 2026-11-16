@@ -2,7 +2,7 @@
 
 黃士育（ShiYu）的 GitHub 專案作品集。
 
-🔗 **網站**：<https://shiyu0318.github.io/shiyu-portfolio/>
+🔗 **網站**：<https://shiyu0318.github.io/NCCU-GenAI-HW/>
 
 這是一個「**用規則驅動 AI 持續擴充**」的靜態網站：每個專案是一篇 Markdown，網站外觀與內容格式全部由 [`AGENTS.md`](./AGENTS.md) 規範。想新增作品時，只要對 AI 說：
 
