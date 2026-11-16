@@ -12,7 +12,7 @@
 - **系統化的理論課**：從經典機器學習、深度學習架構到強化學習，分成「基礎、加深、加廣、延伸」四部分循序漸進。
 - **生成式 AI 實作**：以 Discord Bot 為介面串接 OpenRouter 與 Ollama，實際練習 system prompt 與 context engineering。
 - **RAG 實作**：從 embedding 概念到建立向量知識庫，把檢索結果組裝成結構化 prompt。
-- **成對的教材**：每個主題都有 📘 Tutorial 與 📝 Exercise 兩份 Notebook，一份上課講解、一份讓學員自己動手。
+- **成對的教材**：每個主題都有 Tutorial 與 Exercise 兩份 Notebook，一份上課講解、一份讓學員自己動手。
 
 ## 技術架構
 
