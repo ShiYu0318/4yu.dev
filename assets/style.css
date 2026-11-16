@@ -6,30 +6,30 @@
 
 /* ---------- 1. 設計變數 ---------- */
 :root {
-  /* 中性色階：黑貓的黑，帶一點耳機的靛色 */
-  --bg: #07081a;
-  --surface: #0d0f24;
-  --raised: #161a33;
-  --line: rgba(238, 240, 255, .08);
-  --line-strong: rgba(238, 240, 255, .14);
+  /* 中性色階：黑貓的黑，帶一點深藍（色相統一約 219°，不偏紫） */
+  --bg: #050b17;
+  --surface: #0c1524;
+  --raised: #141e31;
+  --line: rgba(237, 243, 255, .08);
+  --line-strong: rgba(237, 243, 255, .14);
 
   /* 文字三種角色：眼睛的白、字幕的淡藍白 */
-  --text: #eef0ff;
-  --text-2: #abb4dc;
-  --muted: #7c84ab;
+  --text: #edf3ff;
+  --text-2: #a8bbdc;
+  --muted: #798ba9;
 
   /* 頭像背景的電光藍：填色用（主要按鈕、頁尾點陣頭像、閱讀進度） */
-  --brand: #1533f3;
-  --brand-hover: #2a46ff;
+  --brand: #195bf5;
+  --brand-hover: #3370ff;
   --on-brand: #ffffff;
   /* 電光藍提亮，給文字用的強調色 */
-  --accent: #7f93ff;
+  --accent: #66a8ff;
   --wip: #e0b866;
 
   --button-highlight: inset 0 1px 0 rgba(255, 255, 255, .18);
-  --image-shadow: 0 24px 48px rgba(0, 0, 8, .5);
-  --float-shadow: 0 16px 40px rgba(0, 0, 8, .55);
-  --scrim: rgba(3, 4, 12, .72);
+  --image-shadow: 0 24px 48px rgba(0, 3, 10, .5);
+  --float-shadow: 0 16px 40px rgba(0, 3, 10, .55);
+  --scrim: rgba(2, 6, 14, .72);
 
   /* 英文 Times New Roman（沒有安裝的裝置用字形相同的 Tinos），中文思源黑體 */
   --font-sans: "Times New Roman", Tinos, Times, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
