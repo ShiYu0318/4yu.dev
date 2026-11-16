@@ -22,7 +22,8 @@
     ],
     "portrait": "content/img/profile/portrait.webp",
     "headline": "把研究問題做成真的能用的系統",
-    "email": "hi@4yu.dev"
+    "email": "hi@4yu.dev",
+    "githubAvatar": "content/img/profile/github-avatar.webp"
   },
   "categories": [
     {
