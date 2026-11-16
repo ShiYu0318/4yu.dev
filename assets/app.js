@@ -1,5 +1,5 @@
 /* =========================================================
-   4yü · 專案 — 全站唯一 JS
+   4yü/專案：全站唯一 JS
    資料：content/projects.json + content/projects/<id>.md
    動態：assets/vendor 的 GSAP（ScrollTrigger、SplitText、Flip）。
          GSAP 沒載入或使用者開啟「減少動態效果」時，內容照常顯示、只是不動。
@@ -28,6 +28,8 @@
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  // 並列的幾段資訊用間距分開，不用「·」之類的分隔符號
+  const parts = (...xs) => xs.filter((x) => x || x === 0).map((x) => `<span class="part">${esc(x)}</span>`).join("");
   const no = (n) => `No. ${String(n).padStart(2, "0")}`;
   const external = (url, label, cls = "button") =>
     `<a class="${cls}" href="${esc(url)}" target="_blank" rel="noopener">${esc(label)}${ICON.out}</a>`;
@@ -156,6 +158,8 @@
 
     scramble(el, text = el.textContent, duration = 0.9) {
       if (!motion || !window.ScrambleTextPlugin || !el) return;
+      const segs = el.querySelectorAll(":scope > .part");
+      if (segs.length) { segs.forEach((seg) => this.scramble(seg, seg.textContent, duration)); return; }
       gsap.to(el, { duration, scrambleText: { text, chars: "01ABCDEFabcdef~/", speed: 0.6, revealDelay: 0.2 } });
     },
 
@@ -447,7 +451,7 @@
         </figure>` : ""}
       </div>
       <div class="footer-base">
-        <span>4yü · 2026</span>
+        <span>4yü 2026</span>
         <span>內容與版面依 <a href="https://github.com/ShiYu0318/NCCU-GenAI-HW/blob/main/AGENTS.md">AGENTS.md</a> 維護</span>
       </div>`;
     const field = $(".dotfield-frame", foot);
@@ -537,7 +541,7 @@
     const others = pf.links.filter((l) => l.label !== "GitHub");
     $("#hero").innerHTML = `
       <div class="hero-text">
-        <p class="hero-eyebrow meta">${esc(pf.nameEn)} · ${esc(pf.tagline)}</p>
+        <p class="hero-eyebrow meta">${esc(pf.nameEn)}　${esc(pf.tagline)}</p>
         <h1 class="sr-only">${esc(pf.name)}</h1>
         <p class="bio">${esc(pf.bio)}</p>
         <div class="hero-actions">
@@ -548,7 +552,7 @@
       </div>
       <figure class="portrait">
         <img src="${esc(pf.portrait)}" alt="${esc(pf.name)} 的照片" width="800" height="800">
-        <figcaption class="meta">${esc(pf.name)} · @${esc(pf.handle)}</figcaption>
+        <figcaption class="meta">@${esc(pf.handle)}</figcaption>
       </figure>`;
     FX.hero($("#hero"));
     if (motion) {
@@ -612,7 +616,7 @@
       `<button type="button" role="radio" data-value="${v.id}" aria-checked="${v.id === view}" title="${v.label}">${v.icon}<span>${v.label}</span></button>`).join("");
 
     const list = data.published;
-    const meta = (p) => `${no(p.no)} · ${esc(data.catTitle[p.category])} · ${esc(p.year)}${p.team ? " · 團隊" : ""}`;
+    const meta = (p) => parts(no(p.no), data.catTitle[p.category], p.year, p.team && "團隊");
     const href = (p) => `project.html?id=${encodeURIComponent(p.id)}`;
 
     $("#view-rows").innerHTML = list.map((p) => `
@@ -631,7 +635,7 @@
       <a class="tile item" data-flip-id="${esc(p.id)}" data-cat="${esc(p.category)}" href="${href(p)}">
         <div class="tile-shot">${coverHTML(p, data)}</div>
         <div class="tile-text">
-          <p class="meta">${String(p.no).padStart(2, "0")} · ${esc(data.catTitle[p.category])}${p.team ? " · 團隊" : ""}</p>
+          <p class="meta">${parts(String(p.no).padStart(2, "0"), data.catTitle[p.category], p.team && "團隊")}</p>
           <h3>${esc(p.title)}</h3>
           <p>${esc(p.tagline)}</p>
         </div>
@@ -886,9 +890,9 @@
 
     const p = data.projects.find((x) => x.id === id);
     if (p) {
-      document.title = `${p.title} · 4yü`;
+      document.title = `4yü/${p.title}`;
       $("#project-head").innerHTML = `
-        <p class="meta">${p.no ? no(p.no) + " · " : ""}${esc(data.catTitle[p.category])} · ${esc(p.year)}${p.team ? " · 團隊專案" : ""}</p>
+        <p class="meta">${parts(p.no && no(p.no), data.catTitle[p.category], p.year, p.team && "團隊專案")}</p>
         <h1>${esc(p.title)}</h1>
         <p class="tagline">${esc(p.tagline)}</p>
         <div class="row">
@@ -995,7 +999,7 @@
     const i = list.findIndex((p) => p.id === id);
     if (i < 0) return;
     const link = (p, cls, label) => p
-      ? `<a class="${cls}" href="project.html?id=${encodeURIComponent(p.id)}"><span class="meta">${label} · ${no(p.no)}</span>${esc(p.title)}</a>`
+      ? `<a class="${cls}" href="project.html?id=${encodeURIComponent(p.id)}"><span class="meta">${parts(label, no(p.no))}</span>${esc(p.title)}</a>`
       : "";
     $("#pager").innerHTML = link(list[i - 1], "prev", "上一個") + link(list[i + 1], "next", "下一個");
   }
@@ -1005,14 +1009,14 @@
   const EXPERIENCE = "content/experience.json";
   // 類型 → 分區標題；順序 = 「分類」檢視的分區順序
   const EXP_TYPES = [
-    ["研究", "研究・論文"],
+    ["研究", "研究、論文"],
     ["工作", "工作"],
-    ["社群", "社群・領導"],
+    ["社群", "社群、領導"],
     ["競賽", "競賽"],
     ["檢定", "檢定"],
-    ["教學", "教學・演講"],
+    ["教學", "教學、演講"],
     ["籌辦", "活動籌辦"],
-    ["學習", "營隊・課程"],
+    ["學習", "營隊、課程"],
   ];
   const EXP_TYPE = Object.fromEntries(EXP_TYPES.map(([id, title], i) => [id, { title, order: i }]));
   const GRADES = ["大四", "大三", "大二", "大一", "高三", "高二", "高一", "國三", "國二", "國一"];
@@ -1052,7 +1056,7 @@
             ${x.org ? `<p class="exp-org">${esc(x.org)}</p>` : ""}
             <p class="meta exp-tags">${tags}</p>
           </div>
-          ${x.result ? `<p class="exp-result">${esc(x.result)}</p>` : ""}
+          ${x.result ? `<p class="exp-result">${parts(...x.result.split(/\s*[・·]\s*/))}</p>` : ""}
         </div>
       </li>`;
   }
@@ -1088,7 +1092,7 @@
 
     const items = data.items;
     const years = [...new Set(items.map((x) => x.start.slice(0, 4)))];
-    $("#exp-meta").textContent = `${items.length} 筆 · ${years.at(-1)}–${years[0]} · 同步自 Notion，更新於 ${data.updated}`;
+    $("#exp-meta").innerHTML = parts(`${items.length} 筆`, `${years.at(-1)}–${years[0]}`, `同步自 Notion，更新於 ${data.updated}`);
 
     const fields = ["全部", ...Object.entries(items.flatMap((x) => x.fields).reduce((m, f) => ((m[f] = (m[f] || 0) + 1), m), {}))
       .sort((a, b) => b[1] - a[1]).map(([f]) => f)];
@@ -1141,19 +1145,19 @@
       box.classList.toggle("timeline", view === "year");
       box.innerHTML = view === "year" ? timelineHTML(list) : groupsOf(list).map(([title, rows], i) => `
         <section class="exp-group">
-          <h2 class="exp-group-head"><span>${esc(title)}</span><span class="meta">${String(i + 1).padStart(2, "0")} · ${rows.length} 筆</span><i aria-hidden="true"></i></h2>
+          <h2 class="exp-group-head"><span>${esc(title)}</span><span class="meta">${parts(String(i + 1).padStart(2, "0"), `${rows.length} 筆`)}</span><i aria-hidden="true"></i></h2>
           <ol class="exp-list">${rows.map(expRow).join("")}</ol>
         </section>`).join("");
-      const parts = $$(".exp-group-head, .exp-year-head, .exp-month-head, .exp", box);
+      const nodes = $$(".exp-group-head, .exp-year-head, .exp-month-head, .exp", box);
       if (animate && motion) {
         // 畫面上的部分依序浮現，其餘的交給捲動淡入
-        const inView = parts.filter((el) => el.getBoundingClientRect().top < innerHeight);
+        const inView = nodes.filter((el) => el.getBoundingClientRect().top < innerHeight);
         markRevealed(inView);
         if (inView.length) gsap.fromTo(inView, { opacity: 0, y: 12, filter: "blur(6px)" },
           { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: EASE, stagger: 0.025, clearProps: "filter" });
-        blurIn(parts.filter((el) => !inView.includes(el)));
+        blurIn(nodes.filter((el) => !inView.includes(el)));
       } else {
-        blurIn(parts);
+        blurIn(nodes);
       }
       $$(".exp-group-head .meta", box).forEach((m) => FX.scramble?.(m));
     };
