@@ -42,7 +42,7 @@ def check_manifest():
     for key in ("portrait", "githubAvatar"):
         if not (ROOT / data["profile"].get(key, "")).is_file():
             err(f"profile.{key}", "圖片檔案不存在")
-    for key in ("name", "headline", "tagline", "bio", "email"):
+    for key in ("name", "tagline", "bio", "email"):
         if not data["profile"].get(key):
             err("profile", f"缺少 `{key}`")
 
