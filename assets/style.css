@@ -101,16 +101,28 @@ kbd {
 .search-trigger { border: 1px solid var(--line-strong) !important; margin-left: 8px; }
 
 .site-footer { max-width: var(--page); margin: 160px auto 0; padding: 0 var(--gutter) 40px; }
-.contact { padding-top: 40px; border-top: 1px solid var(--line); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 32px; align-items: end; }
+.contact {
+  padding-top: 40px; border-top: 1px solid var(--line);
+  display: grid; grid-template-columns: minmax(0, 1fr) 320px; grid-template-areas: "mail field" "links field";
+  column-gap: 64px; row-gap: 32px; align-items: end;
+}
+.contact > div:first-child { grid-area: mail; align-self: center; }
 .contact .meta { margin: 0 0 12px; }
 .contact-mail {
   font-size: clamp(32px, 6vw, 72px); line-height: 1.05; font-weight: 500; letter-spacing: -0.03em;
   text-decoration: none; display: inline-block; padding: 0; background: none; border: 0; color: var(--text); cursor: pointer; font-family: inherit;
+  transition: color 150ms var(--ease);
 }
 .contact-mail:hover { color: var(--accent); }
-.contact-links { display: flex; gap: 24px; font-size: 15px; }
+.contact-links { grid-area: links; align-self: start; display: flex; gap: 24px; font-size: 15px; }
 .contact-links a { color: var(--text-2); text-decoration: none; }
 .contact-links a:hover { color: var(--text); }
+
+/* 點陣頭像：GitHub 頭像的黑貓，用點畫成；游標靠近時散開 */
+.dotfield { grid-area: field; margin: 0; }
+.dotfield-frame { position: relative; aspect-ratio: 1; border-radius: var(--r-card); overflow: hidden; border: 1px solid var(--line); background: var(--bg); }
+.dotfield canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; }
+.dotfield figcaption { margin-top: 12px; }
 .footer-base { margin-top: 64px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; color: var(--muted); font-size: 14px; }
 .footer-base a { color: var(--text-2); }
 
@@ -142,23 +154,12 @@ main { display: block; }
 .hero .bio { font-size: 18px; line-height: 1.8; color: var(--text-2); max-width: 36rem; margin: 0 0 40px; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 
-/* 點陣肖像：人像照片取樣成電光藍點陣，游標靠近時散開 */
-.portrait { margin: 0; }
-.portrait-frame { position: relative; aspect-ratio: 4 / 5; border-radius: var(--r-card); overflow: hidden; border: 1px solid var(--line); background: var(--bg); }
-.portrait-frame canvas, .portrait-frame img { position: absolute; inset: 0; width: 100%; height: 100%; }
-.portrait-frame img { object-fit: cover; object-position: 50% 30%; opacity: 0; transition: opacity 400ms var(--ease); }
-.portrait-frame canvas { transition: opacity 400ms var(--ease); cursor: crosshair; }
-.portrait[data-mode="photo"] .portrait-frame img { opacity: 1; }
-.portrait[data-mode="photo"] .portrait-frame canvas { opacity: 0; }
-.portrait figcaption { margin-top: 12px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.portrait .toggle { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid var(--line); border-radius: var(--r-control); }
-.portrait .toggle button {
-  font: 13px var(--font-mono); height: 26px; padding: 0 10px; cursor: pointer;
-  color: var(--muted); background: transparent; border: 0; border-radius: var(--r-tag);
-  transition: color 150ms var(--ease), background-color 150ms var(--ease);
+/* 人像：圓形小照片 */
+.portrait { margin: 0; justify-self: center; display: grid; justify-items: center; gap: 16px; }
+.portrait img {
+  width: 280px; height: 280px; border-radius: 50%; object-fit: cover; object-position: 50% 30%;
+  border: 1px solid var(--line-strong); box-shadow: 0 0 0 8px var(--bg), 0 0 0 9px var(--line);
 }
-.portrait .toggle button:hover { color: var(--text); }
-.portrait .toggle button[aria-pressed="true"] { background: var(--raised); color: var(--text); }
 
 /* ---------- 6. 首頁：專案 ---------- */
 .projects { max-width: var(--page); margin: 0 auto; padding: 0 var(--gutter); }
@@ -345,7 +346,9 @@ main { display: block; }
   .hero { grid-template-columns: 1fr; gap: 40px; padding: 48px var(--gutter) 80px; }
   .hero h1 { font-size: 40px; }
   .hero .bio { font-size: 17px; }
-  .portrait { max-width: 340px; }
+  .portrait { justify-self: start; order: -1; }
+  .portrait img { width: 120px; height: 120px; box-shadow: none; }
+  .portrait figcaption { display: none; }
   .feature, .feature:nth-child(even) { grid-template-columns: 1fr; gap: 24px; }
   .feature:nth-child(even) .feature-shot { order: 0; }
   .feature h3 { font-size: 26px; }
@@ -358,6 +361,7 @@ main { display: block; }
   .project-head .stack { margin-left: 0; flex-basis: 100%; }
   .pager { grid-template-columns: 1fr; }
   .pager .next { grid-column: 1; text-align: left; }
-  .contact { grid-template-columns: 1fr; }
+  .contact { grid-template-columns: 1fr; grid-template-areas: "mail" "links" "field"; }
+  .dotfield { max-width: 320px; }
   .site-footer { margin-top: 112px; }
 }
