@@ -26,23 +26,23 @@
   "categories": [
     {
       "id": "games-rl",
-      "title": "遊戲、強化學習"
+      "title": "遊戲 x 強化學習"
     },
     {
       "id": "ai-rag",
-      "title": "LLM、RAG、Agent"
+      "title": "LLM / RAG / Agent"
     },
     {
       "id": "research",
-      "title": "研究、論文"
+      "title": "研究 / 論文"
     },
     {
       "id": "city-campus",
-      "title": "城市、校園"
+      "title": "城市 / 校園"
     },
     {
       "id": "teaching",
-      "title": "教學、社群"
+      "title": "教學 / 社群"
     }
   ],
   "projects": [
