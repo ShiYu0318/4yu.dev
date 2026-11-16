@@ -95,7 +95,7 @@ shiyu-portfolio/
     "portrait": "content/img/profile/portrait.webp",  // 首頁右側的圓形照片（正方形原圖，顯示 280px）
     "githubAvatar": "content/img/profile/github-avatar.webp", // GitHub 頭像，頁尾用點陣畫出來
     "tagline": "國立中央大學資訊工程學系",              // 學校與系所；首頁不顯示，自我介紹上方不放小字
-    "bio": "...",                                     // 自我介紹，見下方規則 5
+    "bio": "...",                                     // 自我介紹，見下方規則 5；可以用 [文字](網址) 放連結，其他 Markdown 不支援
     "email": "hi@4yu.dev",                            // 頁尾的大字聯絡信箱，點擊會複製
     "links": [{ "label": "Blog", "url": "https://blog.4yu.dev" }, { "label": "GitHub", "url": "..." }, { "label": "LinkedIn", "url": "..." }, { "label": "Instagram", "url": "..." }, { "label": "CV", "url": "..." }]  // 頁尾連結；Blog 同分頁，其餘開新分頁
   },
