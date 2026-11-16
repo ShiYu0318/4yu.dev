@@ -191,12 +191,24 @@ def check_experience():
     return len(data.get("items", []))
 
 
+def check_sitemap():
+    """sitemap.xml 要跟 projects.json 同步（新增或發佈專案後跑 scripts/sitemap.py）。"""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("sitemap", ROOT / "scripts" / "sitemap.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    path = ROOT / "sitemap.xml"
+    if not path.exists() or path.read_text(encoding="utf-8") != mod.build():
+        err("sitemap.xml", "跟 projects.json 不同步，請執行 python3 scripts/sitemap.py")
+
+
 def main():
     data = check_manifest()
     if data:
         for p in data["projects"]:
             check_markdown(p)
     ne = check_experience()
+    check_sitemap()
     for w in warnings:
         print(w)
     for e in errors:
