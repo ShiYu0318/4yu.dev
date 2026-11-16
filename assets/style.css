@@ -31,10 +31,10 @@
   --float-shadow: 0 16px 40px rgba(0, 0, 8, .55);
   --scrim: rgba(3, 4, 12, .72);
 
-  /* 英文 Times New Roman（沒有安裝的裝置用字形相同的 Tinos），中文霞鶩文楷 */
-  --font-sans: "Times New Roman", Tinos, Times, "LXGW WenKai TC", "Kaiti TC", "BiauKai", serif;
-  /* 等寬：打字機風格的 Courier Prime，0 是乾淨的橢圓，沒有斜線或點；中文落到霞鶩文楷 */
-  --font-mono: "Courier Prime", "Courier New", "LXGW WenKai TC", monospace;
+  /* 英文 Times New Roman（沒有安裝的裝置用字形相同的 Tinos），中文思源黑體 */
+  --font-sans: "Times New Roman", Tinos, Times, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  /* 等寬：打字機風格的 Courier Prime，0 是乾淨的橢圓，沒有斜線或點；中文落到思源黑體 */
+  --font-mono: "Courier Prime", "Courier New", "Noto Sans TC", monospace;
 
   --r-tag: 6px;
   --r-control: 8px;
