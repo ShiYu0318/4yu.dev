@@ -61,7 +61,15 @@
     lenis: null,
     interactive: motion && finePointer,
 
+    // 第一次進站的加載畫面結束前，首頁等元素的進場動畫要延後
+    introDelay: 0, introEnd: 0,
+    // 加載畫面還沒結束時，進場動畫要等它結束再播
+    introWait() { return Math.max(0, this.introEnd - performance.now() / 1000); },
+    ready: null, markReady: () => {},
+
     init() {
+      this.ready = new Promise((res) => { this.markReady = res; });
+      this.loader();
       if (!motion) return;
       // 平滑捲動
       if (window.Lenis) {
@@ -86,6 +94,51 @@
     },
 
     // 換頁布幕：點站內連結時布幕從下蓋上，新頁面載入後從上收起
+    /* 加載畫面：散落的點飛向中央、聚成點陣版的 ~/4yü（「~/」是電光藍），
+       資料載好後向四周炸開、底色淡掉。只在同一次瀏覽的第一頁出現；減少動態時不出現。 */
+    loader() {
+      const root = document.documentElement;
+      const done = () => { root.classList.remove("is-loading"); try { sessionStorage.setItem("loaded", "1"); } catch { /* 忽略 */ } };
+      if (!root.classList.contains("is-loading") || !motion) { done(); return; }
+      this.introDelay = 1.6;
+      this.introEnd = performance.now() / 1000 + 1.6;
+      const el = document.createElement("div"); el.className = "loader-screen"; el.setAttribute("aria-hidden", "true");
+      const cv = document.createElement("canvas"); el.appendChild(cv); document.body.appendChild(el);
+      root.classList.remove("is-loading");
+      root.style.overflow = "hidden";
+      const c = cv.getContext("2d"), W = innerWidth, H = innerHeight, dpr = Math.min(devicePixelRatio || 1, 2);
+      cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const mono = cssVar("--font-mono"), text = cssVar("--text"), accent = cssVar("--accent");
+      const fontReady = Promise.race([document.fonts?.load(`100px ${mono}`) ?? Promise.resolve(), new Promise((r) => setTimeout(r, 700))]);
+      fontReady.then(() => {
+        const size = Math.min(W / 4.2, 220), g = W < 760 ? 5 : 7;
+        const off = document.createElement("canvas"), oc = off.getContext("2d");
+        off.width = W; off.height = H;
+        oc.font = `${size}px ${mono}`; oc.textAlign = "center"; oc.textBaseline = "middle"; oc.fillStyle = "#fff";
+        oc.fillText("~/4yü", W / 2, H / 2);
+        const split = W / 2 - oc.measureText("~/4yü").width / 2 + oc.measureText("~/").width;
+        const px = oc.getImageData(0, 0, W, H).data, pts = [];
+        for (let y = 0; y < H; y += g) for (let x = 0; x < W; x += g)
+          if (px[(y * W + x) * 4 + 3] > 128) pts.push({ tx: x, ty: y, x: Math.random() * W, y: Math.random() * H, acc: x < split });
+        const s = Math.max(2, g * 0.42);
+        const draw = () => {
+          c.clearRect(0, 0, W, H);
+          c.fillStyle = text; for (const p of pts) if (!p.acc) c.fillRect(p.x - s / 2, p.y - s / 2, s, s);
+          c.fillStyle = accent; for (const p of pts) if (p.acc) c.fillRect(p.x - s / 2, p.y - s / 2, s, s);
+        };
+        const tl = gsap.timeline({ onUpdate: draw });
+        tl.to(pts, { x: (i, p) => p.tx, y: (i, p) => p.ty, duration: 1.2, ease: "expo.out", stagger: { amount: 0.35, from: "random" } });
+        // 等資料載好（最多 3 秒）才炸開
+        tl.add(() => {
+          tl.pause();
+          Promise.race([this.ready, new Promise((r) => setTimeout(r, 3000))]).then(() => setTimeout(() => tl.play(), 150));
+        });
+        tl.to(pts, { x: (i, p) => p.tx + (p.tx - W / 2) * (2 + Math.random() * 2), y: (i, p) => p.ty + (p.ty - H / 2) * (2 + Math.random() * 2), duration: 0.8, ease: "expo.in" })
+          .to(el, { backgroundColor: "rgba(0,0,0,0)", duration: 0.5, ease: "power2.in" }, "-=0.55")
+          .add(() => { el.remove(); root.style.overflow = ""; done(); });
+      });
+    },
+
     curtain() {
       const el = $(".curtain"), mark = el && $(".wordmark", el);
       if (!el) return;
@@ -194,9 +247,9 @@
     },
 
 
-    /* Hero 背景：六種互動場景隨機播放（見 AGENTS.md §6.5）
+    /* Hero 背景：六種互動場景依序輪播（見 AGENTS.md §6.5）
        等高線、流場粒子、ASCII 字元場、生命遊戲、鳥群、梯度下降。
-       每次進站隨機挑一種，約 24 秒換下一種（淡出淡入），右下角的標籤可以手動換。
+       約 24 秒換下一種（淡出淡入），右下角的「下一個」小圖示可以手動換。
        減少動態時只畫一張靜止的等高線。 */
     backdrop(canvas, host) {
       const ctx = canvas.getContext("2d");
@@ -395,23 +448,24 @@
       SCENES.descent.frame = SCENES.descent.frame.bind(SCENES);
       const ORDER = Object.keys(SCENES);
 
-      // 每次進站隨機挑，避免和上一次相同
-      let prev = null; try { prev = sessionStorage.getItem("backdrop"); } catch { /* 無法使用時不管 */ }
-      const pick = (not) => { const pool = ORDER.filter((k) => k !== not); return pool[(Math.random() * pool.length) | 0]; };
-      let key = motion ? pick(prev) : "contour", state = {}, visible = true, last = 0, since = 0, switching = false;
+      // 依固定順序輪播；下次進站從下一種開始，不會每次都是同一種
+      let saved = null; try { saved = sessionStorage.getItem("backdrop"); } catch { /* 無法使用時不管 */ }
+      const after = (k) => ORDER[(ORDER.indexOf(k) + 1) % ORDER.length];
+      let key = motion ? (ORDER.includes(saved) ? after(saved) : ORDER[0]) : "contour", state = {}, visible = true, last = 0, since = 0, switching = false;
       const label = document.createElement("button");
-      label.type = "button"; label.className = "backdrop-label meta";
-      label.setAttribute("aria-label", "換一種背景");
+      label.type = "button"; label.className = "backdrop-next";
+      label.setAttribute("aria-label", "下一個背景"); label.title = "下一個背景";
+      label.innerHTML = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 17 5-5-5-5"/><path d="m13 17 5-5-5-5"/></svg>';
       host.appendChild(label);
       const start = (k) => {
         key = k; state = {}; SCENES[key].init(state); clear(); since = 0;
-        label.innerHTML = `<span>${esc(SCENES[key].label)}</span><span aria-hidden="true">↻</span>`;
+        canvas.setAttribute("aria-label", SCENES[key].label);
         try { sessionStorage.setItem("backdrop", key); } catch { /* 忽略 */ }
       };
       const next = () => {
         if (switching || !motion) return; switching = true;
         gsap.to(canvas, { opacity: 0, duration: 0.6, ease: "power2.in", onComplete: () => {
-          start(pick(key));
+          start(after(key));
           gsap.to(canvas, { opacity: 1, duration: 0.9, ease: "power2.out", onComplete: () => { switching = false; } });
         } });
       };
@@ -670,8 +724,8 @@
   function revealOnScroll(targets, opts = {}) {
     const els = typeof targets === "string" ? $$(targets) : targets;
     if (!motion || !els.length) return;
-    gsap.set(els, { opacity: 0, y: 16 });
-    onVisible(els, (batch) => gsap.to(batch, { opacity: 1, y: 0, duration: 0.7, ease: EASE, stagger: 0.06, overwrite: "auto", ...opts }));
+    gsap.set(els, { opacity: 0, y: 36 });
+    onVisible(els, (batch) => gsap.to(batch, { opacity: 1, y: 0, duration: 1.1, ease: EASE, stagger: 0.07, delay: FX.introWait(), overwrite: "auto", ...opts }));
   }
 
   // 截圖展開：外框從內縮的裁切展開，圖片從放大縮回
@@ -690,7 +744,8 @@
   async function renderHome() {
     let data;
     try { data = await loadManifest(); }
-    catch (e) { $("#hero").innerHTML = errorBox(e.message); return; }
+    catch (e) { $("#hero").innerHTML = errorBox(e.message); FX.markReady(); return; }
+    FX.markReady();
     initPalette(data);
     renderFooter(data);
 
@@ -712,8 +767,8 @@
       </figure>`;
     FX.hero($("#hero"));
     if (motion) {
-      gsap.from([".hero .bio", ".hero-actions"], { opacity: 0, y: 16, duration: 0.9, ease: EASE, stagger: 0.1, delay: 0.15 });
-      gsap.from(".portrait", { opacity: 0, scale: 0.94, duration: 1, ease: EASE, delay: 0.2 });
+      gsap.from([".hero .bio", ".hero-actions"], { opacity: 0, y: 24, duration: 1, ease: EASE, stagger: 0.1, delay: 0.15 + FX.introDelay });
+      gsap.from(".portrait", { opacity: 0, scale: 0.94, duration: 1, ease: EASE, delay: 0.2 + FX.introDelay });
     }
 
     renderProjects(data);
@@ -1032,7 +1087,7 @@
   async function renderProject() {
     const article = $("#article");
     const id = new URLSearchParams(location.search).get("id");
-    if (!id) { article.innerHTML = errorBox("網址缺少 ?id=，請從首頁選一個專案"); return; }
+    if (!id) { article.innerHTML = errorBox("網址缺少 ?id=，請從首頁選一個專案"); FX.markReady(); return; }
 
     let data, md;
     try {
@@ -1040,7 +1095,8 @@
       const res = await fetch(PROJECT_DIR + encodeURIComponent(id) + ".md", { cache: "no-cache" });
       if (!res.ok) throw new Error(`找不到專案「${id}」（HTTP ${res.status}）`);
       md = await res.text();
-    } catch (e) { article.innerHTML = errorBox(e.message); return; }
+    } catch (e) { article.innerHTML = errorBox(e.message); FX.markReady(); return; }
+    FX.markReady();
     initPalette(data);
     renderFooter(data);
 
@@ -1057,9 +1113,9 @@
           <span class="stack">${p.tags.map(esc).join(" / ")}</span>
         </div>
         ${p.cover ? `<figure class="project-cover"><img src="${esc(p.cover)}" alt="${esc(p.title)} 的主要畫面"></figure>` : ""}`;
-      splitReveal($("#project-head h1"));
-      if (motion) gsap.from(["#project-head .meta", "#project-head .tagline", "#project-head .row"], { opacity: 0, y: 12, duration: 0.8, ease: EASE, stagger: 0.08, delay: 0.2 });
-      if (motion && p.cover) gsap.from(".project-cover", { clipPath: "inset(10% 6% 10% 6% round 16px)", opacity: 0, duration: 1.2, ease: EASE, delay: 0.3 });
+      splitReveal($("#project-head h1"), FX.introDelay);
+      if (motion) gsap.from(["#project-head .meta", "#project-head .tagline", "#project-head .row"], { opacity: 0, y: 12, duration: 0.8, ease: EASE, stagger: 0.08, delay: 0.2 + FX.introDelay });
+      if (motion && p.cover) gsap.from(".project-cover", { clipPath: "inset(10% 6% 10% 6% round 16px)", opacity: 0, duration: 1.2, ease: EASE, delay: 0.3 + FX.introDelay });
     }
 
     article.innerHTML = window.marked ? marked.parse(md, { gfm: true }) : `<pre>${esc(md)}</pre>`;
@@ -1217,12 +1273,12 @@
       </li>`;
   }
 
-  // 經歷列從模糊中浮現（參考 vicwen.com 的捲動進場）
-  function blurIn(els) {
+  // 經歷列捲到時往上浮出
+  function riseIn(els) {
     if (!motion || !els.length) return;
     els = els.filter((el) => !revealed.has(el));
-    gsap.set(els, { opacity: 0, y: 12, filter: "blur(8px)" });
-    onVisible(els, (batch) => gsap.to(batch, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9, ease: EASE, stagger: 0.05, clearProps: "filter", overwrite: "auto" }), "0px 0px -4% 0px");
+    gsap.set(els, { opacity: 0, y: 36 });
+    onVisible(els, (batch) => gsap.to(batch, { opacity: 1, y: 0, duration: 1.1, ease: EASE, stagger: 0.07, delay: FX.introWait(), overwrite: "auto" }), "0px 0px -4% 0px");
   }
 
   // 首頁：最近 5 筆
@@ -1234,7 +1290,7 @@
     catch { $("#experience").hidden = true; return; }
     $("#exp-count").textContent = String(data.items.length).padStart(2, "0");
     box.innerHTML = data.items.slice(0, 5).map(expRow).join("");
-    blurIn($$(".exp", box));
+    riseIn($$(".exp", box));
     FX.magnetize($("#experience"));
   }
 
@@ -1242,7 +1298,8 @@
   async function renderExperience() {
     let manifest, data;
     try { [manifest, data] = await Promise.all([loadManifest(), loadExperience()]); }
-    catch (e) { $("#exp-groups").innerHTML = errorBox(e.message); return; }
+    catch (e) { $("#exp-groups").innerHTML = errorBox(e.message); FX.markReady(); return; }
+    FX.markReady();
     initPalette(manifest);
     renderFooter(manifest);
 
@@ -1309,11 +1366,11 @@
         // 畫面上的部分依序浮現，其餘的交給捲動淡入
         const inView = nodes.filter((el) => el.getBoundingClientRect().top < innerHeight);
         markRevealed(inView);
-        if (inView.length) gsap.fromTo(inView, { opacity: 0, y: 12, filter: "blur(6px)" },
-          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: EASE, stagger: 0.025, clearProps: "filter" });
-        blurIn(nodes.filter((el) => !inView.includes(el)));
+        if (inView.length) gsap.fromTo(inView, { opacity: 0, y: 28 },
+          { opacity: 1, y: 0, duration: 0.8, ease: EASE, stagger: 0.03 });
+        riseIn(nodes.filter((el) => !inView.includes(el)));
       } else {
-        blurIn(nodes);
+        riseIn(nodes);
       }
       $$(".exp-group-head .meta", box).forEach((m) => FX.scramble?.(m));
     };
@@ -1335,8 +1392,8 @@
     });
     draw(false);
     if (motion) {
-      splitReveal($("#exp-page-title"));
-      gsap.from(["#exp-meta", ".exp-head .controls"], { opacity: 0, y: 12, duration: 0.8, ease: EASE, stagger: 0.08, delay: 0.1 });
+      splitReveal($("#exp-page-title"), FX.introDelay);
+      gsap.from(["#exp-meta", ".exp-head .controls"], { opacity: 0, y: 12, duration: 0.8, ease: EASE, stagger: 0.08, delay: 0.1 + FX.introDelay });
     }
   }
 
