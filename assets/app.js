@@ -246,8 +246,8 @@
       hero.addEventListener("pointermove", (e) => {
         topo.point(e.clientX, e.clientY);
         const hr = hero.getBoundingClientRect();
-        tx(((e.clientX - hr.left) / hr.width - 0.5) * 18);
-        ty(-((e.clientY - hr.top) / hr.height - 0.5) * 18);
+        tx(((e.clientX - hr.left) / hr.width - 0.5) * 40);
+        ty(-((e.clientY - hr.top) / hr.height - 0.5) * 34);
       });
       hero.addEventListener("pointerleave", () => { topo.leave(); tx(0); ty(0); });
 
@@ -544,9 +544,20 @@
         gsap.set(shot, { transformPerspective: 1000 });
         shot.addEventListener("pointermove", (e) => {
           const r = shot.getBoundingClientRect();
-          ry(((e.clientX - r.left) / r.width - 0.5) * 10); rx(-((e.clientY - r.top) / r.height - 0.5) * 8);
+          ry(((e.clientX - r.left) / r.width - 0.5) * 22); rx(-((e.clientY - r.top) / r.height - 0.5) * 16);
         });
         shot.addEventListener("pointerleave", () => { rx(0); ry(0); });
+      });
+      // 矩陣的卡片也跟著游標傾斜
+      if (this.interactive) $$(".tile").forEach((tile) => {
+        const shot = $(".tile-shot", tile);
+        const rx = gsap.quickTo(shot, "rotationX", { duration: 0.5, ease: "power3" }), ry = gsap.quickTo(shot, "rotationY", { duration: 0.5, ease: "power3" });
+        gsap.set(shot, { transformPerspective: 700 });
+        tile.addEventListener("pointermove", (e) => {
+          const r = shot.getBoundingClientRect();
+          ry(((e.clientX - r.left) / r.width - 0.5) * 24); rx(-((e.clientY - r.top) / r.height - 0.5) * 18);
+        });
+        tile.addEventListener("pointerleave", () => { rx(0); ry(0); });
       });
       if (this.interactive) $$("#index a").forEach((a) => {
         const n = $(".no", a), text = n.textContent;
@@ -736,13 +747,21 @@
     onVisible(els, (batch) => gsap.to(batch, { opacity: 1, y: 0, duration: 1.1, ease: EASE, stagger: 0.07, delay: FX.introWait(), overwrite: "auto", ...opts }));
   }
 
+  // 從左右滑入：dir(el) 回傳起始的水平位移（負數從左邊、正數從右邊）
+  function slideIn(els, dir) {
+    if (!motion || !els.length) return;
+    els.forEach((el) => gsap.set(el, { opacity: 0, x: dir(el) }));
+    onVisible(els, (batch) => gsap.to(batch, { opacity: 1, x: 0, duration: 1.2, ease: EASE, stagger: 0.08, delay: FX.introWait(), overwrite: "auto" }));
+  }
+
   // 截圖展開：外框從內縮的裁切展開，圖片從放大縮回
-  function revealShots(shots) {
+  // dir(el) 有給的話同時從左右滑入（同一個元素只能交給一個捲動觀察器）
+  function revealShots(shots, dir = () => 0) {
     if (!motion) return;
-    gsap.set(shots, { clipPath: "inset(10% 6% 10% 6% round 16px)" });
+    shots.forEach((s) => gsap.set(s, { clipPath: "inset(10% 6% 10% 6% round 16px)", x: dir(s), opacity: dir(s) ? 0 : 1 }));
     shots.forEach((s) => gsap.set(s.firstElementChild, { scale: 1.2 }));
-    onVisible(shots, (batch) => batch.forEach((shot) => {
-      gsap.to(shot, { clipPath: "inset(0% 0% 0% 0% round 16px)", duration: 1.1, ease: EASE, clearProps: "clipPath" });
+    onVisible(shots, (batch) => batch.forEach((shot, i) => {
+      gsap.to(shot, { clipPath: "inset(0% 0% 0% 0% round 16px)", x: 0, opacity: 1, duration: 1.2, ease: EASE, delay: FX.introWait() + i * 0.08, clearProps: "clipPath" });
       gsap.to(shot.firstElementChild, { scale: 1, duration: 1.4, ease: EASE });
     }));
   }
@@ -910,11 +929,12 @@
         if (motion) {
           const shots = $$(".feature-shot", viewEl(view)), texts = $$(".feature-text", viewEl(view));
           if (shots.length) { gsap.set(shots, { clearProps: "clipPath" }); shots.forEach((s) => gsap.set(s.firstElementChild, { scale: 1 })); }
-          if (texts.length) gsap.set(texts, { opacity: 1, y: 0 });
+          if (texts.length) gsap.set(texts, { opacity: 1, y: 0, x: 0 });
+          if (shots.length) gsap.set(shots, { opacity: 1, x: 0 });
           const top = viewEl(view).getBoundingClientRect().top;
           const inView = to.filter((el) => el.getBoundingClientRect().top < innerHeight + 40);
-          if (to.length) gsap.set(to, { opacity: 1, y: 0 });
-          if (inView.length) gsap.fromTo(inView, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: EASE, stagger: 0.035, clearProps: "transform" });
+          if (to.length) gsap.set(to, { opacity: 1, y: 0, x: 0 });
+          if (inView.length) gsap.fromTo(inView, { opacity: 0, x: (i) => (i % 2 ? 60 : -60) }, { opacity: 1, x: 0, duration: 0.7, ease: EASE, stagger: 0.035, clearProps: "transform" });
           if (top < 0) FX.lenis ? FX.lenis.scrollTo("#projects", { offset: -72, duration: 0.8 }) : null;
         }
         window.ScrollTrigger?.refresh();
@@ -934,10 +954,12 @@
     showView(view);
     filter();
 
-    revealShots($$(".feature-shot"));
-    revealOnScroll($$(".feature-text"));
-    revealOnScroll($$(".tile"));
-    revealOnScroll($$("#index li"));
+    // 專案從左右滑入：交錯檢視的截圖從自己那一側、文字從另一側；矩陣依所在的半邊；表格一列左一列右
+    const even = (el) => [...el.parentElement.children].indexOf(el) % 2 === 1;
+    revealShots($$(".feature-shot"), (el) => even(el.closest(".feature")) ? 140 : -140);
+    slideIn($$(".feature-text"), (el) => even(el.closest(".feature")) ? -90 : 90);
+    slideIn($$(".tile"), (el) => (el.offsetLeft + el.offsetWidth / 2 < el.parentElement.offsetWidth / 2 ? -80 : 80));
+    slideIn($$("#index li"), (el) => even(el) ? 60 : -60);
     initPreview(data);
     FX.marquee(data);
     FX.projects();
