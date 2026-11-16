@@ -4,7 +4,7 @@
     "nameEn": "ShiYu Huang",
     "handle": "ShiYu0318",
     "tagline": "國立中央大學資訊工程學系",
-    "bio": "我是黃士育，國立中央大學資訊工程學系二年級，目前在 IISR 實驗室做專題。研究方向是自然語言處理與深度強化學習，關注 RAG，以及讓模型的回答有證據可循。高中時是競賽程式選手，曾任 SCIST 南臺灣學生資訊社群第 5 屆總召；現在是 GDG on Campus NCU 的技術組長，有約 3 年、累計超過 500 小時的教學經驗。",
+    "bio": "我是黃士育，國立中央大學資訊工程學系二年級，目前在 IISR 實驗室做專題。研究方向是自然語言處理與深度強化學習。高中時是競賽程式選手，曾任 SCIST 南臺灣學生資訊社群第 5 屆總召；現在是 GDG on Campus NCU 的技術組長，有約 3 年、累計超過 500 小時的教學經驗。",
     "links": [
       {
         "label": "GitHub",
@@ -20,7 +20,6 @@
       }
     ],
     "portrait": "content/img/profile/portrait.webp",
-    "headline": "研究 NLP 與強化學習\n把想法做成能用的系統",
     "email": "hi@4yu.dev",
     "githubAvatar": "content/img/profile/github-avatar.webp"
   },
