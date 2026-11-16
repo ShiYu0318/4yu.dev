@@ -39,8 +39,12 @@ def check_manifest():
     if errors:
         return None
 
-    if not (ROOT / data["profile"].get("avatar", "")).is_file():
-        err("profile.avatar", "頭像檔案不存在")
+    for key in ("avatar", "portrait"):
+        if not (ROOT / data["profile"].get(key, "")).is_file():
+            err(f"profile.{key}", "圖片檔案不存在")
+    for key in ("name", "headline", "tagline", "bio"):
+        if not data["profile"].get(key):
+            err("profile", f"缺少 `{key}`")
 
     cats = {c["id"] for c in data["categories"]}
     seen = set()
@@ -83,10 +87,12 @@ def check_manifest():
                 err(where, f"cover 必須放在 content/img/{pid}/")
         if p.get("featured") and p.get("status") == "published":
             featured += 1
+            if not cover:
+                err(where, "featured 專案必須有 cover")
         if not (PROJECT_DIR / f"{pid}.md").is_file():
             err(where, f"找不到 content/projects/{pid}.md")
-    if featured > 4:
-        err("projects.json", f"featured 共 {featured} 個，最多 4 個")
+    if featured > 3:
+        err("projects.json", f"featured 共 {featured} 個，最多 3 個")
 
     for md in PROJECT_DIR.glob("*.md"):
         if md.stem not in seen:
@@ -154,6 +160,8 @@ def check_markdown(p):
     for bad in ("<script", "<style", "style="):
         if bad in plain:
             err(where, f"Markdown 中不能使用 `{bad}`")
+    if re.search(r"[\U0001F300-\U0001FAFF\u2600-\u27BF]", body):
+        err(where, "介紹頁不能使用 emoji")
     for word in SIMPLIFIED:
         if word in body:
             warn(where, f"疑似非台灣用語「{word}」")
