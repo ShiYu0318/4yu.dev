@@ -38,7 +38,7 @@
   const gsap = window.gsap;
   const motion = !!gsap && !reduced;
   if (gsap) {
-    [window.ScrollTrigger, window.SplitText, window.Flip].forEach((p) => p && gsap.registerPlugin(p));
+    [window.ScrollTrigger, window.SplitText, window.Flip, window.ScrambleTextPlugin].forEach((p) => p && gsap.registerPlugin(p));
   }
 
   async function loadManifest() {
@@ -50,6 +50,255 @@
     data.catTitle = Object.fromEntries(data.categories.map((c) => [c.id, c.title]));
     return data;
   }
+
+
+  /* ================= 互動與動態效果（AGENTS.md §6.5） ================= */
+  const FX = {
+    lenis: null,
+    interactive: motion && finePointer,
+
+    init() {
+      if (!motion) return;
+      // 平滑捲動
+      if (window.Lenis) {
+        this.lenis = new Lenis({ duration: 1.1, easing: (t) => 1 - Math.pow(1 - t, 4) });
+        if (window.ScrollTrigger) this.lenis.on("scroll", ScrollTrigger.update);
+        gsap.ticker.add((t) => this.lenis.raf(t * 1000));
+        gsap.ticker.lagSmoothing(0);
+        document.addEventListener("click", (e) => {
+          const a = e.target.closest('a[href*="#"]');
+          if (!a || a.target === "_blank") return;
+          const url = new URL(a.href, location.href);
+          if (url.pathname !== location.pathname || !url.hash) return;
+          const target = document.getElementById(decodeURIComponent(url.hash.slice(1)));
+          if (!target) return;
+          e.preventDefault();
+          this.lenis.scrollTo(target, { offset: -72 });
+          history.replaceState(null, "", url.hash);
+        });
+      }
+      this.curtain();
+      if (this.interactive) { this.cursor(); this.magnetize(document); }
+    },
+
+    // 換頁布幕：點站內連結時布幕從下蓋上，新頁面載入後從上收起
+    curtain() {
+      const el = $(".curtain"), mark = el && $(".wordmark", el);
+      if (!el) return;
+      if (sessionStorage.getItem("curtain")) {
+        sessionStorage.removeItem("curtain");
+        document.documentElement.classList.add("is-entering");
+        gsap.set(el, { scaleY: 1, transformOrigin: "50% 0%" });
+        gsap.set(mark, { opacity: 1 });
+        gsap.timeline({ onComplete: () => document.documentElement.classList.remove("is-entering") })
+          .to(mark, { opacity: 0, y: -12, duration: 0.25, ease: "power2.in" })
+          .to(el, { scaleY: 0, duration: 0.6, ease: "expo.inOut" }, "-=0.05");
+      }
+      addEventListener("pageshow", (e) => { if (e.persisted) gsap.set(el, { scaleY: 0 }); });
+      document.addEventListener("click", (e) => {
+        const a = e.target.closest("a[href]");
+        if (e.defaultPrevented || !a || a.target === "_blank" || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+        const url = new URL(a.href, location.href);
+        if (url.origin !== location.origin || !/\.html$|\/$/.test(url.pathname)) return;
+        if (url.pathname === location.pathname && url.search === location.search) return;
+        e.preventDefault();
+        sessionStorage.setItem("curtain", "1");
+        document.documentElement.classList.add("is-leaving");
+        gsap.set(el, { transformOrigin: "50% 100%" });
+        gsap.timeline({ onComplete: () => { location.href = url.href; } })
+          .to(el, { scaleY: 1, duration: 0.5, ease: "expo.inOut" })
+          .fromTo(mark, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.25 }, "-=0.15");
+      });
+    },
+
+    // 自訂游標：小點緊跟、圓圈延遲跟隨；移到連結放大，移到專案變成標籤
+    cursor() {
+      const root = $(".cursor"), dot = $(".cursor-dot"), ring = $(".cursor-ring"), label = $(".cursor-label");
+      if (!root) return;
+      document.documentElement.classList.add("has-cursor");
+      const dx = gsap.quickTo(dot, "x", { duration: 0.1 }), dy = gsap.quickTo(dot, "y", { duration: 0.1 });
+      const rx = gsap.quickTo(ring, "x", { duration: 0.45, ease: "power3" }), ry = gsap.quickTo(ring, "y", { duration: 0.45, ease: "power3" });
+      addEventListener("pointermove", (e) => { dx(e.clientX); dy(e.clientY); rx(e.clientX); ry(e.clientY); }, { passive: true });
+      document.addEventListener("pointerover", (e) => {
+        const t = e.target;
+        const tagged = t.closest("[data-cursor]");
+        const hidden = t.closest("canvas, input, textarea, .prose pre");
+        const link = t.closest("a, button, [role='tab'], summary");
+        root.classList.toggle("is-label", !!tagged);
+        root.classList.toggle("is-link", !tagged && !!link);
+        root.classList.toggle("is-hidden", !!hidden);
+        if (tagged) label.textContent = tagged.dataset.cursor;
+      });
+      document.addEventListener("pointerleave", () => root.classList.add("is-hidden"));
+      document.addEventListener("pointerenter", () => root.classList.remove("is-hidden"));
+    },
+
+    // 磁吸：按鈕被游標吸過去一點，離開後彈回
+    magnetize(root) {
+      if (!this.interactive) return;
+      $$(".button, .search-trigger, .contact-links a, .contact-mail, .pager a, .toc-toggle", root).forEach((el) => {
+        if (el.dataset.magnet) return;
+        el.dataset.magnet = "1";
+        const strength = el.matches(".contact-mail, .pager a") ? 0.12 : 0.3;
+        const xTo = gsap.quickTo(el, "x", { duration: 0.4, ease: "power3" }), yTo = gsap.quickTo(el, "y", { duration: 0.4, ease: "power3" });
+        el.addEventListener("pointermove", (e) => {
+          const r = el.getBoundingClientRect();
+          xTo((e.clientX - r.left - r.width / 2) * strength); yTo((e.clientY - r.top - r.height / 2) * strength);
+        });
+        el.addEventListener("pointerleave", () => gsap.to(el, { x: 0, y: 0, duration: 0.8, ease: "elastic.out(1, 0.4)" }));
+      });
+    },
+
+    scramble(el, text = el.textContent, duration = 0.9) {
+      if (!motion || !window.ScrambleTextPlugin || !el) return;
+      gsap.to(el, { duration, scrambleText: { text, chars: "01ABCDEFabcdef~/", speed: 0.6, revealDelay: 0.2 } });
+    },
+
+    // Hero：背景格點、照片 3D 傾斜、標題字被滑過時跳動、小字解碼
+    hero(hero, split) {
+      this.scramble($(".hero-eyebrow", hero), undefined, 1.4);
+      const canvas = document.createElement("canvas");
+      canvas.className = "hero-grid"; canvas.setAttribute("aria-hidden", "true");
+      hero.prepend(canvas);
+      const ctx = canvas.getContext("2d");
+      const base = cssVar("--muted"), hot = cssVar("--accent");
+      let w = 0, h = 0, dpr = 1, pointer = { x: -999, y: -999 }, strength = { v: 0 };
+      const GAP = 28, R = 180;
+      const draw = () => {
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, w, h);
+        const ox = (w % GAP) / 2, oy = (h % GAP) / 2;
+        for (let y = oy; y < h; y += GAP) {
+          for (let x = ox; x < w; x += GAP) {
+            const ddx = pointer.x - x, ddy = pointer.y - y, d = Math.sqrt(ddx * ddx + ddy * ddy);
+            const k = Math.max(0, 1 - d / R) * strength.v;
+            const px = x + ddx * k * 0.12, py = y + ddy * k * 0.12;
+            ctx.globalAlpha = 0.22 + k * 0.78;
+            ctx.fillStyle = k > 0.05 ? hot : base;
+            ctx.beginPath(); ctx.arc(px, py, 1 + k * 2.4, 0, Math.PI * 2); ctx.fill();
+          }
+        }
+        ctx.globalAlpha = 1;
+      };
+      const size = () => {
+        const r = canvas.getBoundingClientRect();
+        w = r.width; h = r.height; dpr = Math.min(devicePixelRatio || 1, 2);
+        canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+        draw();
+      };
+      new ResizeObserver(size).observe(hero);
+      if (!this.interactive) return;
+
+      let queued = false;
+      const queue = () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; draw(); }); } };
+      const img = $(".portrait img", hero);
+      const tx = gsap.quickTo(img, "rotationY", { duration: 0.6, ease: "power3" });
+      const ty = gsap.quickTo(img, "rotationX", { duration: 0.6, ease: "power3" });
+      hero.addEventListener("pointermove", (e) => {
+        const r = canvas.getBoundingClientRect();
+        pointer = { x: e.clientX - r.left, y: e.clientY - r.top };
+        if (strength.v < 1 && !gsap.isTweening(strength)) gsap.to(strength, { v: 1, duration: 0.4, onUpdate: queue });
+        queue();
+        const hr = hero.getBoundingClientRect();
+        tx(((e.clientX - hr.left) / hr.width - 0.5) * 18);
+        ty(-((e.clientY - hr.top) / hr.height - 0.5) * 18);
+      });
+      hero.addEventListener("pointerleave", () => {
+        gsap.to(strength, { v: 0, duration: 0.6, onUpdate: queue });
+        tx(0); ty(0);
+      });
+      split?.chars.forEach((c) => c.addEventListener("pointerenter", () => {
+        if (gsap.isTweening(c)) return;
+        gsap.timeline().to(c, { y: -12, color: hot, duration: 0.18, ease: "power2.out" }).to(c, { y: 0, clearProps: "color", duration: 0.6, ease: "elastic.out(1, 0.35)" });
+      }));
+    },
+
+    // 跑馬燈：所有專案用到的技術；捲動越快跑越快，方向跟著捲動方向
+    marquee(data) {
+      const track = $(".marquee-track");
+      if (!track) return;
+      const tags = [...new Set(data.published.flatMap((p) => p.tags))];
+      const run = tags.map((t) => `<span>${esc(t)}</span><span class="sep">/</span>`).join("");
+      track.innerHTML = run + run;
+      if (!motion) return;
+      let x = 0, dir = -1, boost = 0;
+      const half = () => track.scrollWidth / 2;
+      gsap.ticker.add((t, dt) => {
+        x += dir * (0.04 + boost) * dt;
+        boost *= 0.94;
+        const hw = half();
+        if (x <= -hw) x += hw; else if (x > 0) x -= hw;
+        gsap.set(track, { x });
+      });
+      if (window.ScrollTrigger) ScrollTrigger.create({
+        onUpdate: (self) => { dir = self.direction === 1 ? -1 : 1; boost = Math.min(Math.abs(self.getVelocity()) / 2500, 1.2); },
+      });
+    },
+
+    // 專案區：截圖 3D 傾斜與視差、編號解碼、清單隨捲動速度傾斜、數字倒數
+    projects() {
+      const countEl = $("#project-count");
+      if (motion && countEl && window.ScrollTrigger) {
+        const total = Number(countEl.textContent), o = { v: 0 };
+        ScrollTrigger.create({ trigger: countEl, start: "top 90%", once: true, onEnter: () =>
+          gsap.to(o, { v: total, duration: 1.2, ease: "power2.out", onUpdate: () => { countEl.textContent = String(Math.round(o.v)).padStart(2, "0"); } }) });
+      }
+      $$(".feature").forEach((f) => {
+        const shot = $(".feature-shot", f), img = shot.firstElementChild, meta = $(".meta", f);
+        if (motion && window.ScrollTrigger) {
+          gsap.fromTo(img, { yPercent: -5 }, { yPercent: 5, ease: "none", scrollTrigger: { trigger: shot, start: "top bottom", end: "bottom top", scrub: true } });
+          ScrollTrigger.create({ trigger: f, start: "top 80%", once: true, onEnter: () => this.scramble(meta) });
+        }
+        if (!this.interactive) return;
+        const rx = gsap.quickTo(shot, "rotationX", { duration: 0.5, ease: "power3" }), ry = gsap.quickTo(shot, "rotationY", { duration: 0.5, ease: "power3" });
+        gsap.set(shot, { transformPerspective: 1000 });
+        shot.addEventListener("pointermove", (e) => {
+          const r = shot.getBoundingClientRect();
+          ry(((e.clientX - r.left) / r.width - 0.5) * 10); rx(-((e.clientY - r.top) / r.height - 0.5) * 8);
+        });
+        shot.addEventListener("pointerleave", () => { rx(0); ry(0); });
+      });
+      if (this.interactive) $$("#index a").forEach((a) => {
+        const n = $(".no", a), text = n.textContent;
+        a.addEventListener("pointerenter", () => this.scramble(n, text, 0.5));
+      });
+      const list = $("#index");
+      if (motion && list && window.ScrollTrigger) {
+        const skew = gsap.quickTo(list, "skewY", { duration: 0.5, ease: "power3" });
+        ScrollTrigger.create({ onUpdate: (self) => skew(Math.max(-2.5, Math.min(2.5, self.getVelocity() / -600))) });
+        let t; addEventListener("scroll", () => { clearTimeout(t); t = setTimeout(() => skew(0), 120); }, { passive: true });
+      }
+    },
+
+    // 頁尾信箱：字母靠近游標時浮起
+    mailWave(btn) {
+      if (!this.interactive || !window.SplitText || !btn) return;
+      const chars = SplitText.create(btn, { type: "chars", charsClass: "char" }).chars;
+      const tos = chars.map((c) => gsap.quickTo(c, "y", { duration: 0.4, ease: "power3" }));
+      const zone = btn.closest(".contact");
+      zone.addEventListener("pointermove", (e) => {
+        chars.forEach((c, i) => {
+          const r = c.getBoundingClientRect(), d = Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2));
+          tos[i](-Math.max(0, 1 - d / 140) * 18);
+        });
+      });
+      zone.addEventListener("pointerleave", () => tos.forEach((to) => to(0)));
+    },
+
+    // 專案頁：章節標題解碼、封面隨捲動縮放、內文圖片展開
+    project(article) {
+      if (!motion || !window.ScrollTrigger) return;
+      $$("h2 .h-text, h3 .h-text", article).forEach((t) => {
+        const text = t.textContent;
+        ScrollTrigger.create({ trigger: t, start: "top 88%", once: true, onEnter: () => this.scramble(t, text, 0.8) });
+      });
+      const cover = $(".project-cover img");
+      if (cover) gsap.to(cover, { scale: 1.08, yPercent: 4, ease: "none", scrollTrigger: { trigger: ".project-cover", start: "top 60%", end: "bottom top", scrub: true } });
+      $$("img", article).forEach((img) => {
+        gsap.from(img, { clipPath: "inset(12% 8% 12% 8% round 12px)", duration: 1.1, ease: EASE, scrollTrigger: { trigger: img, start: "top 88%", once: true } });
+      });
+    },
+  };
 
   /* ================= 共用：導覽、搜尋、頁尾、進度 ================= */
 
@@ -91,7 +340,9 @@
       a.setAttribute("aria-selected", i === sel);
       if (i === sel) a.scrollIntoView({ block: "nearest" });
     });
-    const open = () => { if (dlg.open) return; input.value = ""; sel = 0; draw(); dlg.showModal(); input.focus(); };
+    const open = () => { if (dlg.open) return; input.value = ""; sel = 0; draw(); dlg.showModal(); input.focus(); FX.lenis?.stop(); };
+    dlg.addEventListener("close", () => FX.lenis?.start());
+    list.setAttribute("data-lenis-prevent", "");
     $$("[data-palette-open]").forEach((b) => b.addEventListener("click", open));
     document.addEventListener("keydown", (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); dlg.open ? dlg.close() : open(); }
@@ -117,7 +368,7 @@
       <div class="contact">
         <div>
           <p class="meta">合作、演講或實驗室聯絡</p>
-          <button class="contact-mail" type="button" data-copy="${esc(pf.email)}" aria-label="複製 Email：${esc(pf.email)}">${esc(pf.email)}</button>
+          <button class="contact-mail" type="button" data-cursor="複製" data-copy="${esc(pf.email)}" aria-label="複製 Email：${esc(pf.email)}">${esc(pf.email)}</button>
           <p class="meta copy-status" aria-live="polite"></p>
         </div>
         <nav class="contact-links" aria-label="其他連結">
@@ -135,6 +386,8 @@
     const field = $(".dotfield-frame", foot);
     if (field) initDotField(field);
     const btn = $("[data-copy]", foot), status = $(".copy-status", foot);
+    FX.mailWave(btn);
+    FX.magnetize(foot);
     btn.addEventListener("click", async () => {
       try { await navigator.clipboard.writeText(btn.dataset.copy); status.textContent = "已複製到剪貼簿"; }
       catch { location.href = `mailto:${btn.dataset.copy}`; }
@@ -158,9 +411,10 @@
 
   // 標題逐字浮現
   function splitReveal(el, delay = 0) {
-    if (!motion || !window.SplitText || !el) return;
-    const split = SplitText.create(el, { type: "lines,chars", linesClass: "line", mask: "lines" });
+    if (!motion || !window.SplitText || !el) return null;
+    const split = SplitText.create(el, { type: "lines,chars", linesClass: "line", charsClass: "char", mask: "lines" });
     gsap.from(split.chars, { yPercent: 110, duration: 0.9, ease: EASE, stagger: 0.018, delay });
+    return split;
   }
 
   // 捲到時才出現：淡入上移
@@ -179,10 +433,10 @@
   function revealShots(shots) {
     if (!motion || !window.ScrollTrigger) return;
     shots.forEach((shot) => {
-      const img = $("img", shot);
+      const img = shot.firstElementChild;
       gsap.timeline({ scrollTrigger: { trigger: shot, start: "top 85%", once: true } })
         .from(shot, { clipPath: "inset(10% 6% 10% 6% round 16px)", duration: 1.1, ease: EASE })
-        .from(img, { scale: 1.12, duration: 1.4, ease: EASE }, 0);
+        .from(img, { scale: 1.2, duration: 1.4, ease: EASE }, 0);
     });
   }
 
@@ -212,7 +466,8 @@
         <img src="${esc(pf.portrait)}" alt="${esc(pf.name)} 的照片" width="800" height="800">
         <figcaption class="meta">${esc(pf.name)} · @${esc(pf.handle)}</figcaption>
       </figure>`;
-    splitReveal($(".hero h1"), 0.1);
+    const heroSplit = splitReveal($(".hero h1"), 0.1);
+    FX.hero($("#hero"), heroSplit);
     if (motion) {
       gsap.from([".hero-eyebrow", ".hero .bio", ".hero-actions"], { opacity: 0, y: 12, duration: 0.8, ease: EASE, stagger: 0.08, delay: 0.35 });
       gsap.from(".portrait", { opacity: 0, scale: 0.94, duration: 1, ease: EASE, delay: 0.2 });
@@ -221,23 +476,67 @@
     renderProjects(data);
   }
 
+  // 封面：有截圖用截圖；沒有的話用程式畫一張專案資訊卡（不是假截圖）
+  const coverHTML = (p, data) => p.cover
+    ? `<img src="${esc(p.cover)}" alt="${esc(p.title)} 的畫面" loading="lazy">`
+    : `<div class="gen-cover" role="img" aria-label="${esc(p.title)} 的資訊卡">
+         <span class="gc-path">~/projects/${esc(p.id)}</span>
+         <span class="gc-title">${esc(p.title)}</span>
+         <span class="gc-stack">${p.tags.map(esc).join(" / ")}</span>
+         <span class="gc-no">${String(p.no).padStart(2, "0")}</span>
+       </div>`;
+
+  // 分段控制：選取底色滑到被點的按鈕
+  function segmented(box, onChange) {
+    const thumb = $(".thumb", box);
+    const move = (btn, animate) => {
+      if (!btn || !thumb) return;
+      const props = { x: btn.offsetLeft, y: btn.offsetTop - 4, width: btn.offsetWidth };
+      if (motion && animate) gsap.to(thumb, { ...props, duration: 0.45, ease: EASE });
+      else if (gsap) gsap.set(thumb, props);
+      else Object.assign(thumb.style, { transform: `translate(${props.x}px, ${props.y}px)`, width: `${props.width}px` });
+    };
+    const attr = box.getAttribute("role") === "radiogroup" ? "aria-checked" : "aria-selected";
+    box.addEventListener("click", (e) => {
+      const btn = e.target.closest("button");
+      if (!btn || btn.getAttribute(attr) === "true") return;
+      $$("button", box).forEach((b) => b.setAttribute(attr, b === btn));
+      move(btn, true);
+      onChange(btn.dataset.value);
+    });
+    const sync = () => move($(`button[${attr}="true"]`, box), false);
+    requestAnimationFrame(sync);
+    addEventListener("resize", sync);
+    document.fonts?.ready.then(sync);
+  }
+
   function renderProjects(data) {
     const cats = [{ id: "all", title: "全部" }, ...data.categories];
     const count = (id) => data.published.filter((p) => id === "all" || p.category === id).length;
-    const fbox = $("#filters");
+    const fbox = $("#filters"), vbox = $("#views");
     fbox.innerHTML = `<span class="thumb" aria-hidden="true"></span>` + cats.filter((c) => count(c.id)).map((c, i) =>
-      `<button type="button" role="tab" data-cat="${esc(c.id)}" aria-selected="${i === 0}">${esc(c.title)}<span class="count">${count(c.id)}</span></button>`).join("");
+      `<button type="button" role="tab" data-value="${esc(c.id)}" aria-selected="${i === 0}">${esc(c.title)}<span class="count">${count(c.id)}</span></button>`).join("");
     $("#project-count").textContent = String(data.published.length).padStart(2, "0");
 
-    const lead = data.published.filter((p) => p.featured && p.cover);
-    const rest = data.published.filter((p) => !lead.includes(p));
-    const teamTag = (p) => p.team ? `<span class="team">團隊</span>` : "";
+    const VIEWS = [
+      { id: "rows", label: "交錯", icon: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="10" height="7" rx="1.5"/><path d="M16 6h5M16 9h3"/><rect x="11" y="13" width="10" height="7" rx="1.5"/><path d="M3 15h5M3 18h3"/></svg>' },
+      { id: "grid", label: "矩陣", icon: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>' },
+      { id: "table", label: "表格", icon: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h18"/></svg>' },
+    ];
+    let view = "rows";
+    try { const saved = localStorage.getItem("view"); if (VIEWS.some((v) => v.id === saved)) view = saved; } catch { /* 無法使用 localStorage 時用預設 */ }
+    vbox.innerHTML = `<span class="thumb" aria-hidden="true"></span>` + VIEWS.map((v) =>
+      `<button type="button" role="radio" data-value="${v.id}" aria-checked="${v.id === view}" title="${v.label}">${v.icon}<span>${v.label}</span></button>`).join("");
 
-    $("#lead").innerHTML = lead.map((p) => `
-      <a class="feature" data-cat="${esc(p.category)}" href="project.html?id=${encodeURIComponent(p.id)}">
-        <div class="feature-shot"><img src="${esc(p.cover)}" alt="${esc(p.title)} 的畫面" loading="lazy"></div>
+    const list = data.published;
+    const meta = (p) => `${no(p.no)} · ${esc(data.catTitle[p.category])} · ${esc(p.year)}${p.team ? " · 團隊" : ""}`;
+    const href = (p) => `project.html?id=${encodeURIComponent(p.id)}`;
+
+    $("#view-rows").innerHTML = list.map((p) => `
+      <a class="feature item" data-flip-id="${esc(p.id)}" data-cursor="開啟" data-cat="${esc(p.category)}" href="${href(p)}">
+        <div class="feature-shot">${coverHTML(p, data)}</div>
         <div class="feature-text">
-          <p class="meta">${no(p.no)} · ${esc(data.catTitle[p.category])} · ${esc(p.year)}${p.team ? " · 團隊" : ""}</p>
+          <p class="meta">${meta(p)}</p>
           <h3>${esc(p.title)}</h3>
           <p>${esc(p.tagline)}</p>
           <p class="stack">${p.tags.map(esc).join(" / ")}</p>
@@ -245,57 +544,78 @@
         </div>
       </a>`).join("");
 
-    $("#index").innerHTML = rest.map((p) => `
-      <li data-cat="${esc(p.category)}"><a href="project.html?id=${encodeURIComponent(p.id)}" ${p.cover ? `data-cover="${esc(p.cover)}"` : ""}>
+    $("#view-grid").innerHTML = list.map((p) => `
+      <a class="tile item" data-flip-id="${esc(p.id)}" data-cursor="開啟" data-cat="${esc(p.category)}" href="${href(p)}">
+        <div class="tile-shot">${coverHTML(p, data)}</div>
+        <div class="tile-text">
+          <p class="meta">${String(p.no).padStart(2, "0")} · ${esc(data.catTitle[p.category])}${p.team ? " · 團隊" : ""}</p>
+          <h3>${esc(p.title)}</h3>
+          <p>${esc(p.tagline)}</p>
+        </div>
+      </a>`).join("");
+
+    $("#index").innerHTML = list.map((p) => `
+      <li class="item" data-flip-id="${esc(p.id)}" data-cat="${esc(p.category)}"><a data-cursor="開啟" href="${href(p)}" ${p.cover ? `data-cover="${esc(p.cover)}"` : ""}>
         <span class="meta no">${String(p.no).padStart(2, "0")}</span>
-        <span><span class="title">${esc(p.title)}${teamTag(p)}</span><span class="tagline">${esc(p.tagline)}</span></span>
+        <span><span class="title">${esc(p.title)}${p.team ? `<span class="team">團隊</span>` : ""}</span><span class="tagline">${esc(p.tagline)}</span></span>
         <span class="cat">${esc(data.catTitle[p.category])}</span>
         <span class="meta year">${esc(p.year)}</span>
+        <span class="go" aria-hidden="true">${ICON.right}</span>
       </a></li>`).join("");
 
-    // 篩選：用 Flip 讓留下的項目平滑移到新位置
-    const thumb = $(".thumb", fbox);
-    const moveThumb = (btn, animate) => {
-      const props = { x: btn.offsetLeft, width: btn.offsetWidth };
-      if (motion && animate) gsap.to(thumb, { ...props, duration: 0.45, ease: EASE });
-      else if (gsap) gsap.set(thumb, props);
-      else Object.assign(thumb.style, { transform: `translateX(${props.x}px)`, width: `${props.width}px` });
-    };
-    const items = () => $$(".feature, #index li");
-    const apply = (cat) => {
-      const state = motion && window.Flip ? Flip.getState(items()) : null;
+    let cat = "all";
+    const viewEl = (id) => $(`#view-${id}`);
+    const filter = () => {
       let shown = 0;
-      items().forEach((el) => {
+      $$(".item", viewEl(view)).forEach((el) => {
         const on = cat === "all" || el.dataset.cat === cat;
         el.hidden = !on;
-        if (on && el.tagName === "LI") shown++;
+        if (on) shown++;
       });
-      const leads = $$(".feature:not([hidden])").length;
-      $("#lead").hidden = leads === 0;
-      $("#empty").hidden = shown > 0 || leads > 0;
-      $(".index-head").hidden = shown === 0;
+      $("#empty").hidden = shown > 0;
+      return shown;
+    };
+    const showView = (id) => VIEWS.forEach((v) => { viewEl(v.id).hidden = v.id !== id; });
+
+    // 篩選：Flip 讓留下的項目平滑移到新位置
+    segmented(fbox, (value) => {
+      const items = $$(".item", viewEl(view));
+      const state = motion && window.Flip ? Flip.getState(items) : null;
+      cat = value;
+      filter();
+      if (state) Flip.from(state, {
+        duration: 0.6, ease: EASE, nested: true,
+        onEnter: (els) => gsap.fromTo(els, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: EASE, stagger: 0.04 }),
+      });
+      if (window.ScrollTrigger) ScrollTrigger.refresh();
+    });
+
+    // 切換顯示方式：同一個專案在不同版面之間用 Flip 變形過去
+    segmented(vbox, (value) => {
+      const from = $$(".item:not([hidden])", viewEl(view));
+      const state = motion && window.Flip ? Flip.getState(from) : null;
+      view = value;
+      try { localStorage.setItem("view", view); } catch { /* 忽略 */ }
+      showView(view);
+      filter();
+      const to = $$(".item:not([hidden])", viewEl(view));
+      gsap?.set(to, { opacity: 1, y: 0, clearProps: "transform" });
       if (state) {
-        Flip.from(state, {
-          duration: 0.6, ease: EASE, absolute: false, nested: true,
-          onEnter: (els) => gsap.fromTo(els, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: EASE, stagger: 0.04 }),
-        });
+        Flip.from(state, { targets: to, duration: 0.7, ease: EASE, absolute: true, scale: true, fade: true, stagger: 0.015, simple: true, prune: true });
       }
       if (window.ScrollTrigger) ScrollTrigger.refresh();
-    };
-    fbox.addEventListener("click", (e) => {
-      const btn = e.target.closest("button");
-      if (!btn || btn.getAttribute("aria-selected") === "true") return;
-      $$("button", fbox).forEach((b) => b.setAttribute("aria-selected", b === btn));
-      moveThumb(btn, true);
-      apply(btn.dataset.cat);
     });
-    requestAnimationFrame(() => moveThumb($("button", fbox), false));
-    addEventListener("resize", () => moveThumb($('button[aria-selected="true"]', fbox), false));
+
+    showView(view);
+    filter();
 
     revealShots($$(".feature-shot"));
     revealOnScroll($$(".feature-text"));
+    revealOnScroll($$(".tile"));
     revealOnScroll($$("#index li"));
     initPreview();
+    FX.marquee(data);
+    FX.projects();
   }
 
   // 索引 hover：截圖預覽跟著游標，帶一點延遲
@@ -304,13 +624,15 @@
     if (!box || !finePointer || !gsap) return;
     const xTo = gsap.quickTo(box, "x", { duration: 0.5, ease: "power3" });
     const yTo = gsap.quickTo(box, "y", { duration: 0.5, ease: "power3" });
-    let visible = false;
+    const rTo = gsap.quickTo(box, "rotation", { duration: 0.6, ease: "power3" });
+    let visible = false, lastX = 0;
     $("#index").addEventListener("pointermove", (e) => {
       const a = e.target.closest("a");
       const cover = a?.dataset.cover;
       if (!cover) { hide(); return; }
       if (!img.src.endsWith(cover)) img.src = cover;
       xTo(e.clientX + 24); yTo(e.clientY - 80);
+      if (motion) { rTo(Math.max(-10, Math.min(10, (e.clientX - lastX) * 0.6))); lastX = e.clientX; }
       if (!visible) {
         visible = true;
         gsap.set(box, { x: e.clientX + 24, y: e.clientY - 80 });
@@ -468,6 +790,8 @@
     buildToc(headings);
     buildPager(data.published, id);
     revealOnScroll($$(":scope > *", article).filter((el) => !el.matches(".lede")));
+    FX.project(article);
+    FX.magnetize(document);
     if (location.hash) document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView();
   }
 
@@ -517,7 +841,7 @@
       used.add(slug);
       h.id = slug;
       h.dataset.label = h.textContent;
-      h.insertAdjacentHTML("beforeend", `<a class="anchor" href="#${slug}" aria-label="連結到此節">#</a>`);
+      h.innerHTML = `<span class="h-text">${h.innerHTML}</span><a class="anchor" href="#${slug}" aria-label="連結到此節">#</a>`;
       return h;
     });
   }
@@ -558,6 +882,7 @@
     return `<div class="error-box">${esc(msg)}<br><a href="index.html">回到所有專案</a></div>`;
   }
 
+  FX.init();
   initNavHover();
   initProgress();
   if (document.body.classList.contains("page-home")) renderHome();
