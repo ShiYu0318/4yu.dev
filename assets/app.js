@@ -945,6 +945,157 @@
     $("#pager").innerHTML = link(list[i - 1], "prev", "上一個") + link(list[i + 1], "next", "下一個");
   }
 
+  /* ================= 經歷（content/experience.json，來自 Notion，見 AGENTS.md §9） ================= */
+
+  const EXPERIENCE = "content/experience.json";
+  // 類型 → 分區標題與 lucide 圖示；順序 = 「分類」檢視的分區順序
+  const EXP_TYPES = [
+    ["研究", "研究・論文", '<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>'],
+    ["工作", "工作", '<path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/>'],
+    ["社群", "社群・領導", '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'],
+    ["競賽", "競賽", '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>'],
+    ["檢定", "檢定", '<path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="m9 12 2 2 4-4"/>'],
+    ["教學", "教學・演講", '<path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/>'],
+    ["籌辦", "活動籌辦", '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/>'],
+    ["學習", "營隊・課程", '<path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>'],
+  ];
+  const EXP_TYPE = Object.fromEntries(EXP_TYPES.map(([id, title, icon], i) => [id, { title, icon, order: i }]));
+  const GRADES = ["大四", "大三", "大二", "大一", "高三", "高二", "高一", "國三", "國二", "國一"];
+  const today = new Date().toISOString().slice(0, 10);
+
+  async function loadExperience() {
+    const res = await fetch(EXPERIENCE, { cache: "no-cache" });
+    if (!res.ok) throw new Error(`讀不到 ${EXPERIENCE}（HTTP ${res.status}）`);
+    const data = await res.json();
+    data.items.forEach((x, i) => { x.key = `exp-${i}`; });
+    return data;
+  }
+
+  const ym = (d) => d.slice(0, 7).replace("-", ".");
+  function expDate(x) {
+    if (x.start > today) return `${ym(x.start)} · 即將`;
+    if (!x.end || ym(x.end) === ym(x.start)) return ym(x.start);
+    return `${ym(x.start)} — ${x.end > today ? "至今" : ym(x.end)}`;
+  }
+
+  function expRow(x) {
+    const t = EXP_TYPE[x.type] || { title: x.type, icon: '<circle cx="12" cy="12" r="4"/>' };
+    const sub = [x.role, x.org].filter(Boolean).map(esc).join(" · ");
+    const title = x.link
+      ? `<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.title)}${ICON.out}</a>`
+      : esc(x.title);
+    return `
+      <li class="exp" data-flip-id="${x.key}">
+        <span class="exp-mark" title="${esc(t.title)}"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${t.icon}</svg></span>
+        <div class="exp-main">
+          <h3>${title}</h3>
+          ${sub ? `<p class="exp-sub">${sub}</p>` : ""}
+          ${x.result ? `<p class="exp-result">${esc(x.result)}</p>` : ""}
+        </div>
+        <div class="exp-side">
+          <span class="meta exp-date">${expDate(x)}</span>
+          ${x.fields.length ? `<span class="meta exp-fields">${x.fields.map(esc).join(" / ")}</span>` : ""}
+        </div>
+      </li>`;
+  }
+
+  // 經歷列從模糊中浮現（參考 vicwen.com 的捲動進場）
+  function blurIn(els) {
+    if (!motion || !window.ScrollTrigger || !els.length) return;
+    gsap.set(els, { opacity: 0, y: 12, filter: "blur(8px)" });
+    ScrollTrigger.batch(els, {
+      start: "top 92%", once: true,
+      onEnter: (batch) => gsap.to(batch, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9, ease: EASE, stagger: 0.05, clearProps: "filter" }),
+    });
+  }
+
+  // 首頁：最近 5 筆
+  async function renderExperiencePreview() {
+    const box = $("#exp-latest");
+    if (!box) return;
+    let data;
+    try { data = await loadExperience(); }
+    catch { $("#experience").hidden = true; return; }
+    $("#exp-count").textContent = String(data.items.length).padStart(2, "0");
+    box.innerHTML = data.items.slice(0, 5).map(expRow).join("");
+    blurIn($$(".exp", box));
+    FX.magnetize($("#experience"));
+  }
+
+  // 經歷頁：分類 / 時間 / 年級三種分組 + 領域篩選
+  async function renderExperience() {
+    let manifest, data;
+    try { [manifest, data] = await Promise.all([loadManifest(), loadExperience()]); }
+    catch (e) { $("#exp-groups").innerHTML = errorBox(e.message); return; }
+    initPalette(manifest);
+    renderFooter(manifest);
+
+    const items = data.items;
+    const years = [...new Set(items.map((x) => x.start.slice(0, 4)))];
+    $("#exp-meta").textContent = `${items.length} 筆 · ${years.at(-1)}–${years[0]} · 同步自 Notion，更新於 ${data.updated}`;
+
+    const fields = ["全部", ...Object.entries(items.flatMap((x) => x.fields).reduce((m, f) => ((m[f] = (m[f] || 0) + 1), m), {}))
+      .sort((a, b) => b[1] - a[1]).map(([f]) => f)];
+    const countOf = (f) => items.filter((x) => f === "全部" || x.fields.includes(f)).length;
+    $("#exp-fields").innerHTML = `<span class="thumb" aria-hidden="true"></span>` + fields.map((f, i) =>
+      `<button type="button" role="tab" data-value="${esc(f)}" aria-selected="${i === 0}">${esc(f)}<span class="count">${countOf(f)}</span></button>`).join("");
+
+    const VIEWS = [
+      { id: "type", label: "分類" },
+      { id: "year", label: "時間" },
+      { id: "grade", label: "年級" },
+    ];
+    let view = "type", field = "全部";
+    try { const saved = localStorage.getItem("exp-view"); if (VIEWS.some((v) => v.id === saved)) view = saved; } catch { /* 用預設 */ }
+    $("#exp-views").innerHTML = `<span class="thumb" aria-hidden="true"></span>` + VIEWS.map((v) =>
+      `<button type="button" role="radio" data-value="${v.id}" aria-checked="${v.id === view}"><span>${v.label}</span></button>`).join("");
+
+    const groupsOf = (list) => {
+      const by = (keyFn, order) => {
+        const m = new Map();
+        list.forEach((x) => { const k = keyFn(x); if (!m.has(k)) m.set(k, []); m.get(k).push(x); });
+        return [...m.entries()].sort((a, b) => order(a[0], b[0]));
+      };
+      if (view === "year") return by((x) => x.start.slice(0, 4), (a, b) => b.localeCompare(a)).map(([k, v]) => [k, v]);
+      if (view === "grade") return by((x) => x.grade || "其他", (a, b) => (GRADES.indexOf(a) + 99) % 99 - (GRADES.indexOf(b) + 99) % 99);
+      return by((x) => x.type, (a, b) => (EXP_TYPE[a]?.order ?? 99) - (EXP_TYPE[b]?.order ?? 99))
+        .map(([k, v]) => [EXP_TYPE[k]?.title || k, v]);
+    };
+
+    const box = $("#exp-groups");
+    const draw = (animate) => {
+      const state = animate && motion && window.Flip ? Flip.getState($$(".exp", box)) : null;
+      const list = items.filter((x) => field === "全部" || x.fields.includes(field));
+      $("#exp-empty").hidden = list.length > 0;
+      box.innerHTML = groupsOf(list).map(([title, rows], i) => `
+        <section class="exp-group">
+          <h2 class="exp-group-head"><span>${esc(title)}</span><span class="meta">${String(i + 1).padStart(2, "0")} · ${rows.length} 筆</span><i aria-hidden="true"></i></h2>
+          <ol class="exp-list">${rows.map(expRow).join("")}</ol>
+        </section>`).join("");
+      if (state) {
+        Flip.from(state, { targets: $$(".exp", box), duration: 0.7, ease: EASE, absolute: true, stagger: 0.008, prune: true,
+          onEnter: (els) => gsap.fromTo(els, { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.6, clearProps: "filter" }) });
+        gsap.from($$(".exp-group-head", box), { opacity: 0, y: 8, duration: 0.6, ease: EASE, stagger: 0.04 });
+        ScrollTrigger?.refresh();
+      } else {
+        blurIn([...$$(".exp-group-head", box), ...$$(".exp", box)]);
+      }
+      $$(".exp-group-head .meta", box).forEach((m) => FX.scramble?.(m));
+    };
+
+    segmented($("#exp-fields"), (v) => { field = v; draw(true); });
+    segmented($("#exp-views"), (v) => {
+      view = v;
+      try { localStorage.setItem("exp-view", v); } catch { /* 無法儲存就算了 */ }
+      draw(true);
+    });
+    draw(false);
+    if (motion) {
+      splitReveal($("#exp-page-title"));
+      gsap.from(["#exp-meta", ".exp-head .controls"], { opacity: 0, y: 12, duration: 0.8, ease: EASE, stagger: 0.08, delay: 0.1 });
+    }
+  }
+
   function errorBox(msg) {
     return `<div class="error-box">${esc(msg)}<br><a href="index.html">回到所有專案</a></div>`;
   }
@@ -952,6 +1103,7 @@
   FX.init();
   initNavHover();
   initProgress();
-  if (document.body.classList.contains("page-home")) renderHome();
+  if (document.body.classList.contains("page-home")) { renderHome(); renderExperiencePreview(); }
+  if (document.body.classList.contains("page-experience")) renderExperience();
   if (document.body.classList.contains("page-project")) renderProject();
 })();
