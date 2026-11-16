@@ -87,7 +87,7 @@ kbd {
   background: var(--bg);
   border-bottom: 1px solid var(--line);
 }
-.wordmark { font-family: var(--font-mono); font-size: 18px; font-weight: 500; text-decoration: none; color: var(--text); letter-spacing: 0; }
+.wordmark { font-family: var(--font-mono); font-size: 26px; line-height: 1; font-weight: 500; text-decoration: none; color: var(--text); letter-spacing: 0; }
 .wordmark-path { color: var(--accent); }
 .wordmark:hover { color: var(--text); }
 .nav { position: relative; display: flex; align-items: center; gap: 4px; font-size: 18px; }
@@ -383,6 +383,7 @@ main { display: block; }
 }
 @media (max-width: 760px) {
   :root { --gutter: 20px; }
+  .site-header .wordmark { font-size: 22px; }
   .nav > a[href="#contact"], .nav > a[href^="https://4yu"] { display: none; }
   .search-trigger kbd { display: none; }
   .hero { grid-template-columns: 1fr; gap: 40px; padding: 48px var(--gutter) 80px; }
@@ -445,7 +446,7 @@ html.lenis, html.lenis body { height: auto; }
   position: fixed; inset: 0; z-index: 100; display: grid; place-items: center;
   background: var(--raised); transform: scaleY(0); transform-origin: 50% 100%; pointer-events: none;
 }
-.curtain .wordmark { font-size: 23px; opacity: 0; }
+.curtain .wordmark { font-size: 36px; opacity: 0; }
 .is-leaving .curtain, .is-entering .curtain { pointer-events: all; }
 
 /* Hero 背景：會流動的等高線地形 */
