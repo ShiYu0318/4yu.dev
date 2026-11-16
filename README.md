@@ -33,4 +33,4 @@ python3 scripts/check.py
 
 ## 技術
 
-純 HTML / CSS / JavaScript，無 build step；Markdown 由 [marked](https://github.com/markedjs/marked) 渲染，程式碼由 [highlight.js](https://highlightjs.org/) 上色。部署於 GitHub Pages。
+純 HTML / CSS / JavaScript，無 build step；函式庫放在 `assets/vendor/`：動態用 [GSAP](https://github.com/greensock/gsap)（ScrollTrigger、SplitText、Flip），Markdown 由 [marked](https://github.com/markedjs/marked) 渲染，程式碼由 [highlight.js](https://highlightjs.org/) 上色。部署於 GitHub Pages。
