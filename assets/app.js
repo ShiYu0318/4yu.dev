@@ -485,27 +485,43 @@
     return split;
   }
 
-  // 捲到時才出現：淡入上移
+  // 捲到時才出現。用 IntersectionObserver 看元素實際位置，版面高度改變（切換檢視、圖片載入）也不會漏掉
+  const revealed = new WeakSet();
+  function onVisible(els, play, margin = "0px 0px -8% 0px") {
+    if (!motion || !("IntersectionObserver" in window) || !els.length) return false;
+    let queue = [], timer = 0;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (!en.isIntersecting) return;
+        io.unobserve(en.target);
+        if (revealed.has(en.target)) return;
+        revealed.add(en.target);
+        queue.push(en.target);
+      });
+      if (queue.length && !timer) timer = requestAnimationFrame(() => { play(queue); queue = []; timer = 0; });
+    }, { rootMargin: margin });
+    els.forEach((el) => io.observe(el));
+    return true;
+  }
+  // 某些元素已由別的動畫負責顯示（例如切換檢視時），之後就不再交給捲動淡入
+  const markRevealed = (els) => els.forEach((el) => revealed.add(el));
+
   function revealOnScroll(targets, opts = {}) {
-    if (!motion || !window.ScrollTrigger) return;
     const els = typeof targets === "string" ? $$(targets) : targets;
-    if (!els.length) return;
+    if (!motion || !els.length) return;
     gsap.set(els, { opacity: 0, y: 16 });
-    ScrollTrigger.batch(els, {
-      start: "top 88%", once: true,
-      onEnter: (batch) => gsap.to(batch, { opacity: 1, y: 0, duration: 0.7, ease: EASE, stagger: 0.06, ...opts }),
-    });
+    onVisible(els, (batch) => gsap.to(batch, { opacity: 1, y: 0, duration: 0.7, ease: EASE, stagger: 0.06, overwrite: "auto", ...opts }));
   }
 
   // 截圖展開：外框從內縮的裁切展開，圖片從放大縮回
   function revealShots(shots) {
-    if (!motion || !window.ScrollTrigger) return;
-    shots.forEach((shot) => {
-      const img = shot.firstElementChild;
-      gsap.timeline({ scrollTrigger: { trigger: shot, start: "top 85%", once: true } })
-        .from(shot, { clipPath: "inset(10% 6% 10% 6% round 16px)", duration: 1.1, ease: EASE })
-        .from(img, { scale: 1.2, duration: 1.4, ease: EASE }, 0);
-    });
+    if (!motion) return;
+    gsap.set(shots, { clipPath: "inset(10% 6% 10% 6% round 16px)" });
+    shots.forEach((s) => gsap.set(s.firstElementChild, { scale: 1.2 }));
+    onVisible(shots, (batch) => batch.forEach((shot) => {
+      gsap.to(shot, { clipPath: "inset(0% 0% 0% 0% round 16px)", duration: 1.1, ease: EASE, clearProps: "clipPath" });
+      gsap.to(shot.firstElementChild, { scale: 1, duration: 1.4, ease: EASE });
+    }));
   }
 
   /* ================= 首頁 ================= */
@@ -622,7 +638,7 @@
       </a>`).join("");
 
     $("#index").innerHTML = list.map((p) => `
-      <li class="item" data-flip-id="${esc(p.id)}" data-cat="${esc(p.category)}"><a href="${href(p)}" ${p.cover ? `data-cover="${esc(p.cover)}"` : ""}>
+      <li class="item" data-flip-id="${esc(p.id)}" data-cat="${esc(p.category)}"><a href="${href(p)}" data-id="${esc(p.id)}">
         <span class="meta no">${String(p.no).padStart(2, "0")}</span>
         <span><span class="title">${esc(p.title)}${p.team ? `<span class="team">團隊</span>` : ""}</span><span class="tagline">${esc(p.tagline)}</span></span>
         <span class="cat">${esc(data.catTitle[p.category])}</span>
@@ -657,20 +673,40 @@
       if (window.ScrollTrigger) ScrollTrigger.refresh();
     });
 
-    // 切換顯示方式：同一個專案在不同版面之間用 Flip 變形過去
+    // 切換顯示方式：舊版面淡出 → 換版面 → 新版面的項目依序浮現（不讓兩種版面的文字疊在一起）
+    let switching = null;
     segmented(vbox, (value) => {
-      const from = $$(".item:not([hidden])", viewEl(view));
-      const state = motion && window.Flip ? Flip.getState(from) : null;
+      const prev = view;
       view = value;
       try { localStorage.setItem("view", view); } catch { /* 忽略 */ }
-      showView(view);
-      filter();
-      const to = $$(".item:not([hidden])", viewEl(view));
-      gsap?.set(to, { opacity: 1, y: 0, clearProps: "transform" });
-      if (state) {
-        Flip.from(state, { targets: to, duration: 0.7, ease: EASE, absolute: true, scale: true, fade: true, stagger: 0.015, simple: true, prune: true });
-      }
-      if (window.ScrollTrigger) ScrollTrigger.refresh();
+      const swap = () => {
+        showView(view);
+        filter();
+        const to = $$(".item:not([hidden])", viewEl(view));
+        markRevealed(to);
+        if (view === "rows") markRevealed($$(".feature-shot, .feature-text", viewEl(view)));
+        if (motion) {
+          const shots = $$(".feature-shot", viewEl(view)), texts = $$(".feature-text", viewEl(view));
+          if (shots.length) { gsap.set(shots, { clearProps: "clipPath" }); shots.forEach((s) => gsap.set(s.firstElementChild, { scale: 1 })); }
+          if (texts.length) gsap.set(texts, { opacity: 1, y: 0 });
+          const top = viewEl(view).getBoundingClientRect().top;
+          const inView = to.filter((el) => el.getBoundingClientRect().top < innerHeight + 40);
+          if (to.length) gsap.set(to, { opacity: 1, y: 0 });
+          if (inView.length) gsap.fromTo(inView, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: EASE, stagger: 0.035, clearProps: "transform" });
+          if (top < 0) FX.lenis ? FX.lenis.scrollTo("#projects", { offset: -72, duration: 0.8 }) : null;
+        }
+        window.ScrollTrigger?.refresh();
+      };
+      if (!motion) { swap(); return; }
+      switching?.kill();
+      const from = $$(".item:not([hidden])", viewEl(prev)).filter((el) => {
+        const r = el.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight;
+      });
+      switching = gsap.to(from, { opacity: 0, y: -10, duration: 0.22, ease: "power2.in", stagger: 0.012, onComplete: () => {
+        const old = $$(".item", viewEl(prev)); if (old.length) gsap.set(old, { opacity: 1, y: 0 });
+        swap();
+      } });
+      if (!from.length) { switching.kill(); swap(); }
     });
 
     showView(view);
@@ -680,36 +716,55 @@
     revealOnScroll($$(".feature-text"));
     revealOnScroll($$(".tile"));
     revealOnScroll($$("#index li"));
-    initPreview();
+    initPreview(data);
     FX.marquee(data);
     FX.projects();
   }
 
   // 索引 hover：截圖預覽跟著游標，帶一點延遲
-  function initPreview() {
-    const box = $(".preview"), img = $("img", box);
-    if (!box || !finePointer || !gsap) return;
+  // 表格 hover 預覽：有截圖顯示截圖，沒有就顯示程式畫的資訊卡；捲動時跟著游標下的那一列更新
+  function initPreview(data) {
+    const box = $(".preview"), list = $("#index");
+    if (!box || !list || !finePointer || !gsap) return;
+    const byId = Object.fromEntries(data.published.map((p) => [p.id, p]));
+    // 先載入所有截圖，第一次 hover 才不會是空框
+    data.published.forEach((p) => { if (p.cover) new Image().src = p.cover; });
     const xTo = gsap.quickTo(box, "x", { duration: 0.5, ease: "power3" });
     const yTo = gsap.quickTo(box, "y", { duration: 0.5, ease: "power3" });
     const rTo = gsap.quickTo(box, "rotation", { duration: 0.6, ease: "power3" });
-    let visible = false, lastX = 0;
-    $("#index").addEventListener("pointermove", (e) => {
-      const a = e.target.closest("a");
-      const cover = a?.dataset.cover;
-      if (!cover) { hide(); return; }
-      if (!img.src.endsWith(cover)) img.src = cover;
-      xTo(e.clientX + 24); yTo(e.clientY - 80);
-      if (motion) { rTo(Math.max(-10, Math.min(10, (e.clientX - lastX) * 0.6))); lastX = e.clientX; }
+    let visible = false, current = null, lastX = 0, px = -1, py = -1;
+
+    const show = (a, x, y) => {
+      const id = a?.dataset.id;
+      if (!id || !byId[id]) { hide(); return; }
+      if (id !== current) { current = id; box.innerHTML = coverHTML(byId[id], data); }
+      xTo(x + 24); yTo(y - 80);
       if (!visible) {
         visible = true;
-        gsap.set(box, { x: e.clientX + 24, y: e.clientY - 80 });
-        gsap.to(box, { opacity: 1, scale: 1, duration: reduced ? 0 : 0.3, ease: EASE });
+        gsap.set(box, { x: x + 24, y: y - 80 });
+        gsap.to(box, { opacity: 1, scale: 1, duration: reduced ? 0 : 0.3, ease: EASE, overwrite: "auto" });
       }
+    };
+    const hide = () => {
+      if (!visible) return;
+      visible = false;
+      gsap.to(box, { opacity: 0, scale: 0.96, duration: 0.2, overwrite: "auto" });
+    };
+    list.addEventListener("pointermove", (e) => {
+      px = e.clientX; py = e.clientY;
+      if (motion) { rTo(Math.max(-10, Math.min(10, (px - lastX) * 0.6))); lastX = px; }
+      show(e.target.closest("a"), px, py);
     });
-    const hide = () => { if (!visible) return; visible = false; gsap.to(box, { opacity: 0, scale: 0.96, duration: 0.2 }); };
-    $("#index").addEventListener("pointerleave", hide);
-    addEventListener("scroll", hide, { passive: true });
+    list.addEventListener("pointerleave", () => { px = -1; hide(); });
+    // 捲動時游標不動、底下的列會換：用游標位置重新找
+    addEventListener("scroll", () => {
+      if (px < 0) return;
+      const el = document.elementFromPoint(px, py);
+      const a = el?.closest("#index a");
+      a ? show(a, px, py) : hide();
+    }, { passive: true });
   }
+
 
   /* 點陣頭像：把 GitHub 頭像（電光藍背景上的黑貓）依顏色取樣成點陣。
      藍色背景 → 電光藍點、白色的眼睛與背景字 → 白點、耳機 → 淡藍點、黑貓本身留空；
@@ -1004,12 +1059,10 @@
 
   // 經歷列從模糊中浮現（參考 vicwen.com 的捲動進場）
   function blurIn(els) {
-    if (!motion || !window.ScrollTrigger || !els.length) return;
+    if (!motion || !els.length) return;
+    els = els.filter((el) => !revealed.has(el));
     gsap.set(els, { opacity: 0, y: 12, filter: "blur(8px)" });
-    ScrollTrigger.batch(els, {
-      start: "top 92%", once: true,
-      onEnter: (batch) => gsap.to(batch, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9, ease: EASE, stagger: 0.05, clearProps: "filter" }),
-    });
+    onVisible(els, (batch) => gsap.to(batch, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9, ease: EASE, stagger: 0.05, clearProps: "filter", overwrite: "auto" }), "0px 0px -4% 0px");
   }
 
   // 首頁：最近 5 筆
@@ -1081,8 +1134,8 @@
     }).join("");
 
     const box = $("#exp-groups");
-    const draw = (animate) => {
-      const state = animate && motion && window.Flip ? Flip.getState($$(".exp", box)) : null;
+    let fading = null;
+    const render = (animate) => {
       const list = items.filter((x) => field === "全部" || x.fields.includes(field));
       $("#exp-empty").hidden = list.length > 0;
       box.classList.toggle("timeline", view === "year");
@@ -1091,15 +1144,27 @@
           <h2 class="exp-group-head"><span>${esc(title)}</span><span class="meta">${String(i + 1).padStart(2, "0")} · ${rows.length} 筆</span><i aria-hidden="true"></i></h2>
           <ol class="exp-list">${rows.map(expRow).join("")}</ol>
         </section>`).join("");
-      if (state) {
-        Flip.from(state, { targets: $$(".exp", box), duration: 0.7, ease: EASE, absolute: true, stagger: 0.008, prune: true,
-          onEnter: (els) => gsap.fromTo(els, { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.6, clearProps: "filter" }) });
-        gsap.from($$(".exp-group-head, .exp-year-head, .exp-month-head", box), { opacity: 0, y: 8, duration: 0.6, ease: EASE, stagger: 0.02 });
-        ScrollTrigger?.refresh();
+      const parts = $$(".exp-group-head, .exp-year-head, .exp-month-head, .exp", box);
+      if (animate && motion) {
+        // 畫面上的部分依序浮現，其餘的交給捲動淡入
+        const inView = parts.filter((el) => el.getBoundingClientRect().top < innerHeight);
+        markRevealed(inView);
+        if (inView.length) gsap.fromTo(inView, { opacity: 0, y: 12, filter: "blur(6px)" },
+          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: EASE, stagger: 0.025, clearProps: "filter" });
+        blurIn(parts.filter((el) => !inView.includes(el)));
       } else {
-        blurIn($$(".exp-group-head, .exp-year-head, .exp-month-head, .exp", box));
+        blurIn(parts);
       }
       $$(".exp-group-head .meta", box).forEach((m) => FX.scramble?.(m));
+    };
+    // 切換：舊的先淡出再換，不讓兩種排列疊在一起
+    const draw = (animate) => {
+      if (!animate || !motion) { render(false); return; }
+      fading?.kill();
+      const out = $$(".exp-group-head, .exp-year-head, .exp-month-head, .exp", box)
+        .filter((el) => { const r = el.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; });
+      if (!out.length) { render(true); return; }
+      fading = gsap.to(out, { opacity: 0, y: -8, duration: 0.2, ease: "power2.in", stagger: 0.008, onComplete: () => render(true) });
     };
 
     segmented($("#exp-fields"), (v) => { field = v; draw(true); });
