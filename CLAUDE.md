@@ -1,0 +1,5 @@
+# CLAUDE.md
+
+本專案的所有規則都寫在 [`AGENTS.md`](./AGENTS.md)。開始任何工作前，請先完整閱讀它並遵守。
+
+@AGENTS.md
