@@ -26,6 +26,7 @@ shiyu-portfolio/
 ├── README.md                 ← 給人類看的簡介
 ├── index.html                ← 首頁：自我介紹 + 專案（交錯 / 矩陣 / 表格三種檢視，JS 讀 projects.json 產生）
 ├── project.html              ← 專案介紹頁：project.html?id=<project-id>
+├── experience.html           ← 經歷頁：分類 / 時間 / 年級三種分組 + 領域篩選（JS 讀 experience.json 產生，見 §9）
 ├── favicon.ico               ← 分頁圖示（GitHub 頭像的黑貓，16/32/48px）
 ├── .nojekyll                 ← 讓 GitHub Pages 不要跑 Jekyll
 ├── assets/
@@ -37,6 +38,7 @@ shiyu-portfolio/
 │       └── highlight.min.js、github-dark.min.css                         ← 程式碼上色
 ├── content/
 │   ├── projects.json         ← 個人資料 + 分類 + 專案清單（manifest）
+│   ├── experience.json       ← 經歷，由 scripts/sync_notion.py 從 Notion 產生，不要手改（§9）
 │   ├── projects/
 │   │   └── <project-id>.md   ← 每個專案一個介紹檔
 │   └── img/
@@ -44,13 +46,15 @@ shiyu-portfolio/
 │       └── <project-id>/     ← 該專案的截圖
 ├── templates/
 │   └── project-template.md   ← 新專案介紹的起手式
-└── scripts/
-    └── check.py              ← 一致性檢查，改完內容一定要跑
+├── scripts/
+│   ├── check.py              ← 一致性檢查，改完內容一定要跑
+│   └── sync_notion.py        ← Notion「經歷」表格 → content/experience.json
+└── .github/workflows/sync-notion.yml ← 每天自動跑 sync_notion.py，有變動才 commit
 ```
 
 ### 禁止事項
 
-- ❌ 不要為某個專案新增獨立的 `.html`；所有介紹頁都由 `project.html` 渲染。
+- ❌ 不要為某個專案新增獨立的 `.html`；所有介紹頁都由 `project.html` 渲染。頁面只有 `index.html`、`project.html`、`experience.html` 三個。
 - ❌ 不要新增第二個自寫的 CSS / JS 檔，也不要在 Markdown 裡寫 `<style>`、`<script>`、行內 `style=""`。
 - ❌ 不要引入打包工具或前端框架（React、Vue、Tailwind…）。函式庫只能是 `assets/vendor/` 裡已有的那幾個；真的要加新的，先問使用者，並同步更新本節。
 - ❌ **不要介紹私有（private）repo**，除非使用者明確要求。私有 repo 的名稱、內容都不能出現在網站上。
@@ -254,6 +258,7 @@ shiyu-portfolio/
 
 - 所有間距是 4 的倍數（4、8、12、16、20、24、32、40、48、64、80、96、112、128）。
 - 圓角：小東西 6、按鈕 / 輸入 8、卡片與截圖 12–16。不是每樣東西都是膠囊。
+- 經歷頁：880px 窄欄，分區標題（名稱 + 等寬編號與筆數 + 一小段細線）底下是條列，每列「類型圖示 / 標題、身分 · 單位、成果（電光藍小方塊開頭）/ 右側日期與領域」。首頁在專案下方放最近 5 筆與「全部經歷」按鈕。
 - 首頁：自我介紹是 7:5 左右分欄（文字 + 280px 圓形照片，手機版縮成 120px 放在最上面）→ 技術標籤跑馬燈 →「專案」標題 + 分段篩選（附數量）+ 檢視切換（交錯 / 矩陣 / 表格）→ 頁尾（大字信箱 + 點陣頭像）。
 - 專案頁：標頭（編號、標題、一句話、GitHub 按鈕、技術清單）→ 封面截圖 → 左側目錄 + 720px 內文。
 - 手機（< 760px）全部改單欄，索引只留編號與名稱。
@@ -283,6 +288,8 @@ shiyu-portfolio/
 | 頁尾 | 信箱字母靠近游標時浮起；點陣頭像聚合、被游標推開 |
 | 專案頁 | 標題逐字浮現、封面裁切展開並隨捲動縮放、章節標題解碼、內文圖片裁切展開、目錄指示線滑動 |
 | 搜尋 | `⌘K` / `Ctrl+K` / `/` 打開，方向鍵選、Enter 開啟 |
+| 經歷列 | 捲到時從模糊（blur 8px）中淡入上移 12px（參考 vicwen.com）；hover 時圖示變 `--accent` |
+| 經歷分組 / 篩選 | 選取底色滑動；同一筆經歷用 Flip 移到新分組的位置，新出現的從模糊浮現；經歷頁標題逐字浮現、分區編號解碼 |
 
 規則：
 
@@ -341,3 +348,22 @@ python3 -m http.server 8000
 - [ ] 全文繁體中文、中英之間有空格
 - [ ] `updated` 已更新
 - [ ] 沒有違反 §6 的視覺規則（若改了樣式）
+- [ ] 改了經歷相關程式時，`experience.html` 三種分組與領域篩選都正常，`experience.json` 沒有非公開欄位
+
+---
+
+## 9. 經歷（Notion → `content/experience.json`）
+
+經歷的唯一來源是使用者的 Notion「經歷」表格。**只有「網站」欄打勾的列會出現在網站上。**
+
+- `content/experience.json` 由 `scripts/sync_notion.py` 產生，**不要手改**；要改內容請改 Notion，再同步。
+- GitHub Actions（`.github/workflows/sync-notion.yml`）每天台灣時間 03:17 自動同步，也可以在 Actions 頁面手動執行；需要 repo secrets `NOTION_TOKEN`、`NOTION_DATA_SOURCE_ID`。沒有設定 secrets 時會直接略過，不會清空資料。
+- 只輸出公開欄位：`Title`、`身分`、`成果`、`單位`、`類型`、`領域`、`優先級`、`年級`、`Date`、`連結`。**`備註`、`證書`、`原始標題`、`CV`、`放`、`編號` 與 Notion 頁面網址一律不輸出**，新增欄位要上網站前先問使用者。
+- 用 MCP 或 API 修改 Notion 表格時，**不要刪除列或欄位，也不要覆寫使用者寫的內容**；要重整格式先備份原文（例如放進 `原始標題`）。
+- 「類型」決定分區與圖示，順序：研究・論文、工作、社群・領導、競賽、檢定、教學・演講、活動籌辦、營隊・課程（`assets/app.js` 的 `EXP_TYPES`）。Notion 新增類型時要一併加進 `EXP_TYPES`，否則會用預設圖示排在最後。
+- 日期顯示為 `2026.09 — 至今`：結束日在未來寫「至今」，開始日在未來寫「即將」。
+
+```bash
+python3 scripts/sync_notion.py                 # 用環境變數 NOTION_TOKEN、NOTION_DATA_SOURCE_ID 連 Notion
+python3 scripts/sync_notion.py --from rows.json  # 從 MCP 查詢結果產生（欄位同上，日期欄叫 s / e）
+```
