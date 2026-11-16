@@ -169,6 +169,9 @@ main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平
 .hero .bio { font-size: clamp(18px, 1.5vw, 20px); line-height: 1.8; color: var(--text); max-width: 36rem; margin: 0 0 40px; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 
+.hero .bio a { color: var(--text); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 5px; transition: color 150ms var(--ease), text-decoration-color 150ms var(--ease); }
+.hero .bio a:hover { color: var(--accent); text-decoration-color: var(--accent); }
+
 /* 人像：圓形小照片 */
 .portrait { margin: 0; justify-self: center; display: grid; justify-items: center; gap: 16px; }
 .portrait img {
