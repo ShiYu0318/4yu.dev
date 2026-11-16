@@ -22,6 +22,7 @@
     <nav class="nav" aria-label="主要連結">
       <span class="nav-hover" aria-hidden="true"></span>
       <a href="#projects">專案</a>
+      <a href="experience.html">經歷</a>
       <a href="#contact">聯絡</a>
       <a href="https://4yu.dev" target="_blank" rel="noopener">Blog</a>
       <button class="search-trigger" type="button" data-palette-open aria-label="搜尋專案">搜尋 <kbd>⌘K</kbd></button>
@@ -48,6 +49,14 @@
         <ol id="index" class="index"></ol>
       </div>
       <p id="empty" class="empty" hidden>這個領域還沒有專案</p>
+    </section>
+
+    <section id="experience" class="exp-preview" aria-labelledby="exp-title">
+      <div class="projects-head">
+        <h2 id="exp-title">經歷 <span id="exp-count" class="meta"></span></h2>
+        <a class="button" href="experience.html">全部經歷<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+      </div>
+      <ol id="exp-latest" class="exp-list"></ol>
     </section>
   </main>
 
