@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>4yü/找不到頁面</title>
+  <meta name="robots" content="noindex">
+  <script>
+    // 4yu.dev 原本是部落格，網域搬到 blog.4yu.dev 之後，舊的文章網址（例如 /post/STL/）在這裡會找不到，
+    // 直接轉到部落格的同一個路徑；作業時期的 /NCCU-GenAI-HW/... 轉成去掉前綴的新網址。
+    (function () {
+      var h = location.hostname, p = location.pathname, rest = location.search + location.hash;
+      if (h !== "4yu.dev" && h !== "www.4yu.dev") return;
+      if (p.indexOf("/NCCU-GenAI-HW/") === 0) { location.replace(p.slice("/NCCU-GenAI-HW".length) + rest); return; }
+      location.replace("https://blog.4yu.dev" + p + rest);
+    })();
+  </script>
+  <style>
+    html { background: #07081a; color: #eef0ff; font-family: "Times New Roman", Times, "Noto Sans TC", "PingFang TC", sans-serif; }
+    body { min-height: 100vh; margin: 0; display: grid; place-items: center; text-align: center; }
+    p { color: #abb4dc; font-size: 18px; }
+    code { font-family: "Courier Prime", "Courier New", monospace; color: #7f93ff; }
+    a { color: #eef0ff; }
+  </style>
+</head>
+<body>
+  <main>
+    <p><code>~/4yü</code></p>
+    <p>找不到這個頁面</p>
+    <p><a href="https://4yu.dev/">回到首頁</a>　<a href="https://blog.4yu.dev/">部落格</a></p>
+  </main>
+</body>
+</html>
