@@ -154,7 +154,7 @@ kbd {
 .icon-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--surface); }
 
 /* ---------- 5. 首頁：自我介紹 ---------- */
-main { display: block; }
+main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平捲軸 */
 .hero {
   max-width: var(--page); margin: 0 auto; padding: 96px var(--gutter) 128px;
   display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 64px; align-items: center;
