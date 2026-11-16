@@ -440,6 +440,12 @@ html.lenis, html.lenis body { height: auto; }
 .cursor.is-label .cursor-label { opacity: 1; }
 .cursor.is-label .cursor-dot, .cursor.is-hidden .cursor-dot, .cursor.is-hidden .cursor-ring { opacity: 0; }
 
+/* 第一次進站的加載畫面：點陣聚合成 ~/4yü 再炸開（app.js 的 FX.loader） */
+html.is-loading::before { content: ""; position: fixed; inset: 0; z-index: 199; background: var(--bg); }
+html.is-loading, html.is-loading body { overflow: hidden; }
+.loader-screen { position: fixed; inset: 0; z-index: 200; background: var(--bg); pointer-events: none; }
+.loader-screen canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
 /* 換頁布幕 */
 .curtain {
   position: fixed; inset: 0; z-index: 100; display: grid; place-items: center;
@@ -455,13 +461,14 @@ html.lenis, html.lenis body { height: auto; }
   position: absolute; z-index: 0; top: 0; bottom: 0; left: 50%; width: 100vw; height: 100%; transform: translateX(-50%); pointer-events: none;
   -webkit-mask-image: radial-gradient(ellipse 70% 80% at 65% 45%, #000 35%, transparent 80%); mask-image: radial-gradient(ellipse 70% 80% at 65% 45%, #000 35%, transparent 80%);
 }
-/* 背景名稱標籤：點一下換下一種背景 */
-.hero > .backdrop-label {
-  position: absolute; z-index: 2; right: var(--gutter); bottom: 28px;
-  display: inline-flex; gap: 8px; align-items: center; padding: 4px 8px; border: 0; border-radius: var(--r-tag);
-  background: transparent; color: var(--muted); font-size: 14px; cursor: pointer; transition: color 150ms var(--ease);
+/* 背景的「下一個」小圖示 */
+.hero > .backdrop-next {
+  position: absolute; z-index: 2; right: var(--gutter); bottom: 24px;
+  width: 32px; height: 32px; display: grid; place-items: center; padding: 0;
+  border: 1px solid var(--line); border-radius: var(--r-control); background: transparent; color: var(--muted); cursor: pointer;
+  transition: color 150ms var(--ease), border-color 150ms var(--ease);
 }
-.hero > .backdrop-label:hover { color: var(--accent); }
+.hero > .backdrop-next:hover { color: var(--accent); border-color: var(--line-strong); }
 .portrait { perspective: 800px; }
 .portrait img { will-change: transform; }
 .hero h1 .char { display: inline-block; will-change: transform; }
