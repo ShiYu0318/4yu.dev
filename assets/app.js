@@ -126,7 +126,6 @@
         ${pf.githubAvatar ? `
         <figure class="dotfield">
           <div class="dotfield-frame"><img src="${esc(pf.githubAvatar)}" alt="" hidden><canvas role="img" aria-label="用點陣畫成的 GitHub 頭像：戴耳機的黑貓"></canvas></div>
-          <figcaption class="meta">GitHub 頭像 · 游標靠近試試</figcaption>
         </figure>` : ""}
       </div>
       <div class="footer-base">
@@ -201,7 +200,7 @@
     $("#hero").innerHTML = `
       <div class="hero-text">
         <p class="hero-eyebrow meta">${esc(pf.nameEn)} · ${esc(pf.tagline)}</p>
-        <h1>${esc(pf.headline)}</h1>
+        <h1>${esc(pf.headline).replace(/\n/g, "<br>")}</h1>
         <p class="bio">${esc(pf.bio)}</p>
         <div class="hero-actions">
           <a class="button primary" href="#projects">看 ${data.published.length} 個專案${ICON.down}</a>
