@@ -11,7 +11,7 @@
 
 - **讀者**：教授、實驗室、競賽評審、實習面試官、想合作的同學。他們通常只會花 30 秒掃過首頁，再挑 1～2 個專案點進去看。
 - **一個專案 = 一篇 Markdown 介紹頁**，首頁的精選、索引、篩選、專案編號與上一個 / 下一個全部由 `content/projects.json` 驅動。
-- 站點是**純靜態網站**（HTML + CSS + 原生 JS），部署在 GitHub Pages，**沒有 build step**。
+- 站點是**純靜態網站**（HTML + CSS + 原生 JS），部署在 GitHub Pages，**沒有 build step**。用到的函式庫都放在 `assets/vendor/`，不依賴 CDN。
 
 > **新增一個作品 = 新增一個 `.md` 檔 + 在 `content/projects.json` 加一筆資料（+ 選擇性放截圖）。不需要寫任何 HTML。**
 
@@ -29,7 +29,11 @@ shiyu-portfolio/
 ├── .nojekyll                 ← 讓 GitHub Pages 不要跑 Jekyll
 ├── assets/
 │   ├── style.css             ← 全站唯一的樣式表
-│   └── app.js                ← 全站唯一的 JS
+│   ├── app.js                ← 全站唯一的自寫 JS
+│   └── vendor/               ← 第三方函式庫（只放 minified 檔，不要修改）
+│       ├── gsap.min.js、ScrollTrigger.min.js、SplitText.min.js、Flip.min.js   ← 動態
+│       ├── marked.min.js     ← Markdown 轉 HTML
+│       └── highlight.min.js、github-dark.min.css                         ← 程式碼上色
 ├── content/
 │   ├── projects.json         ← 個人資料 + 分類 + 專案清單（manifest）
 │   ├── projects/
@@ -46,9 +50,11 @@ shiyu-portfolio/
 ### 禁止事項
 
 - ❌ 不要為某個專案新增獨立的 `.html`；所有介紹頁都由 `project.html` 渲染。
-- ❌ 不要新增第二個 CSS / JS 檔，也不要在 Markdown 裡寫 `<style>`、`<script>`、行內 `style=""`。
-- ❌ 不要引入 npm、打包工具或前端框架。外部函式庫只允許 `project.html` 已經從 CDN 載入的 `marked`、`highlight.js`。
-- ❌ **不要介紹私有（private）repo，也不要介紹 fork 來的 repo**，除非使用者明確要求。私有 repo 的名稱、內容都不能出現在網站上。
+- ❌ 不要新增第二個自寫的 CSS / JS 檔，也不要在 Markdown 裡寫 `<style>`、`<script>`、行內 `style=""`。
+- ❌ 不要引入打包工具或前端框架（React、Vue、Tailwind…）。函式庫只能是 `assets/vendor/` 裡已有的那幾個；真的要加新的，先問使用者，並同步更新本節。
+- ❌ **不要介紹私有（private）repo**，除非使用者明確要求。私有 repo 的名稱、內容都不能出現在網站上。
+- ❌ **fork 來的 repo 只有在裡面有 ShiYu 的 commit 時才能放**（用 `git log --all --author` 確認，作者可能是 `ShiYu`、`士育`、`4yü` 或 `89064538+ShiYu0318@users.noreply.github.com`）。放上去時 `team` 設 `true`，並在「技術亮點」加一個 `### 我負責的部分` 小節，寫清楚 commit 數與負責的內容。
+- ❌ 不放課程作業（例如 `NCKU-Intro2AI`、`NTHU-NLP-HW`、`NCU-CSIE-*-HW`）、空 repo，以及只有檔案、沒有說明的 repo（例如只放講義 PDF 或題目測資）。
 - ❌ 不要捏造數據。星數、測試數量、效能數字、得獎紀錄只能寫 **repo README 或使用者親口提供** 的內容。
 - ❌ 不要改已發佈專案的 `id`（會讓舊連結失效）。
 
@@ -83,6 +89,7 @@ shiyu-portfolio/
     "tagline": "國立中央大學資訊工程學系",              // 標題上方那行小字
     "headline": "把研究問題做成真的能用的系統",        // 首頁主標題，一句話、不加句號
     "bio": "...",                                     // 一段話，只寫查得到出處的事實
+    "email": "hi@4yu.dev",                            // 頁尾的大字聯絡信箱，點擊會複製
     "links": [{ "label": "GitHub", "url": "https://github.com/ShiYu0318" }]
   },
   "categories": [                    // 篩選按鈕，順序 = 顯示順序
@@ -100,6 +107,7 @@ shiyu-portfolio/
       "cover": "content/img/maijong/table.webp",      // 主要畫面；精選與專案頁標頭使用，可為 null（就不顯示圖）
       "year": 2026,                                   // 主要開發年份
       "featured": true,                               // true 且有 cover 才會以圖文大列呈現，全站最多 3 個
+      "team": false,                                  // 團隊專案（含有貢獻的 fork）設 true，會標示「團隊」
       "status": "published",                          // published | draft（draft 不出現在首頁）
       "updated": "2026-11-16"                         // YYYY-MM-DD，每次改內容都要更新
     }
@@ -110,7 +118,7 @@ shiyu-portfolio/
 規則：
 
 1. `projects` 陣列的**順序就是首頁顯示順序**，也決定**專案編號**（已發佈的第 1 個是 `No. 01`）與「上一個 / 下一個」。精選放最前面，其他依重要性排。
-2. `featured: true` 的專案最多 **3** 個，而且**必須有 `cover`**。首頁用圖文交錯的大列呈現它們，其餘專案進「索引」條列（編號、名稱、一句話、領域、年份），**不顯示縮圖**。
+2. `featured: true` 的專案最多 **3** 個，而且**必須有 `cover`**。首頁用圖文交錯的大列呈現它們，其餘專案進「索引」條列（編號、名稱、一句話、領域、年份）；索引本身不放縮圖，有 `cover` 的專案在滑鼠移過時才浮出預覽。
 3. `cover` 優先用最能代表專案的真實截圖，比例最好接近 16:10；比例差很多時（例如 2:1 的品牌圖），用圖片原本的底色補邊到 16:10，不要讓它被裁切。
 4. JSON 必須合法（不能有註解、尾逗號）；上面的 `jsonc` 只是說明。
 
@@ -201,7 +209,7 @@ shiyu-portfolio/
 | 產品 | 讓教授、實驗室與面試官 30 秒內看懂 ShiYu 做了什麼、最值得點開哪一個 |
 | 個性 | 安靜、精確、像實驗室筆記 |
 | 世界 | 深夜的研究室：GitHub 頭像裡戴耳機的黑貓，背後一片電光藍的當機畫面 |
-| 重點畫面 | 首頁的人像照片與精選專案的真實截圖；外框只有主要按鈕帶電光藍 |
+| 重點畫面 | 首頁的點陣肖像（人像照片取樣成電光藍點陣，可切回原照片）與精選專案的真實截圖 |
 | 標誌細節 | 專案編號 `No. 01`（等寬字、灰色），只出現在首頁精選 / 索引、專案頁標頭與上一個 / 下一個 |
 
 **模板檢查**：把名字換成別人，這個頁面還成立嗎？成立的話，代表文案或畫面不夠具體。
@@ -219,12 +227,12 @@ shiyu-portfolio/
 | `--raised` | `#161a33` | 耳機的靛灰，選取中的項目、行內程式碼 |
 | `--line` / `--line-strong` | 白 8% / 14% | 所有分隔線與邊框 |
 | `--text` / `--text-2` / `--muted` | `#eef0ff` / `#abb4dc` / `#7c84ab` | 眼睛的白、字幕的淡藍白；文字只有這三種角色 |
-| `--brand` | `#1533f3` | 頭像背景的電光藍，**只當填色**：主要按鈕（白字，對比 8.7:1） |
+| `--brand` | `#1533f3` | 頭像背景的電光藍，**只當填色**：主要按鈕（白字，對比 8.7:1）、點陣肖像的暗部、頂端 2px 進度條 |
 | `--accent` | `#7f93ff` | 電光藍提亮後的文字版：hover、目錄目前位置、HIGHLIGHT。一頁不超過幾處 |
 | `--wip` | `#e0b866` | 只給 WIP 提示框 |
 
 - `--brand` 放在深底上當文字只有 2.3:1，太暗，**不能拿來寫字或當細線**，文字一律用 `--accent`。
-- 每個畫面最多一兩個 `--brand` 填色（通常就是那顆主要按鈕）。
+- `--brand` 只出現在上面列的三個地方，不要再加新的用途。
 
 **禁止**：漸層（背景、文字、按鈕都不行）、發光陰影、放射狀色塊、彩色邊框，也不要把頭像的電光藍鋪成大面積背景。深度只靠底色深淺與細線；唯一的陰影是截圖底下的中性陰影（`--image-shadow`）。
 
@@ -240,15 +248,33 @@ shiyu-portfolio/
 
 - 所有間距是 4 的倍數（4、8、12、16、20、24、32、40、48、64、80、96、112、128）。
 - 圓角：小東西 6、按鈕 / 輸入 8、卡片與截圖 12–16。不是每樣東西都是膠囊。
-- 首頁：自我介紹是 7:5 左右分欄（文字 + 照片），下面是「專案」標題 + 分段篩選 → 精選大列（圖文左右交錯）→ 索引條列。**不要回到等寬卡片牆。**
+- 首頁：自我介紹是 7:5 左右分欄（文字 + 點陣肖像），下面是「專案」標題 + 分段篩選（附數量）→ 精選大列（圖文左右交錯）→ 索引條列 → 頁尾大字信箱。**不要回到等寬卡片牆。**
 - 專案頁：標頭（編號、標題、一句話、GitHub 按鈕、技術清單）→ 封面截圖 → 左側目錄 + 720px 內文。
 - 手機（< 760px）全部改單欄，索引只留編號與名稱。
 
-### 6.5 動態
+### 6.5 動態與互動
 
-- 只有一次進場：淡入並上移 8px（`.enter`），最多錯開 3 個元素。
-- hover 只改顏色或底色，不放大、不位移、不加光暈。按下按鈕可縮到 0.98。
-- 只用一條曲線 `--ease`，時間 120–180ms（hover）、300–500ms（進場）。不要 `transition: all`。
+動態只用在**能幫讀者理解或操作**的地方，參考 GSAP、Motion、Fluid Functionalism、threeui 的手法。全部寫在 `assets/app.js`，用 `assets/vendor/` 的 GSAP 實作。
+
+| 位置 | 做法 |
+|---|---|
+| 標題 | SplitText 逐字從遮罩下浮現（首頁 H1、專案頁 H1），只在載入時一次 |
+| 點陣肖像 | 人像取樣成點陣（暗處大點、亮處小點），游標靠近時點被推開、離開後彈回；載入時點從四散聚合。右下可切換「點陣 / 照片」 |
+| 導覽列 | 流體 hover：一塊 `--raised` 底色滑到游標所在的連結 |
+| 分段篩選 | 選取底色滑到被點的按鈕；清單用 Flip 平滑重排 |
+| 精選截圖 | 捲到時外框從內縮裁切展開、圖片從 1.12 倍縮回 |
+| 內文與索引列 | 捲到時淡入並上移 16px，同一批錯開 0.06 秒 |
+| 索引 hover | 有 `cover` 的列會在游標旁浮出截圖預覽，帶一點延遲跟隨 |
+| 搜尋 | `⌘K` / `Ctrl+K` / `/` 打開搜尋面板，可用方向鍵選、Enter 開啟 |
+| 目錄 | 一條 `--accent` 細線滑到目前章節 |
+| 換頁 | `@view-transition` 整頁淡入淡出 |
+
+規則：
+
+- 曲線一律 `expo.out`（CSS 用 `--ease`）。hover 120–180ms，滑動指示 350–450ms，進場 600–1200ms。
+- **不要**：無限循環的動畫、視差、游標跟隨的裝飾、hover 時卡片放大或浮起、彈跳效果、`transition: all`。只動 `transform`、`opacity`、`clip-path` 與顏色。
+- 一定要尊重 `prefers-reduced-motion: reduce`：所有 GSAP 動態關閉、點陣直接畫在原位。GSAP 沒載入時內容也要完整顯示（初始隱藏狀態只能由 JS 在確定要播動畫時設定）。
+- 觸控裝置不做 hover 預覽與流體 hover。
 
 ---
 
@@ -256,7 +282,7 @@ shiyu-portfolio/
 
 ### 情境 A：「幫我把 repo X 加進作品集」
 
-1. **確認是公開、非 fork 的 repo**；不是的話先停下來問使用者。
+1. **確認是公開 repo**；私有的先停下來問使用者。是 fork 的話，先用 `git log --all --author` 確認有 ShiYu 的 commit，沒有就不放（§2 禁止事項）。
 2. 讀 repo 的 `README`（含 `README.zh-TW.md`）、目錄結構、`package.json` / `pyproject.toml`，蒐集：用途、功能、技術、可用截圖、數據。
 3. 決定 `id`（§3.1），把截圖轉成 webp 放到 `content/img/<id>/`（§3.2）。
 4. 複製 `templates/project-template.md` 為 `content/projects/<id>.md`，依 §5 填寫。**所有事實都要能在 repo 裡找到出處。**
@@ -272,9 +298,9 @@ shiyu-portfolio/
 
 ### 情境 C：「改網站外觀 / 功能」
 
-1. 只能動 `assets/style.css`、`assets/app.js`、`index.html`、`project.html`。
-2. 改完至少打開首頁（桌面與手機寬度）與一篇介紹頁確認：篩選、精選大列、索引、編號、提示框、程式碼上色、目錄、上一個 / 下一個都正常。
-3. 對照 §6 再檢查一次：有沒有出現漸層、光暈、膠囊標籤、粗標題、emoji、hover 放大。
+1. 只能動 `assets/style.css`、`assets/app.js`、`index.html`、`project.html`；`assets/vendor/` 裡的檔案不要改。
+2. 改完至少打開首頁（桌面與手機寬度）與一篇介紹頁確認：點陣肖像、篩選、精選大列、索引與 hover 預覽、⌘K 搜尋、提示框、程式碼上色、目錄、上一個 / 下一個都正常，瀏覽器 console 沒有錯誤；再用「減少動態效果」模式看一次。
+3. 對照 §6 再檢查一次：有沒有出現漸層、光暈、膠囊標籤、粗標題、emoji、hover 放大、無限循環動畫。
 4. 若新增了 Markdown 語法，**同步更新本文件 §5 與 `templates/project-template.md`**，並更新 `scripts/check.py`。
 
 ### 本機預覽
