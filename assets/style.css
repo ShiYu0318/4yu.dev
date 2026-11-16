@@ -440,10 +440,13 @@ html.lenis, html.lenis body { height: auto; }
 .curtain .wordmark { font-size: 20px; opacity: 0; }
 .is-leaving .curtain, .is-entering .curtain { pointer-events: all; }
 
-/* Hero 背景的實驗室格點 */
+/* Hero 背景：會流動的等高線地形 */
 .hero { position: relative; }
 .hero > :not(.hero-grid) { position: relative; z-index: 1; }
-.hero-grid { position: absolute; z-index: 0; top: 0; bottom: 0; left: 50%; width: 100vw; height: 100%; transform: translateX(-50%); pointer-events: none; }
+.hero-grid {
+  position: absolute; z-index: 0; top: 0; bottom: 0; left: 50%; width: 100vw; height: 100%; transform: translateX(-50%); pointer-events: none;
+  -webkit-mask-image: radial-gradient(ellipse 70% 80% at 65% 45%, #000 35%, transparent 80%); mask-image: radial-gradient(ellipse 70% 80% at 65% 45%, #000 35%, transparent 80%);
+}
 .portrait { perspective: 800px; }
 .portrait img { will-change: transform; }
 .hero h1 .char { display: inline-block; will-change: transform; }
