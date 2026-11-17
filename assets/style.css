@@ -91,22 +91,24 @@ kbd {
 .progress { position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 50; background: var(--brand); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none; }
 
 /* ---------- 3. 頁首 / 頁尾 ---------- */
-/* 浮動膠囊導覽列：離上緣一段距離、圓角玻璃，左邊品牌、中間連結（滑動底色）、右邊動作 */
-:root { --header-gap: 14px; --header-h: 58px; --header-total: calc(var(--header-gap) + var(--header-h)); }
+/* 導覽列：貼齊上緣的整條玻璃列，左邊品牌、中間經歷 / 專案（滑動底色）、右邊 Blog / GitHub / 搜尋 */
+:root { --header-gap: 0px; --header-h: 64px; --header-total: var(--header-h); }
 .site-header {
-  position: sticky; top: var(--header-gap); z-index: 30;
-  width: min(var(--page), calc(100% - 32px)); height: var(--header-h); margin: var(--header-gap) auto 0;
-  padding: 0 10px 0 20px;
+  position: sticky; top: 0; z-index: 30;
+  height: var(--header-h); padding: 0 var(--gutter);
   display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 16px;
-  border: 1px solid var(--line-strong); border-radius: 22px;
-  background: rgba(5, 11, 23, .55);
+  background: rgba(5, 11, 23, .72); border-bottom: 1px solid var(--line);
   -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05), 0 12px 32px -12px rgba(0, 3, 10, .6);
   transition: background-color .3s var(--ease), border-color .3s var(--ease);
 }
-.site-header.is-scrolled { background: rgba(5, 11, 23, .8); }
+.site-header.is-scrolled { background: rgba(5, 11, 23, .86); border-bottom-color: var(--line-strong); }
 .site-header .wordmark { justify-self: start; }
 .nav-actions { justify-self: end; display: flex; align-items: center; gap: 6px; }
+.nav-text { height: 38px; padding: 0 12px; display: inline-flex; align-items: center; font-size: 17px; color: var(--text-2); text-decoration: none; border-radius: 10px; transition: color .2s var(--ease), background-color .2s var(--ease); }
+.nav-text:hover { color: var(--text); background: rgba(237, 243, 255, .07); }
+.nav-icon { width: 38px; height: 38px; display: inline-grid; place-items: center; color: var(--text-2); border-radius: 12px; transition: color .2s var(--ease), background-color .2s var(--ease); }
+.nav-icon:hover { color: var(--text); background: rgba(237, 243, 255, .07); }
+.nav-icon .icon { width: 18px; height: 18px; }
 .wordmark { font-family: var(--font-mono); font-size: 26px; line-height: 1; font-weight: 500; text-decoration: none; color: var(--text); letter-spacing: 0; }
 .wordmark { display: inline-flex; align-items: center; gap: 10px; }
 .wordmark-logo { height: 30px; width: auto; display: block; }
@@ -455,9 +457,12 @@ main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平
   #filters::-webkit-scrollbar, #exp-fields::-webkit-scrollbar { display: none; }
   #filters button, #exp-fields button { flex: none; }
   .controls { width: 100%; }
-  :root { --header-gap: 8px; --header-h: 52px; }
-  .site-header { width: calc(100% - 16px); padding: 0 6px 0 14px; display: flex; justify-content: space-between; gap: 8px; border-radius: 18px; }
+  :root { --header-h: 56px; }
+  .site-header { padding: 0 8px 0 var(--gutter); display: flex; justify-content: space-between; gap: 4px; }
   .nav { margin-left: auto; }
+  .nav-actions { gap: 0; }
+  .nav-text { padding: 0 8px; font-size: 16px; }
+  .nav-icon { width: 34px; height: 34px; }
   .site-header .wordmark { font-size: 18px; gap: 6px; }
   .site-header .wordmark-logo { height: 22px; }
   .nav { font-size: 16px; gap: 0; }
