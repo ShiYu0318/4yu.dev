@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """把 Notion「經歷」表格裡「網站」打勾的列，轉成 content/experience.json。
 
-只輸出公開欄位（AGENTS.md §9）：Title、身分、成果、單位、類型、領域、優先級、年級、Date、連結。
-備註、證書、原始標題、CV、放、編號等欄位一律不讀進輸出，Notion 頁面網址也不輸出。
+只輸出公開欄位（AGENTS.md §9）：Title、身分、成果、主辦單位、類型、領域、含金量、年級、Date、補充連結。
+備註、證書、原始標題、類別、CV、放、編號等欄位一律不讀進輸出，Notion 頁面網址也不輸出。
 
 用法：
   # 從 Notion API 讀（GitHub Actions 每天跑一次）
@@ -28,11 +28,13 @@ OUT = ROOT / "content" / "experience.json"
 API = "https://api.notion.com/v1"
 NOTION_VERSION = "2025-09-03"
 
-# Notion 欄位名稱 → 輸出欄位。只有這些會被讀取。
+# Notion 欄位名稱 → 輸出欄位。只有這些會被讀取。欄位改過名，新舊名稱都認得。
 PUBLIC = {
-    "Title": "title", "身分": "role", "成果": "result", "單位": "org",
-    "類型": "type", "領域": "fields", "優先級": "priority", "年級": "grade", "連結": "link",
+    "Title": "title", "身分": "role", "成果": "result", "主辦單位": "org", "單位": "org",
+    "類型": "type", "領域": "fields", "含金量": "priority", "優先級": "priority", "年級": "grade",
+    "補充連結": "link", "連結": "link",
 }
+pick = lambda row, *names: next((row[n] for n in names if row.get(n) not in (None, "", [])), None)
 CHECK = "網站"
 
 
@@ -90,24 +92,24 @@ def stars(v) -> int:
 def normalize(row: dict) -> dict | None:
     if not row.get("Title") or not row.get("s"):
         return None
-    fields = row.get("領域")
+    fields = pick(row, "領域")
     if isinstance(fields, str):  # MCP 匯出時 multi_select 是 JSON 字串
         fields = json.loads(fields)
-    org, result = row.get("單位"), row.get("成果")
+    org, result = pick(row, "主辦單位", "單位"), pick(row, "成果")
     if org and org == result:  # 單位欄重複填了成果時只留成果
         org = None
     return {
         "title": row["Title"].strip(),
-        "role": row.get("身分"),
+        "role": pick(row, "身分"),
         "result": result,
         "org": org,
-        "type": row.get("類型") or "其他",
+        "type": pick(row, "類型") or "其他",
         "fields": fields or [],
-        "priority": stars(row.get("優先級")),
-        "grade": row.get("年級"),
+        "priority": stars(pick(row, "含金量", "優先級")),
+        "grade": pick(row, "年級"),
         "start": row["s"][:10],
         "end": (row.get("e") or "")[:10] or None,
-        "link": row.get("連結"),
+        "link": pick(row, "補充連結", "連結"),
     }
 
 
