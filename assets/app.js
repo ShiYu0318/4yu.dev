@@ -746,7 +746,7 @@
         </figure>` : ""}
       </div>
       <div class="footer-base">
-        <span>© 2026 4yü.dev All Rights Reserved</span>
+        <span>© 2026 4yü.dev All Rights Reserved.</span>
         <button class="to-top" type="button" aria-label="回到頂端" title="回到頂端">${ICON.up}</button>
       </div>`;
     $(".to-top", foot).addEventListener("click", () => smoothTo(0));
@@ -1423,6 +1423,11 @@
     if (!x.end || x.end === x.start) return ymd(x.start);
     return `${ymd(x.start)} – ${x.end > today ? "至今" : ymd(x.end)}`;
   }
+  // 卡片上的日期：區間拆成兩行，第二行用 ↳ 接起來
+  function expDateHTML(x) {
+    if (!x.end || x.end === x.start) return `<span>${ymd(x.start)}</span>`;
+    return `<span>${ymd(x.start)}</span><span class="exp-to"><i aria-hidden="true">↳</i>${x.end > today ? "至今" : ymd(x.end)}</span>`;
+  }
 
   // 類型標籤的顏色：深底上好讀的低飽和色，一眼分得出研究 / 競賽 / 教學…
   const TYPE_COLOR = {
@@ -1434,7 +1439,7 @@
 
   // 一筆經歷：雙列卡片
   //   上列：日期 / 類型 / 主辦單位 / 身分
-  //   下列：含金量（淺藍 → 深藍 5 格）/ #領域 / 標題 / 成果
+  //   下列：重要程度（淺藍 → 深藍 5 格）/ #領域 / 標題 / 成果
   function expRow(x, i = 0) {
     const title = x.link
       ? `<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.title)}${ICON.out}</a>`
@@ -1442,11 +1447,11 @@
     const lv = x.priority || 0;
     return `
       <li class="exp" data-flip-id="${x.key}" data-i="${i}">
-        <p class="meta exp-date">${expDate(x)}${x.start > today ? `<span class="exp-soon">即將</span>` : ""}</p>
+        <p class="meta exp-date" aria-label="${esc(expDate(x))}">${expDateHTML(x)}${x.start > today ? `<span class="exp-soon">即將</span>` : ""}</p>
         <span class="exp-type" style="--c:${typeColor(x.type)}">${esc(x.type)}</span>
-        <p class="exp-org" title="${esc(x.org || "")}">${esc(x.org || "")}</p>
+        <p class="exp-org">${esc(x.org || "")}</p>
         <span class="exp-role">${esc(x.role || "")}</span>
-        <span class="exp-lv" data-l="${lv}" title="含金量 ${lv ? `${lv} / 5` : "未評"}" aria-label="含金量 ${lv ? `${lv} / 5` : "未評"}"><i></i><i></i><i></i><i></i><i></i></span>
+        <span class="exp-lv" data-l="${lv}" title="重要程度 ${lv ? `${lv} / 5` : "未評"}" aria-label="重要程度 ${lv ? `${lv} / 5` : "未評"}"><i></i><i></i><i></i><i></i><i></i></span>
         <p class="meta exp-tags">${x.fields.map((f) => `<span>#${esc(f.replace(/\s+/g, ""))}</span>`).join("")}</p>
         <h3 class="exp-title">${title}</h3>
         ${x.result ? `<p class="exp-result">${parts(...x.result.split(/\s*[・·]\s*/))}</p>` : `<span></span>`}
@@ -1641,12 +1646,11 @@
       { id: "role", label: "身分", get: (x) => [x.role], opts: byCount(tally(items.map((x) => x.role).filter(Boolean))) },
       { id: "stage", label: "學段", get: (x) => [stage(x.grade)],
         opts: ["研究所", "大學", "高中", "國中"].map((s) => [s, items.filter((x) => stage(x.grade) === s).length]).filter(([, n]) => n) },
-      { id: "lv", label: "含金量", get: (x) => [String(x.priority || 0)],
+      { id: "lv", label: "重要程度", get: (x) => [String(x.priority || 0)],
         opts: ["5", "4", "3", "2", "1", "0"].map((v) => [v, items.filter((x) => String(x.priority || 0) === v).length]).filter(([, n]) => n) },
-      { id: "result", label: "成果", get: (x) => [x.result ? "有" : "無"], opts: [["有", items.filter((x) => x.result).length]] },
     ];
     const lvLabel = (v) => v === "0" ? "未評" : `${"■".repeat(+v)}${"□".repeat(5 - v)}`;
-    const optLabel = (g, v) => g.id === "lv" ? lvLabel(v) : g.id === "result" ? "有成果" : v;
+    const optLabel = (g, v) => g.id === "lv" ? lvLabel(v) : v;
     const picked = Object.fromEntries(GROUPS.map((g) => [g.id, new Set()]));
     const filtersEl = $("#exp-filters");
     filtersEl.innerHTML = GROUPS.map((g) => `
