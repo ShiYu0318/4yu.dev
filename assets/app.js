@@ -1461,6 +1461,136 @@
     onVisible(els, (batch) => gsap.to(batch, { opacity: 1, y: 0, duration: 1.1, ease: EASE, stagger: 0.07, delay: FX.introWait(), overwrite: "auto" }), "0px 0px -4% 0px");
   }
 
+  // ---- 時光機時間軸（首頁與經歷頁共用）
+  // 左欄粗時間軸 + 在畫面垂直置中的「DESTINATION TIME」面板，右邊雙列卡片。
+  // 捲到哪張卡片，面板就轉到那張的日期；停手時把最近的卡片卡到面板旁邊
+  function createTimeline(box) {
+    box.classList.add("exp-tm");
+    const digits = (n) => Array.from({ length: n }, () =>
+      `<span class="dg"><span class="strip">${"0123456789".split("").map((d) => `<span>${d}</span>`).join("")}</span></span>`).join("");
+    let list = [], cards = [], active = -1, lastY = "";
+    const narrow = () => matchMedia("(max-width: 760px)").matches;
+    const dialOf = () => $(".tm-dial", box);
+    const rowsHTML = (xs, from) => xs.map((x, k) => {
+      const y = x.start.slice(0, 4), head = y !== lastY ? `<li class="tm-year" aria-hidden="true">${y}</li>` : "";
+      lastY = y;
+      return head + expRow(x, from + k);
+    }).join("");
+    // 面板放在可視範圍（扣掉頁首）的正中間
+    const center = () => {
+      const dial = dialOf();
+      if (!dial) return;
+      const head = $(".site-header")?.offsetHeight || 64;
+      box.style.setProperty("--dial-top", `${Math.max(head + 16, Math.round(head + (innerHeight - head - dial.offsetHeight) / 2))}px`);
+    };
+    const show = (i) => {
+      if (i === active || !cards[i]) return;
+      active = i;
+      const x = list[i];
+      $$(".strip", box).forEach((el, k) => { el.style.transform = `translateY(${-Number(x.start.replace(/-/g, "")[k]) * 10}%)`; });
+      $(".tm-grade", box).textContent = x.grade || "";
+      $(".tm-n", box).textContent = `${i + 1} / ${list.length}`;
+      $(".tm-sr", box).textContent = ymd(x.start);
+      cards.forEach((c, k) => c.classList.toggle("is-on", k === i));
+    };
+    // 基準線：面板中線；手機上面板是貼在頁首下的一條，改成面板下緣再往下一點
+    const line = () => {
+      if (narrow()) return $(".tm-side", box).getBoundingClientRect().bottom + 48;
+      const r = dialOf().getBoundingClientRect(); return r.top + r.height / 2;
+    };
+    function track() {
+      const dial = dialOf();
+      if (!dial || !cards.length) return;
+      const y = line();
+      let i = 0;
+      for (let k = 0; k < cards.length; k++) { if (cards[k].getBoundingClientRect().top <= y) i = k; else break; }
+      show(i);
+      if (narrow()) return;
+      const side = $(".tm-side", box).getBoundingClientRect();
+      $(".tm-fill", box).style.height = `${Math.max(0, Math.min(side.height, y - side.top))}px`;
+      // 指針從面板右緣一路接到卡片
+      const gap = Math.max(0, $(".tm-list", box).getBoundingClientRect().left - dial.getBoundingClientRect().right);
+      const ptr = $(".tm-pointer", box);
+      ptr.style.width = `${gap}px`; ptr.style.right = `${-gap}px`;
+    }
+    // 自動卡上：停手後把最近那張卡片的上半部對齊面板中線（指針剛好指到卡片第一列）
+    let idle = 0, snapping = false;
+    const offsetOf = (c) => { const r = c.getBoundingClientRect(); return r.top + Math.min(r.height / 2, 36) - line(); };
+    const snap = () => {
+      if (snapping || !cards.length || narrow()) return;
+      const dial = dialOf().getBoundingClientRect();
+      const first = cards[0].getBoundingClientRect(), last = cards.at(-1).getBoundingClientRect();
+      if (first.top > dial.bottom || last.bottom < dial.top) return;   // 還沒捲到清單，或已經捲過頭
+      let best = null;
+      for (const c of cards) { const d = offsetOf(c); if (best === null || Math.abs(d) < Math.abs(best)) best = d; }
+      if (best === null || Math.abs(best) < 2 || Math.abs(best) > 160) return;
+      snapping = true;
+      const done = () => { snapping = false; };
+      if (FX.lenis) FX.lenis.scrollTo(scrollY + best, { duration: 0.6, easing: (t) => 1 - Math.pow(1 - t, 3), onComplete: done });
+      else { scrollTo({ top: scrollY + best, behavior: reduced ? "auto" : "smooth" }); setTimeout(done, 600); }
+    };
+    addEventListener("scroll", () => {
+      requestAnimationFrame(track);
+      clearTimeout(idle);
+      if (!snapping) idle = setTimeout(snap, 160);
+    }, { passive: true });
+    addEventListener("resize", () => { center(); requestAnimationFrame(track); });
+    // 點卡片（不是點連結）也會把它卡到面板旁
+    box.addEventListener("click", (e) => {
+      const c = e.target.closest(".exp");
+      if (!c || e.target.closest("a") || narrow()) return;
+      const d = offsetOf(c);
+      FX.lenis ? FX.lenis.scrollTo(scrollY + d, { duration: 0.8 }) : scrollTo({ top: scrollY + d, behavior: reduced ? "auto" : "smooth" });
+    });
+    const reveal = (nodes, animate) => {
+      if (animate && motion) {
+        const inView = nodes.filter((el) => el.getBoundingClientRect().top < innerHeight);
+        markRevealed(inView);
+        if (inView.length) gsap.fromTo(inView, { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 0.8, ease: EASE, stagger: 0.03 });
+        riseIn(nodes.filter((el) => !inView.includes(el)));
+      } else riseIn(nodes);
+    };
+    const api = {
+      nodes: () => $$(".exp, .tm-year", box),
+      // 整份換掉（篩選、排序）
+      set(xs, animate) {
+        list = xs; lastY = ""; active = -1;
+        if (!xs.length) { box.innerHTML = ""; cards = []; return; }
+        box.innerHTML = `
+          <div class="tm-side">
+            <div class="tm-rail" aria-hidden="true"><div class="tm-fill"></div></div>
+            <div class="tm-dial-wrap">
+              <div class="tm-dial" role="status" aria-live="off">
+                <span class="tm-dial-title" aria-hidden="true">DESTINATION TIME</span>
+                <div class="tm-digits" aria-hidden="true">${digits(4)}<span class="tm-sep">/</span>${digits(2)}<span class="tm-sep">/</span>${digits(2)}</div>
+                <div class="tm-labels" aria-hidden="true"><span>YEAR</span><span>MONTH</span><span>DAY</span></div>
+                <div class="tm-foot"><b class="tm-grade"></b><span class="tm-n"></span></div>
+                <span class="visually-hidden tm-sr"></span>
+                <span class="tm-pointer" aria-hidden="true"></span>
+              </div>
+            </div>
+          </div>
+          <ol class="exp-list tm-list">${rowsHTML(xs, 0)}</ol>`;
+        cards = $$(".exp", box);
+        center(); track();
+        reveal(api.nodes(), animate);
+        if (motion) gsap.from(dialOf(), { opacity: 0, y: 12, duration: 0.8, ease: EASE, delay: animate ? 0 : 0.2 + FX.introDelay });
+      },
+      // 接在後面（首頁的「更多」）
+      append(xs) {
+        if (!list.length) { api.set(xs); return; }
+        const from = list.length;
+        list = list.concat(xs);
+        $(".tm-list", box).insertAdjacentHTML("beforeend", rowsHTML(xs, from));
+        cards = $$(".exp", box);
+        $(".tm-n", box).textContent = `${active + 1} / ${list.length}`;
+        reveal(api.nodes().filter((el) => !revealed.has(el)), false);
+        track();
+      },
+    };
+    return api;
+  }
+
   // 首頁：最近 5 筆
   async function renderExperiencePreview() {
     const box = $("#exp-latest");
@@ -1471,11 +1601,11 @@
     $("#exp-count").textContent = String(data.items.length).padStart(2, "0");
     // 先放最近 5 筆，「更多」每次再加 5 筆；「全部」連到經歷頁
     const more = $("#exp-more"), STEP = 10;
+    const tl = createTimeline(box);
     let shown = 0;
     const add = () => {
       const next = data.items.slice(shown, shown + STEP);
-      box.insertAdjacentHTML("beforeend", next.map((x, i) => expRow(x, shown + i)).join(""));
-      riseIn([...box.children].slice(shown));
+      shown ? tl.append(next) : tl.set(next);
       shown += next.length;
       if (shown >= data.items.length) more.hidden = true;
       else more.querySelector(".more-count").textContent = Math.min(STEP, data.items.length - shown);
@@ -1543,10 +1673,8 @@
       const list = items.filter((x) => GROUPS.every((g) => !picked[g.id].size || g.get(x).some((v) => picked[g.id].has(v))));
       return dir === "desc" ? list : list.slice().reverse();
     };
-    const digits = (n) => Array.from({ length: n }, () =>
-      `<span class="dg"><span class="strip">${"0123456789".split("").map((d) => `<span>${d}</span>`).join("")}</span></span>`).join("");
-
-    let list = [], cards = [], active = -1;
+    const tl = createTimeline(box);
+    let list = [];
     const render = (animate) => {
       list = visible();
       const n = GROUPS.reduce((s, g) => s + picked[g.id].size, 0);
@@ -1554,113 +1682,15 @@
       $("#exp-clear").hidden = !n;
       $("#exp-shown").textContent = n ? `顯示 ${list.length} / ${items.length} 筆` : "";
       $("#exp-empty").hidden = list.length > 0;
-      if (!list.length) { box.innerHTML = ""; cards = []; return; }
-      let lastY = "";
-      box.innerHTML = `
-        <div class="tm-side">
-          <div class="tm-rail" aria-hidden="true"><div class="tm-fill"></div></div>
-          <div class="tm-dial-wrap">
-            <div class="tm-dial" role="status" aria-live="off">
-              <span class="tm-dial-title" aria-hidden="true">DESTINATION TIME</span>
-              <div class="tm-digits" aria-hidden="true">${digits(4)}<span class="tm-sep">/</span>${digits(2)}<span class="tm-sep">/</span>${digits(2)}</div>
-              <div class="tm-labels" aria-hidden="true"><span>YEAR</span><span>MONTH</span><span>DAY</span></div>
-              <div class="tm-foot"><b class="tm-grade"></b><span class="tm-n"></span></div>
-              <span class="visually-hidden tm-sr"></span>
-              <span class="tm-pointer" aria-hidden="true"></span>
-            </div>
-          </div>
-        </div>
-        <ol class="exp-list tm-list">${list.map((x, i) => {
-          const y = x.start.slice(0, 4), head = y !== lastY ? `<li class="tm-year" aria-hidden="true">${y}</li>` : "";
-          lastY = y;
-          return head + expRow(x, i);
-        }).join("")}</ol>`;
-      cards = $$(".exp", box);
-      active = -1;
-      track();
-      const nodes = $$(".exp, .tm-year", box);
-      if (animate && motion) {
-        const inView = nodes.filter((el) => el.getBoundingClientRect().top < innerHeight);
-        markRevealed(inView);
-        if (inView.length) gsap.fromTo(inView, { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 0.8, ease: EASE, stagger: 0.03 });
-        riseIn(nodes.filter((el) => !inView.includes(el)));
-      } else riseIn(nodes);
-      if (motion) gsap.from(".tm-dial", { opacity: 0, y: 12, duration: 0.8, ease: EASE, delay: animate ? 0 : 0.2 + FX.introDelay });
+      tl.set(list, animate);
     };
-
-    // ---- 時光機面板：碰到面板中線的那張卡片就是「現在」
-    const dialOf = () => $(".tm-dial", box);
-    const show = (i) => {
-      if (i === active || !cards[i]) return;
-      active = i;
-      const x = list[i];
-      $$(".strip", box).forEach((s, k) => { s.style.transform = `translateY(${-Number(x.start.replace(/-/g, "")[k]) * 10}%)`; });
-      $(".tm-grade", box).textContent = x.grade || "";
-      $(".tm-n", box).textContent = `${i + 1} / ${list.length}`;
-      $(".tm-sr", box).textContent = ymd(x.start);
-      cards.forEach((c, k) => c.classList.toggle("is-on", k === i));
-    };
-    // 手機上面板是貼在頁首下的一條，基準線改成面板下緣再往下一點
-    const narrow = () => matchMedia("(max-width: 760px)").matches;
-    const line = () => {
-      if (narrow()) return $(".tm-side", box).getBoundingClientRect().bottom + 48;
-      const r = dialOf().getBoundingClientRect(); return r.top + r.height / 2;
-    };
-    function track() {
-      const dial = dialOf();
-      if (!dial || !cards.length) return;
-      const y = line();
-      let i = 0;
-      for (let k = 0; k < cards.length; k++) { if (cards[k].getBoundingClientRect().top <= y) i = k; else break; }
-      show(i);
-      if (narrow()) return;
-      const side = $(".tm-side", box).getBoundingClientRect();
-      $(".tm-fill", box).style.height = `${Math.max(0, Math.min(side.height, y - side.top))}px`;
-      // 指針從面板右緣一路接到卡片
-      const gap = Math.max(0, $(".tm-list", box).getBoundingClientRect().left - dial.getBoundingClientRect().right);
-      const ptr = $(".tm-pointer", box);
-      ptr.style.width = `${gap}px`; ptr.style.right = `${-gap}px`;
-    }
-
-    // ---- 自動卡上：停手後把最近的卡片頂端對齊面板頂端
-    let idle = 0, snapping = false;
-    const snap = () => {
-      if (snapping || !cards.length || narrow()) return;
-      const dial = dialOf().getBoundingClientRect();
-      const first = cards[0].getBoundingClientRect(), last = cards.at(-1).getBoundingClientRect();
-      if (first.top > dial.bottom || last.bottom < dial.top) return;   // 還沒捲到清單，或已經捲過頭
-      let best = null;
-      for (const c of cards) {
-        const d = c.getBoundingClientRect().top - dial.top;
-        if (!best || Math.abs(d) < Math.abs(best)) best = d;
-      }
-      if (best === null || Math.abs(best) < 2 || Math.abs(best) > 160) return;
-      snapping = true;
-      const done = () => { snapping = false; };
-      const target = scrollY + best;
-      if (FX.lenis) FX.lenis.scrollTo(target, { duration: 0.6, easing: (t) => 1 - Math.pow(1 - t, 3), onComplete: done });
-      else { scrollTo({ top: target, behavior: reduced ? "auto" : "smooth" }); setTimeout(done, 600); }
-    };
-    addEventListener("scroll", () => {
-      requestAnimationFrame(track);
-      clearTimeout(idle);
-      if (!snapping) idle = setTimeout(snap, 160);
-    }, { passive: true });
-    addEventListener("resize", () => requestAnimationFrame(track));
-    // 點卡片（不是點連結）也會把它卡到面板旁
-    box.addEventListener("click", (e) => {
-      const c = e.target.closest(".exp");
-      if (!c || e.target.closest("a") || matchMedia("(max-width: 760px)").matches) return;
-      const d = c.getBoundingClientRect().top - dialOf().getBoundingClientRect().top;
-      FX.lenis ? FX.lenis.scrollTo(scrollY + d, { duration: 0.8 }) : scrollTo({ top: scrollY + d, behavior: reduced ? "auto" : "smooth" });
-    });
 
     // ---- 切換：舊的先淡出再換
     let fading = null;
     const draw = (animate) => {
       if (!animate || !motion) { render(false); return; }
       fading?.kill();
-      const out = $$(".exp, .tm-year", box).filter((el) => { const r = el.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; });
+      const out = tl.nodes().filter((el) => { const r = el.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; });
       if (!out.length) { render(true); return; }
       fading = gsap.to(out, { opacity: 0, y: -8, duration: 0.2, ease: "power2.in", stagger: 0.006, onComplete: () => render(true) });
     };
