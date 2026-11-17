@@ -1471,8 +1471,11 @@
   // 捲到哪張卡片，面板就轉到那張的日期；停手時把最近的卡片卡到面板旁邊
   function createTimeline(box) {
     box.classList.add("exp-tm");
+    // 3D 滾輪：每一位是 10 面的圓柱（半徑讓 10 面剛好圍一圈），一律往同一方向轉，像里程表
+    const R = "1.85em";   // = 字高 1.2em ÷ (2 × tan 18°)
     const digits = (n) => Array.from({ length: n }, () =>
-      `<span class="dg"><span class="strip">${"0123456789".split("").map((d) => `<span>${d}</span>`).join("")}</span></span>`).join("");
+      `<span class="dg"><span class="cyl">${"0123456789".split("").map((d, i) => `<span style="transform:rotateX(${-i * 36}deg) translateZ(${R})">${d}</span>`).join("")}</span></span>`).join("");
+    let rot = [];
     let list = [], cards = [], active = -1, lastY = "";
     const narrow = () => matchMedia("(max-width: 760px)").matches;
     const dialOf = () => $(".tm-dial", box);
@@ -1492,11 +1495,17 @@
       if (i === active || !cards[i]) return;
       active = i;
       const x = list[i];
-      $$(".strip", box).forEach((el, k) => { el.style.transform = `translateY(${-Number(x.start.replace(/-/g, "")[k]) * 10}%)`; });
+      const ds = x.start.replace(/-/g, "");
+      $$(".cyl", box).forEach((el, k) => {
+        const cur = (((rot[k] || 0) % 10) + 10) % 10;
+        rot[k] = (rot[k] || 0) + (+ds[k] - cur + 10) % 10;
+        el.style.transform = `translateZ(-${R}) rotateX(${rot[k] * 36}deg)`;
+      });
       $(".tm-grade", box).textContent = x.grade || "";
       $(".tm-n", box).textContent = `${i + 1} / ${list.length}`;
       $(".tm-sr", box).textContent = ymd(x.start);
       cards.forEach((c, k) => c.classList.toggle("is-on", k === i));
+      fiber.spark = 0; fiber.kick();
       // 換日期時數字故障抖一下
       if (motion) { const d = dialOf(); d.classList.remove("is-glitch"); void d.offsetWidth; d.classList.add("is-glitch"); }
     };
@@ -1510,29 +1519,68 @@
       if (!dial || !cards.length) return;
       const y = line();
       let i = 0;
-      for (let k = 0; k < cards.length; k++) { if (cards[k].getBoundingClientRect().top <= y) i = k; else break; }
+      for (let k = 0; k < cards.length; k++) { if (cards[k].getBoundingClientRect().top <= y + 6) i = k; else break; }
       show(i);
       if (narrow()) return;
       const side = $(".tm-side", box).getBoundingClientRect();
       $(".tm-fill", box).style.height = `${Math.max(0, Math.min(side.height, y - side.top))}px`;
-      // 指針從面板右緣一路接到卡片
-      const gap = Math.max(0, $(".tm-list", box).getBoundingClientRect().left - dial.getBoundingClientRect().right);
-      const ptr = $(".tm-pointer", box);
-      ptr.style.width = `${gap}px`; ptr.style.right = `${-gap}px`;
+      // 時間軸的光條跟著捲動往下流，捲得越快越亮
+      const dy = scrollY - (flow.last ?? scrollY);
+      flow.last = scrollY; flow.pos += dy * 1.6; flow.speed = Math.min(1, flow.speed + Math.abs(dy) / 120);
+      box.style.setProperty("--flow", `${flow.pos.toFixed(1)}px`);
+      fiber.kick();
     }
-    // 自動卡上：停手後把最近那張卡片的上半部對齊面板中線（指針剛好指到卡片第一列）
+    const flow = { pos: 0, speed: 0, last: null };
+
+    // ---- 彈性光纖：從面板右緣接到目前卡片左緣的正中間；端點用彈簧跟著卡片，靜止時是一條水平線
+    const fiber = {
+      off: 0, v: 0, spark: 1, running: false, init: false,
+      kick() { if (!this.running && !narrow() && motion) { this.running = true; requestAnimationFrame(() => this.step()); } else if (!motion) this.step(true); },
+      step(once) {
+        const svg = $(".tm-fiber", box), dial = dialOf(), card = cards[active];
+        if (!svg || !dial || !card || narrow()) { this.running = false; return; }
+        const b = box.getBoundingClientRect(), d = dial.getBoundingClientRect(), c = card.getBoundingClientRect();
+        const x0 = d.right - b.left, y0 = d.top + d.height / 2 - b.top, x1 = c.left - b.left;
+        const target = (c.top + c.height / 2) - (d.top + d.height / 2);
+        if (!this.init || once) { this.off = target; this.init = true; }
+        const a = (target - this.off) * 0.12 - this.v * 0.32;   // 彈簧：拉力 0.12、阻尼 0.32
+        this.v += a; this.off += this.v;
+        const y1 = y0 + this.off, mx = (x0 + x1) / 2, sway = this.v * 3;
+        const path = `M ${x0} ${y0} C ${mx + sway} ${y0}, ${mx - sway} ${y1}, ${x1} ${y1}`;
+        $(".tm-fiber-glow", svg).setAttribute("d", path);
+        const line = $(".tm-fiber-line", svg); line.setAttribute("d", path);
+        const e0 = $(".tm-fiber-a", svg), e1 = $(".tm-fiber-b", svg), sp = $(".tm-fiber-spark", svg);
+        e0.setAttribute("cx", x0); e0.setAttribute("cy", y0); e1.setAttribute("cx", x1); e1.setAttribute("cy", y1);
+        if (this.spark < 1 && motion) {
+          this.spark = Math.min(1, this.spark + 0.035);
+          const p = line.getPointAtLength(line.getTotalLength() * this.spark);
+          sp.setAttribute("cx", p.x); sp.setAttribute("cy", p.y); sp.style.opacity = String(1 - this.spark * 0.3);
+        } else sp.style.opacity = "0";
+        // 時間軸光條的亮度慢慢退回
+        flow.speed *= 0.94;
+        box.style.setProperty("--flow-glow", flow.speed.toFixed(3));
+        const still = Math.abs(this.v) < 0.02 && Math.abs(target - this.off) < 0.2 && this.spark >= 1 && flow.speed < 0.01;
+        if (once || still) { this.running = false; return; }
+        requestAnimationFrame(() => this.step());
+      },
+    };
+    // 自動卡上：停手後把最近那張卡片的正中間對齊面板中線，光纖就是一條水平線
     let idle = 0, snapping = false;
-    const offsetOf = (c) => { const r = c.getBoundingClientRect(); return r.top + Math.min(r.height / 2, 36) - line(); };
+    const offsetOf = (c) => { const r = c.getBoundingClientRect(); return r.top + r.height / 2 - line(); };
     const snap = () => {
       if (snapping || !cards.length || narrow()) return;
+      // Lenis 的慣性還在滑：等它停下再卡
+      if (FX.lenis?.isScrolling) { clearTimeout(idle); idle = setTimeout(snap, 120); return; }
       const dial = dialOf().getBoundingClientRect();
       const first = cards[0].getBoundingClientRect(), last = cards.at(-1).getBoundingClientRect();
       if (first.top > dial.bottom || last.bottom < dial.top) return;   // 還沒捲到清單，或已經捲過頭
       let best = null;
       for (const c of cards) { const d = offsetOf(c); if (best === null || Math.abs(d) < Math.abs(best)) best = d; }
-      if (best === null || Math.abs(best) < 2 || Math.abs(best) > 160) return;
+      if (best === null || Math.abs(best) < 1 || Math.abs(best) > 160) return;
       snapping = true;
-      const done = () => { snapping = false; };
+      // 使用者中途又捲動時 Lenis 會取消這次 scrollTo、不會呼叫 onComplete，所以另外設一個保險
+      const done = () => { snapping = false; clearTimeout(guard); };
+      const guard = setTimeout(done, 900);
       if (FX.lenis) FX.lenis.scrollTo(scrollY + best, { duration: 0.6, easing: (t) => 1 - Math.pow(1 - t, 3), onComplete: done });
       else { scrollTo({ top: scrollY + best, behavior: reduced ? "auto" : "smooth" }); setTimeout(done, 600); }
     };
@@ -1561,7 +1609,7 @@
       nodes: () => $$(".exp, .tm-year", box),
       // 整份換掉（篩選、排序）
       set(xs, animate) {
-        list = xs; lastY = ""; active = -1;
+        list = xs; lastY = ""; active = -1; rot = []; fiber.init = false;
         if (!xs.length) { box.innerHTML = ""; cards = []; return; }
         box.innerHTML = `
           <div class="tm-side">
@@ -1573,11 +1621,14 @@
                 <div class="tm-digits" aria-hidden="true">${digits(4)}<span class="tm-sep">/</span>${digits(2)}<span class="tm-sep">/</span>${digits(2)}</div>
                 <div class="tm-foot"><b class="tm-grade"></b><span class="tm-n"></span></div>
                 <span class="visually-hidden tm-sr"></span>
-                <span class="tm-pointer" aria-hidden="true"></span>
               </div>
             </div>
           </div>
-          <ol class="exp-list tm-list">${rowsHTML(xs, 0)}</ol>`;
+          <ol class="exp-list tm-list">${rowsHTML(xs, 0)}</ol>
+          <svg class="tm-fiber" aria-hidden="true">
+            <path class="tm-fiber-glow"/><path class="tm-fiber-line"/>
+            <circle class="tm-fiber-a" r="4"/><circle class="tm-fiber-b" r="6"/><circle class="tm-fiber-spark" r="3"/>
+          </svg>`;
         cards = $$(".exp", box);
         center(); track();
         reveal(api.nodes(), animate);
