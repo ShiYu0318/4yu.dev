@@ -700,7 +700,23 @@ html.is-loading, html.is-loading body { overflow: hidden; }
 .exp-tm { display: grid; grid-template-columns: 264px minmax(0, 1fr); }
 .tm-side { position: relative; }
 .tm-rail { position: absolute; left: 50%; top: 0; bottom: 0; width: 6px; margin-left: -3px; border-radius: 6px; background: var(--raised); }
-.tm-fill { position: absolute; left: 0; top: 0; width: 100%; height: 0; border-radius: 6px; background: linear-gradient(var(--accent), var(--brand)); box-shadow: 0 0 14px rgba(102, 168, 255, .5); }
+.tm-fill {
+  position: absolute; left: 0; top: 0; width: 100%; height: 0; border-radius: 6px; overflow: hidden;
+  background: linear-gradient(var(--accent), var(--brand));
+  box-shadow: 0 0 calc(14px + 22px * var(--flow-glow, 0)) rgba(102, 168, 255, calc(.5 + .4 * var(--flow-glow, 0)));
+}
+/* 光條：一段段亮光跟著捲動往下流（位移由 JS 的 --flow 決定），捲越快越亮 */
+.tm-fill::after {
+  content: ""; position: absolute; inset: 0;
+  background: repeating-linear-gradient(transparent 0 46px, rgba(255, 255, 255, .85) 58px, transparent 72px, transparent 120px);
+  background-position: 0 var(--flow, 0px); opacity: calc(.35 + .65 * var(--flow-glow, 0));
+}
+/* 未捲到的那段軌道也有淡淡的流動 */
+.tm-rail::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  background: repeating-linear-gradient(transparent 0 30px, rgba(102, 168, 255, .25) 40px, transparent 50px, transparent 90px);
+  background-position: 0 calc(var(--flow, 0px) * .5); opacity: calc(.3 + .7 * var(--flow-glow, 0));
+}
 .tm-dial-wrap { position: sticky; top: var(--dial-top, 30vh); z-index: 5; display: flex; justify-content: center; }
 /* 面板：終端機主導（深色 CRT 小螢幕 + 藍色磷光 LED 滾輪數字 + 掃描線），外層是全息玻璃的邊框與反光 */
 .tm-dial {
@@ -716,26 +732,34 @@ html.is-loading, html.is-loading body { overflow: hidden; }
 @keyframes tm-sheen { from { transform: translateX(-45%); } to { transform: translateX(45%); } }
 @keyframes crt-flicker { 0%, 96% { opacity: 1; } 97% { opacity: .88; } 98% { opacity: 1; } 99% { opacity: .92; } }
 .tm-prompt { font-size: 13px; color: #6f95cc; text-shadow: 0 0 4px rgba(102, 168, 255, .5); }
-.tm-digits { display: flex; align-items: center; font-family: var(--font-mono); font-size: 28px; line-height: 1; color: #9ccaff; text-shadow: 0 0 5px rgba(102, 168, 255, .9), 0 0 16px rgba(25, 91, 245, .6); }
+.tm-digits { display: flex; align-items: center; font-family: var(--font-mono); font-size: 25px; line-height: 1; color: #9ccaff; text-shadow: 0 0 5px rgba(102, 168, 255, .9), 0 0 16px rgba(25, 91, 245, .6); }
 .tm-dial.is-glitch .tm-digits { animation: tm-glitch .35s steps(2) 1; }
 @keyframes tm-glitch { 0% { transform: translate(2px, -1px); filter: hue-rotate(40deg); } 50% { transform: translate(-2px, 1px); clip-path: inset(15% 0 35% 0); } 100% { transform: none; } }
 .tm-sep { padding: 0 2px; color: rgba(160, 200, 255, .45); text-shadow: none; }
-.dg { position: relative; display: inline-block; width: .62em; height: 1.15em; margin: 0 1px; overflow: hidden; border-radius: 2px; background: rgba(25, 91, 245, .07); }
-.dg::before { content: "8"; position: absolute; inset: 0; text-align: center; line-height: 1.15em; color: rgba(102, 168, 255, .07); text-shadow: none; }
-.dg .strip { position: absolute; left: 0; top: 0; width: 100%; transition: transform .7s cubic-bezier(.2, .9, .25, 1.15); }
-.dg .strip span { display: block; height: 1.15em; line-height: 1.15em; text-align: center; }
+/* 3D 滾輪：每一位是 10 面的圓柱，在小窗後面轉，上下有陰影像窺視窗 */
+.dg { position: relative; display: inline-block; width: .66em; height: 1.2em; margin: 0 1px; overflow: hidden; border-radius: 3px; perspective: 180px; background: linear-gradient(rgba(25, 91, 245, .1), rgba(25, 91, 245, .03) 50%, rgba(25, 91, 245, .1)); }
+.dg::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(rgba(3, 8, 18, .9), transparent 32%, transparent 68%, rgba(3, 8, 18, .9)); }
+.dg .cyl { position: absolute; inset: 0; transform-style: preserve-3d; transform: translateZ(-1.85em); transition: transform .9s cubic-bezier(.3, 1.3, .4, 1); }
+.dg .cyl span { position: absolute; inset: 0; display: grid; place-items: center; backface-visibility: hidden; }
 .tm-foot { display: flex; justify-content: space-between; gap: 18px; font-size: 13px; color: #8fb3e6; }
 .tm-foot b { color: #cfe2ff; font-weight: 400; font-family: var(--font-sans); font-size: 14px; }
 .tm-n { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
-.tm-pointer { position: absolute; top: 50%; right: 0; width: 0; height: 2px; background: var(--accent); }
-.tm-pointer::after { content: ""; position: absolute; right: -4px; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
-.tm-list { padding: 0 0 8vh; min-width: 0; }
+/* 彈性光纖：面板 → 卡片正中間 */
+.exp-tm { position: relative; }
+.tm-fiber { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 4; }
+.tm-fiber path { fill: none; stroke-linecap: round; }
+.tm-fiber-glow { stroke: #3a7bff; stroke-width: 8; opacity: .3; filter: blur(4px); }
+.tm-fiber-line { stroke: #9ccaff; stroke-width: 2.5; }
+.tm-fiber-a { fill: #9ccaff; }
+.tm-fiber-b { fill: #cfe2ff; filter: drop-shadow(0 0 6px #66a8ff); }
+.tm-fiber-spark { fill: #fff; opacity: 0; filter: drop-shadow(0 0 6px #fff); }
+.tm-list { padding: 0 0 8vh 40px; min-width: 0; }
 .exp-preview .tm-list { padding-bottom: 0; }
 .tm-year { font-family: var(--font-mono); font-size: 15px; color: var(--muted); margin: 32px 0 12px; display: flex; align-items: center; gap: 12px; font-variant-numeric: tabular-nums; }
 .tm-year:first-child { margin-top: 0; }
 .tm-year::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 .tm-list .exp { cursor: pointer; }
-.tm-list .exp.is-on { border-color: var(--accent); background: #0f1b30; transform: translateX(6px); }
+.tm-list .exp.is-on { border-color: var(--accent); background: #0f1b30; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 @media (max-width: 1000px) {
@@ -761,12 +785,12 @@ html.is-loading, html.is-loading body { overflow: hidden; }
   .exp-flabel { line-height: 1.4; }
   /* 手機：時間軸收起來，面板變成貼在頁首下方的一條 */
   .exp-tm { grid-template-columns: 1fr; }
-  .tm-rail, .tm-pointer { display: none; }
+  .tm-rail, .tm-fiber { display: none; }
   .tm-side { position: sticky; top: 64px; z-index: 6; background: var(--bg); padding: 10px 0; margin: 0 calc(var(--gutter) * -1) 12px; border-bottom: 1px solid var(--line); }
   .tm-dial-wrap { position: static; }
   .tm-dial { flex-direction: row; align-items: center; gap: 12px; padding: 8px 14px; border-radius: 12px; box-shadow: 0 0 0 3px rgba(12, 21, 36, .9), 0 0 20px rgba(25, 91, 245, .2), inset 0 0 20px rgba(25, 91, 245, .15); }
   .tm-prompt, .tm-sheen { display: none; }
   .tm-digits { font-size: 20px; }
   .tm-foot { flex-direction: column; font-size: 13px; gap: 2px; }
-  .tm-list .exp.is-on { transform: none; }
+  .tm-list { padding-left: 0; }
 }
