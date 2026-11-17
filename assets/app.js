@@ -1467,7 +1467,7 @@
   }
 
   // ---- 時光機時間軸（首頁與經歷頁共用）
-  // 左欄粗時間軸 + 在畫面垂直置中的「DESTINATION TIME」面板，右邊雙列卡片。
+  // 左欄粗時間軸 + 固定在畫面上方 1/3 的終端機風格時光機面板，右邊雙列卡片。
   // 捲到哪張卡片，面板就轉到那張的日期；停手時把最近的卡片卡到面板旁邊
   function createTimeline(box) {
     box.classList.add("exp-tm");
@@ -1497,6 +1497,8 @@
       $(".tm-n", box).textContent = `${i + 1} / ${list.length}`;
       $(".tm-sr", box).textContent = ymd(x.start);
       cards.forEach((c, k) => c.classList.toggle("is-on", k === i));
+      // 換日期時數字故障抖一下
+      if (motion) { const d = dialOf(); d.classList.remove("is-glitch"); void d.offsetWidth; d.classList.add("is-glitch"); }
     };
     // 基準線：面板中線；手機上面板是貼在頁首下的一條，改成面板下緣再往下一點
     const line = () => {
@@ -1566,9 +1568,9 @@
             <div class="tm-rail" aria-hidden="true"><div class="tm-fill"></div></div>
             <div class="tm-dial-wrap">
               <div class="tm-dial" role="status" aria-live="off">
-                <span class="tm-dial-title" aria-hidden="true">DESTINATION TIME</span>
+                <span class="tm-sheen" aria-hidden="true"></span>
+                <span class="tm-prompt" aria-hidden="true">&gt; jump --to</span>
                 <div class="tm-digits" aria-hidden="true">${digits(4)}<span class="tm-sep">/</span>${digits(2)}<span class="tm-sep">/</span>${digits(2)}</div>
-                <div class="tm-labels" aria-hidden="true"><span>YEAR</span><span>MONTH</span><span>DAY</span></div>
                 <div class="tm-foot"><b class="tm-grade"></b><span class="tm-n"></span></div>
                 <span class="visually-hidden tm-sr"></span>
                 <span class="tm-pointer" aria-hidden="true"></span>
