@@ -317,7 +317,7 @@
         "演算法"
       ],
       "priority": 0,
-      "grade": "高三上",
+      "grade": "高三下",
       "start": "2025-08-06",
       "end": null,
       "link": null
@@ -332,7 +332,7 @@
         "AI/ML"
       ],
       "priority": 0,
-      "grade": "高三上",
+      "grade": "高三下",
       "start": "2025-03-01",
       "end": null,
       "link": null
@@ -467,7 +467,7 @@
         "資訊安全"
       ],
       "priority": 3,
-      "grade": "高二上",
+      "grade": "高二下",
       "start": "2024-08-15",
       "end": "2024-08-18",
       "link": null
@@ -482,7 +482,7 @@
         "演算法"
       ],
       "priority": 3,
-      "grade": "高二上",
+      "grade": "高二下",
       "start": "2024-08-06",
       "end": null,
       "link": null
@@ -497,7 +497,7 @@
         "演算法"
       ],
       "priority": 2,
-      "grade": "高二上",
+      "grade": "高二下",
       "start": "2024-07-28",
       "end": "2024-08-01",
       "link": null
@@ -512,7 +512,7 @@
         "演算法"
       ],
       "priority": 4,
-      "grade": "高二上",
+      "grade": "高二下",
       "start": "2024-07-01",
       "end": "2025-06-30",
       "link": null
@@ -527,7 +527,7 @@
         "演算法"
       ],
       "priority": 4,
-      "grade": "高二上",
+      "grade": "高二下",
       "start": "2024-07-01",
       "end": "2025-06-30",
       "link": null
@@ -542,7 +542,7 @@
         "演算法"
       ],
       "priority": 4,
-      "grade": "高二上",
+      "grade": "高二下",
       "start": "2024-06-16",
       "end": null,
       "link": null
@@ -557,7 +557,7 @@
         "AI/ML"
       ],
       "priority": 3,
-      "grade": "高二上",
+      "grade": "高二下",
       "start": "2024-06-11",
       "end": null,
       "link": null
@@ -572,7 +572,7 @@
         "AI/ML"
       ],
       "priority": 3,
-      "grade": "高二上",
+      "grade": "高二下",
       "start": "2024-06-09",
       "end": null,
       "link": null
@@ -587,7 +587,7 @@
         "AI/ML"
       ],
       "priority": 3,
-      "grade": "高二上",
+      "grade": "高二下",
       "start": "2024-06-09",
       "end": null,
       "link": null
@@ -602,7 +602,7 @@
         "程式 / 開發"
       ],
       "priority": 3,
-      "grade": "高二上",
+      "grade": "高二下",
       "start": "2024-06-08",
       "end": null,
       "link": null
@@ -617,7 +617,7 @@
         "資訊安全"
       ],
       "priority": 2,
-      "grade": "高二上",
+      "grade": "高二下",
       "start": "2024-06-01",
       "end": null,
       "link": null
@@ -632,7 +632,7 @@
         "程式 / 開發"
       ],
       "priority": 3,
-      "grade": "高二上",
+      "grade": "高二下",
       "start": "2024-05-27",
       "end": null,
       "link": null
@@ -647,7 +647,7 @@
         "程式 / 開發"
       ],
       "priority": 3,
-      "grade": "高二上",
+      "grade": "高二下",
       "start": "2024-05-26",
       "end": null,
       "link": null
@@ -662,7 +662,7 @@
         "社群 / 社團"
       ],
       "priority": 4,
-      "grade": "高二上",
+      "grade": "高二下",
       "start": "2024-05-25",
       "end": null,
       "link": null
@@ -677,7 +677,7 @@
         "資訊安全"
       ],
       "priority": 2,
-      "grade": "高二上",
+      "grade": "高二下",
       "start": "2024-05-25",
       "end": null,
       "link": null
@@ -692,7 +692,7 @@
         "演算法"
       ],
       "priority": 3,
-      "grade": "高二上",
+      "grade": "高二下",
       "start": "2024-04-14",
       "end": null,
       "link": null
@@ -707,7 +707,7 @@
         "演算法"
       ],
       "priority": 1,
-      "grade": "高二上",
+      "grade": "高二下",
       "start": "2024-03-10",
       "end": null,
       "link": null
@@ -722,7 +722,7 @@
         "演算法"
       ],
       "priority": 3,
-      "grade": "高二上",
+      "grade": "高二下",
       "start": "2024-02-24",
       "end": "2024-06-29",
       "link": null
@@ -887,7 +887,7 @@
         "社群 / 社團"
       ],
       "priority": 3,
-      "grade": "高二上",
+      "grade": "高一下",
       "start": "2023-08-01",
       "end": "2024-07-31",
       "link": null
@@ -902,7 +902,7 @@
         "演算法"
       ],
       "priority": 1,
-      "grade": "高一上",
+      "grade": "高一下",
       "start": "2023-07-23",
       "end": "2023-07-27",
       "link": null
@@ -917,7 +917,7 @@
         "演算法"
       ],
       "priority": 4,
-      "grade": "高一上",
+      "grade": "高一下",
       "start": "2023-07-09",
       "end": null,
       "link": null
@@ -932,7 +932,7 @@
         "演算法"
       ],
       "priority": 5,
-      "grade": "高一上",
+      "grade": "高一下",
       "start": "2023-06-30",
       "end": null,
       "link": null
@@ -947,7 +947,7 @@
         "程式 / 開發"
       ],
       "priority": 2,
-      "grade": "高一上",
+      "grade": "高一下",
       "start": "2023-05-01",
       "end": "2023-06-30",
       "link": null
