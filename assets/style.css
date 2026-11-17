@@ -49,7 +49,7 @@
 
 /* ---------- 2. 基礎 ---------- */
 * { box-sizing: border-box; }
-html { scroll-padding-top: 80px; }
+html { scroll-padding-top: calc(var(--header-total) + 16px); }
 html, body { overflow-x: clip; }
 body {
   margin: 0;
@@ -91,30 +91,44 @@ kbd {
 .progress { position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 50; background: var(--brand); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none; }
 
 /* ---------- 3. 頁首 / 頁尾 ---------- */
+/* 浮動膠囊導覽列：離上緣一段距離、圓角玻璃，左邊品牌、中間連結（滑動底色）、右邊動作 */
+:root { --header-gap: 14px; --header-h: 58px; --header-total: calc(var(--header-gap) + var(--header-h)); }
 .site-header {
-  position: sticky; top: 0; z-index: 30;
-  height: 64px; padding: 0 var(--gutter);
-  display: flex; align-items: center; justify-content: space-between;
-  background: var(--bg);
-  border-bottom: 1px solid var(--line);
+  position: sticky; top: var(--header-gap); z-index: 30;
+  width: min(var(--page), calc(100% - 32px)); height: var(--header-h); margin: var(--header-gap) auto 0;
+  padding: 0 10px 0 20px;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 16px;
+  border: 1px solid var(--line-strong); border-radius: 22px;
+  background: rgba(5, 11, 23, .55);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05), 0 12px 32px -12px rgba(0, 3, 10, .6);
+  transition: background-color .3s var(--ease), border-color .3s var(--ease);
 }
+.site-header.is-scrolled { background: rgba(5, 11, 23, .8); }
+.site-header .wordmark { justify-self: start; }
+.nav-actions { justify-self: end; display: flex; align-items: center; gap: 6px; }
 .wordmark { font-family: var(--font-mono); font-size: 26px; line-height: 1; font-weight: 500; text-decoration: none; color: var(--text); letter-spacing: 0; }
 .wordmark { display: inline-flex; align-items: center; gap: 10px; }
 .wordmark-logo { height: 30px; width: auto; display: block; }
 .wordmark-tld { color: var(--accent); }
 .wordmark:hover { color: var(--text); }
-.nav { position: relative; display: flex; align-items: center; gap: 4px; font-size: 18px; }
+.nav { position: relative; display: flex; align-items: center; gap: 2px; font-size: 17px; }
 .nav > a, .nav > button {
-  position: relative; z-index: 1; height: 32px; padding: 0 12px; white-space: nowrap;
+  position: relative; z-index: 1; height: 34px; padding: 0 14px; white-space: nowrap;
   display: inline-flex; align-items: center; gap: 8px;
   color: var(--text-2); text-decoration: none; border-radius: var(--r-control);
   font: inherit; background: transparent; border: 0; cursor: pointer;
   transition: color 150ms var(--ease);
 }
-.nav > a:hover, .nav > button:hover { color: var(--text); }
+.nav > a:hover, .nav > button:hover, .nav > a[aria-current], .nav > a[data-current] { color: var(--text); }
 /* 流體 hover：一塊底色跟著游標滑到目前的連結 */
-.nav-hover { position: absolute; left: 0; top: 50%; height: 32px; width: 0; margin-top: -16px; border-radius: var(--r-control); background: var(--raised); opacity: 0; pointer-events: none; }
-.search-trigger { border: 1px solid var(--line-strong) !important; margin-left: 8px; width: 38px; padding: 0 !important; justify-content: center; }
+.nav-hover { position: absolute; left: 0; top: 50%; height: 34px; width: 0; margin-top: -17px; border-radius: 10px; background: rgba(237, 243, 255, .08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06); opacity: 0; pointer-events: none; }
+.search-trigger {
+  width: 38px; height: 38px; display: inline-grid; place-items: center; padding: 0; cursor: pointer;
+  color: var(--text-2); background: transparent; border: 1px solid var(--line-strong); border-radius: 12px;
+  transition: color .2s var(--ease), background-color .2s var(--ease);
+}
+.search-trigger:hover { color: var(--text); background: rgba(237, 243, 255, .07); }
 .search-trigger .icon { width: 17px; height: 17px; }
 
 .site-footer { max-width: var(--page); margin: 160px auto 0; padding: 0 var(--gutter) 40px; }
@@ -172,7 +186,7 @@ main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平
 /* 首屏：導覽列以下剛好填滿一個畫面高度 */
 .hero {
   max-width: var(--page); margin: 0 auto; padding: 64px var(--gutter) 112px;
-  min-height: calc(100vh - 64px); min-height: calc(100svh - 64px);
+  min-height: calc(100vh - var(--header-total)); min-height: calc(100svh - var(--header-total));
   display: grid; grid-template-columns: minmax(0, max-content) auto; justify-content: space-between; column-gap: clamp(48px, 6vw, 88px); row-gap: 40px; align-items: center; align-content: center;
 }
 .hero h1 {
@@ -420,7 +434,7 @@ main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平
 @media (max-width: 1000px) {
   .project-body { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .toc {
-    display: none; position: fixed; top: 64px; left: 0; right: 0; max-height: 60vh; overflow-y: auto;
+    display: none; position: fixed; top: calc(var(--header-total) + 8px); left: 0; right: 0; max-height: 60vh; overflow-y: auto;
     background: var(--surface); border-bottom: 1px solid var(--line); padding: 16px var(--gutter); z-index: 25;
   }
   .toc.open { display: block; }
@@ -441,11 +455,14 @@ main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平
   #filters::-webkit-scrollbar, #exp-fields::-webkit-scrollbar { display: none; }
   #filters button, #exp-fields button { flex: none; }
   .controls { width: 100%; }
+  :root { --header-gap: 8px; --header-h: 52px; }
+  .site-header { width: calc(100% - 16px); padding: 0 6px 0 14px; display: flex; justify-content: space-between; gap: 8px; border-radius: 18px; }
+  .nav { margin-left: auto; }
   .site-header .wordmark { font-size: 18px; gap: 6px; }
   .site-header .wordmark-logo { height: 22px; }
   .nav { font-size: 16px; gap: 0; }
   .nav > a, .nav > button { padding: 0 8px; }
-  .search-trigger { margin-left: 4px; width: 34px; }
+  .search-trigger { width: 34px; height: 34px; border-radius: 10px; }
   .hero { grid-template-columns: 1fr; gap: 40px; padding: 40px var(--gutter) 104px; }
   .hero h1 { font-size: 35px; }
   .hero .bio { font-size: 16px; line-height: 1.7; }
@@ -786,7 +803,7 @@ html.is-loading, html.is-loading body { overflow: hidden; }
   /* 手機：時間軸收起來，面板變成貼在頁首下方的一條 */
   .exp-tm { grid-template-columns: 1fr; }
   .tm-rail, .tm-fiber { display: none; }
-  .tm-side { position: sticky; top: 64px; z-index: 6; background: var(--bg); padding: 10px 0; margin: 0 calc(var(--gutter) * -1) 12px; border-bottom: 1px solid var(--line); }
+  .tm-side { position: sticky; top: calc(var(--header-total) + 6px); z-index: 6; background: var(--bg); padding: 10px 0; margin: 0 calc(var(--gutter) * -1) 12px; border-bottom: 1px solid var(--line); }
   .tm-dial-wrap { position: static; }
   .tm-dial { flex-direction: row; align-items: center; gap: 12px; padding: 8px 14px; border-radius: 12px; box-shadow: 0 0 0 3px rgba(12, 21, 36, .9), 0 0 20px rgba(25, 91, 245, .2), inset 0 0 20px rgba(25, 91, 245, .15); }
   .tm-prompt, .tm-sheen { display: none; }
