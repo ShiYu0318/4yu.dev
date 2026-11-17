@@ -1476,12 +1476,12 @@
       lastY = y;
       return head + expRow(x, from + k);
     }).join("");
-    // 面板放在可視範圍（扣掉頁首）的正中間
+    // 面板中線放在可視範圍（扣掉頁首）上方 1/3 的位置
     const center = () => {
       const dial = dialOf();
       if (!dial) return;
       const head = $(".site-header")?.offsetHeight || 64;
-      box.style.setProperty("--dial-top", `${Math.max(head + 16, Math.round(head + (innerHeight - head - dial.offsetHeight) / 2))}px`);
+      box.style.setProperty("--dial-top", `${Math.max(head + 16, Math.round(head + (innerHeight - head) / 3 - dial.offsetHeight / 2))}px`);
     };
     const show = (i) => {
       if (i === active || !cards[i]) return;
