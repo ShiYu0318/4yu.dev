@@ -623,59 +623,138 @@ html.is-loading, html.is-loading body { overflow: hidden; }
 .projects-head h1 { font-size: clamp(44px, 6.6vw, 70px); font-weight: 500; letter-spacing: -.02em; margin: 0; display: flex; align-items: baseline; gap: 16px; }
 .projects-head h1 .meta { font-size: 18px; letter-spacing: 0; }
 
-.exp-page { max-width: 880px; margin: 0 auto; padding: 80px var(--gutter) 0; }
+.exp-page { max-width: var(--page); margin: 0 auto; padding: 80px var(--gutter) 0; }
 .exp-head { margin-bottom: 64px; }
 .exp-head h1 { font-size: clamp(44px, 6.6vw, 70px); font-weight: 500; letter-spacing: -.02em; margin: 12px 0 32px; }
 
-.exp-group + .exp-group { margin-top: 80px; }
-.exp-group-head { display: flex; align-items: center; gap: 12px; margin: 0 0 8px; font-size: 18px; font-weight: 500; color: var(--text-2); }
-.exp-group-head .meta { font-size: 14px; }
-.exp-group-head i { flex: 0 0 40px; height: 1px; background: var(--line-strong); }
-
 .exp-list { list-style: none; margin: 0; padding: 0; }
 
-/* 一筆經歷（履歷排版）：日期 → 標題 - - - 身分 → ▫ 單位、標籤，右側成果 */
-.exp { padding: 20px 0; border-bottom: 1px solid var(--line); }
-.exp-list .exp:last-child { border-bottom: 0; }
-.exp-date { margin: 0 0 6px; font-size: 14px; display: flex; gap: 8px; align-items: baseline; }
-.exp-soon { color: var(--accent); }
-.exp-line { display: flex; align-items: baseline; gap: 12px; }
-.exp h3 { flex: 0 1 auto; font-size: 18px; font-weight: 500; line-height: 1.5; margin: 0; color: var(--text); }
-.exp h3 a { color: inherit; text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
-.exp h3 a .icon { width: 14px; height: 14px; margin-left: 4px; color: var(--muted); vertical-align: -1px; transition: color .2s var(--ease); }
-.exp h3 a:hover, .exp h3 a:hover .icon { color: var(--accent); }
-/* 標題與身分之間的虛線，像履歷的點線引導 */
-.exp-leader { flex: 1 1 24px; min-width: 24px; align-self: center; border-bottom: 1px dashed var(--line-strong); transform: translateY(2px); }
-.exp-role { flex: none; font-size: 18px; font-weight: 500; color: var(--text); white-space: nowrap; transition: color .2s var(--ease); }
+/* 一筆經歷：雙列卡片
+   上列：日期 / 類型 / 主辦單位 / 身分
+   下列：含金量 / #領域 / 標題 / 成果 */
+.exp {
+  position: relative; display: grid; grid-template-columns: 158px 112px minmax(0, 1fr) auto; grid-template-rows: auto auto;
+  column-gap: 18px; row-gap: 10px; align-items: center;
+  margin-bottom: 12px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  transition: border-color .3s var(--ease), background-color .3s var(--ease), transform .4s var(--ease);
+}
+.exp:hover { border-color: var(--line-strong); }
+.exp-date { margin: 0; font-size: 14px; color: var(--text-2); font-variant-numeric: tabular-nums; display: flex; flex-wrap: wrap; gap: 0 8px; }
+.exp-soon { font-family: var(--font-mono); font-size: 12px; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 0 5px; line-height: 18px; }
+.exp-type {
+  justify-self: start; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; line-height: 1; padding: 5px 9px; border-radius: var(--r-tag); white-space: nowrap;
+  color: var(--c); border: 1px solid color-mix(in srgb, var(--c) 35%, transparent); background: color-mix(in srgb, var(--c) 8%, transparent);
+}
+.exp-type::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.exp-org { margin: 0; font-size: 15px; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.exp-role { justify-self: end; font-size: 16px; font-weight: 500; color: var(--text); white-space: nowrap; transition: color .2s var(--ease); }
 .exp:hover .exp-role { color: var(--accent); }
-.exp-detail { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-top: 6px; }
-.exp-org { margin: 0; font-size: 17px; color: var(--text-2); display: flex; gap: 10px; align-items: baseline; }
-.exp-org::before { content: ""; flex: none; width: 6px; height: 6px; border: 1px solid var(--muted); border-radius: 1px; transform: translateY(-2px); }
-.exp-tags { margin: 6px 0 0; font-size: 14px; }
-.exp-result { margin: 0; flex: none; max-width: 50%; text-align: right; font-size: 16px; color: var(--accent); }
+/* 含金量：5 格，從淺藍到深藍；沒評的整條變淡 */
+.exp-lv { display: inline-flex; gap: 3px; }
+.exp-lv i { width: 14px; height: 6px; border-radius: 2px; background: var(--raised); }
+.exp-lv[data-l="1"] i:nth-child(-n+1) { background: #cfe2ff; }
+.exp-lv[data-l="2"] i:nth-child(-n+2) { background: #9cc4ff; }
+.exp-lv[data-l="3"] i:nth-child(-n+3) { background: #66a8ff; }
+.exp-lv[data-l="4"] i:nth-child(-n+4) { background: #3a7bff; }
+.exp-lv[data-l="5"] i:nth-child(-n+5) { background: #195bf5; }
+.exp-lv[data-l="0"] { opacity: .5; }
+.exp-tags { margin: 0; font-size: 13px; display: flex; flex-wrap: wrap; gap: 2px 10px; }
+.exp-title { margin: 0; font-size: 18px; font-weight: 500; line-height: 1.5; color: var(--text); }
+.exp-title a { color: inherit; text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+.exp-title a .icon { width: 14px; height: 14px; margin-left: 4px; color: var(--muted); vertical-align: -1px; transition: color .2s var(--ease); }
+.exp-title a:hover, .exp-title a:hover .icon { color: var(--accent); }
+.exp-result { justify-self: end; margin: 0; max-width: 18em; text-align: right; font-size: 15px; font-weight: 500; color: var(--accent); display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0 10px; }
+.exp-result::before { content: "★"; font-size: .85em; }
 
-/* 時間線：左側一條細線，年份是大段落，月份節點附年級 */
-.exp-year + .exp-year { margin-top: 72px; }
-.exp-year-head { display: flex; align-items: baseline; gap: 12px; margin: 0 0 16px; font-family: var(--font-mono); font-size: 44px; font-weight: 400; letter-spacing: -.02em; color: var(--text); font-variant-numeric: tabular-nums; }
-.exp-year-head .meta { font-size: 14px; letter-spacing: 0; }
-.exp-month { position: relative; padding: 0 0 8px 32px; border-left: 1px solid var(--line-strong); margin-left: 5px; }
-.exp-month:last-child { padding-bottom: 0; }
-.exp-month-head { position: relative; margin: 0 0 0 -32px; padding: 4px 0 0 32px; font-family: var(--font-mono); font-size: 16px; font-weight: 400; color: var(--text-2); font-variant-numeric: tabular-nums; }
-.exp-month-head span:not(.exp-node) { color: var(--muted); font-family: var(--font-sans); }
-.exp-node { position: absolute; left: -6px; top: 7px; width: 11px; height: 11px; border-radius: 50%; background: var(--bg); border: 1px solid var(--muted); transition: border-color .2s var(--ease), background-color .2s var(--ease); }
-.exp-month:hover .exp-node { border-color: var(--accent); background: var(--accent); }
-.exp-month .exp:first-child { padding-top: 12px; }
+/* 經歷頁工具列：篩選、排序 */
+.exp-head { margin-bottom: 48px; }
+.exp-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.exp-tool { height: 40px; padding: 0 14px; font-size: 16px; font-weight: 400; }
+.exp-tool .count { font-family: var(--font-mono); font-size: 13px; min-width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 9px; background: var(--brand); color: var(--on-brand); }
+.exp-tool .count:empty { display: none; }
+.exp-tool[aria-expanded="true"] { border-color: var(--accent); }
+.exp-sort .arrow { transition: transform .4s var(--ease); transform-origin: 18px 12px; }
+.exp-sort[data-dir="asc"] .arrow { transform: rotate(180deg); }
+.exp-clear { font: inherit; font-size: 15px; color: var(--muted); background: none; border: 0; cursor: pointer; text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 4px; }
+.exp-clear:hover { color: var(--accent); }
+.exp-shown { margin: 0 0 0 auto; font-size: 14px; }
+.exp-filters { display: grid; gap: 12px; margin-top: 16px; padding: 18px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.exp-filters[hidden] { display: none; }
+.exp-fgroup { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; align-items: start; }
+.exp-flabel { font-size: 15px; color: var(--muted); line-height: 32px; }
+.exp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.exp-chip {
+  --c: var(--accent);
+  font: inherit; font-size: 15px; height: 32px; padding: 0 12px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  color: var(--text-2); background: transparent; border: 1px solid var(--line-strong); border-radius: 999px;
+  transition: color .15s var(--ease), border-color .15s var(--ease), background-color .15s var(--ease);
+}
+.exp-chip .count { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.exp-chip:hover { color: var(--text); border-color: var(--c); }
+.exp-chip[aria-pressed="true"] { color: var(--c); border-color: var(--c); background: color-mix(in srgb, var(--c) 12%, transparent); }
+.exp-chip.is-lv { font-family: var(--font-mono); letter-spacing: -.05em; }
+
+/* 時光機時間軸：左欄粗軸 + 置中的「DESTINATION TIME」面板，捲動時固定在頁首下方 */
+.exp-tm { display: grid; grid-template-columns: 300px minmax(0, 1fr); }
+.tm-side { position: relative; }
+.tm-rail { position: absolute; left: 50%; top: 0; bottom: 0; width: 6px; margin-left: -3px; border-radius: 6px; background: var(--raised); }
+.tm-fill { position: absolute; left: 0; top: 0; width: 100%; height: 0; border-radius: 6px; background: linear-gradient(var(--accent), var(--brand)); box-shadow: 0 0 14px rgba(102, 168, 255, .5); }
+.tm-dial-wrap { position: sticky; top: 92px; z-index: 5; display: flex; justify-content: center; }
+.tm-dial {
+  position: relative; display: flex; flex-direction: column; gap: 8px; padding: 12px 16px 12px;
+  background: #060d1a; border: 2px solid #22324f; border-radius: 6px;
+  box-shadow: inset 0 0 0 4px #0b1528, 0 12px 32px rgba(0, 3, 10, .6);
+}
+.tm-dial-title { align-self: center; font-family: var(--font-mono); font-size: 11px; letter-spacing: .18em; color: #071026; background: var(--accent); padding: 2px 8px; border-radius: 2px; }
+.tm-digits { display: flex; align-items: center; font-family: var(--font-mono); font-size: 27px; line-height: 1; color: #8fc2ff; text-shadow: 0 0 6px rgba(102, 168, 255, .9), 0 0 16px rgba(25, 91, 245, .6); }
+.tm-sep { padding: 0 3px; color: var(--muted); text-shadow: none; }
+.dg { position: relative; display: inline-block; width: .62em; height: 1.15em; margin: 0 1px; overflow: hidden; border-radius: 2px; background: rgba(25, 91, 245, .08); }
+.dg::before { content: "8"; position: absolute; inset: 0; text-align: center; line-height: 1.15em; color: rgba(102, 168, 255, .08); text-shadow: none; }
+.dg .strip { position: absolute; left: 0; top: 0; width: 100%; transition: transform .7s cubic-bezier(.2, .9, .25, 1.15); }
+.dg .strip span { display: block; height: 1.15em; line-height: 1.15em; text-align: center; }
+.tm-labels { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; color: var(--accent); }
+.tm-foot { display: flex; justify-content: space-between; font-size: 14px; color: var(--text-2); }
+.tm-foot b { color: var(--accent); font-weight: 500; }
+.tm-n { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.tm-pointer { position: absolute; top: 50%; right: 0; width: 0; height: 2px; background: var(--accent); }
+.tm-pointer::after { content: ""; position: absolute; right: -4px; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+.tm-list { padding: 0 0 40vh; min-width: 0; }
+.tm-year { font-family: var(--font-mono); font-size: 15px; color: var(--muted); margin: 32px 0 12px; display: flex; align-items: center; gap: 12px; font-variant-numeric: tabular-nums; }
+.tm-year:first-child { margin-top: 0; }
+.tm-year::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.tm-list .exp { cursor: pointer; }
+.tm-list .exp.is-on { border-color: var(--accent); background: #0f1b30; transform: translateX(6px); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 1000px) {
+  .exp { grid-template-columns: 140px minmax(0, 1fr) auto; }
+  .exp-type { grid-column: 2; grid-row: 1; } .exp-org { grid-column: 1 / -1; grid-row: 3; }
+  .exp-role { grid-column: 3; grid-row: 1; }
+  .exp-lv { grid-column: 1; grid-row: 4; } .exp-tags { grid-column: 2 / -1; grid-row: 4; }
+  .exp-title { grid-column: 1 / -1; grid-row: 2; }
+  .exp-result { grid-column: 1 / -1; grid-row: 5; justify-self: start; justify-content: flex-start; text-align: left; max-width: none; }
+  .exp-result:empty, .exp > span:last-child:empty { display: none; }
+  .exp-tm { grid-template-columns: 240px minmax(0, 1fr); }
+  .tm-digits { font-size: 22px; }
+}
 
 @media (max-width: 760px) {
   .exp-preview + .projects { margin-top: 112px; }
   .exp-page { padding-top: 48px; }
-  .exp-head { margin-bottom: 40px; }
-  .exp-line { flex-wrap: wrap; gap: 4px 12px; }
-  .exp-leader { display: none; }
-  .exp-role { flex-basis: 100%; font-size: 17px; }
-  .exp-detail { flex-direction: column; gap: 6px; }
-  .exp-result { max-width: none; text-align: left; }
-  .exp-year-head { font-size: 35px; }
-  .exp-month { padding-left: 20px; }
-  .exp-month-head { margin-left: -20px; padding-left: 20px; }
+  .exp-head { margin-bottom: 24px; }
+  .exp { padding: 14px 16px; column-gap: 12px; grid-template-columns: auto minmax(0, 1fr) auto; }
+  .exp-title { font-size: 17px; }
+  .exp-shown { flex-basis: 100%; margin: 0; }
+  .exp-fgroup { grid-template-columns: 1fr; gap: 6px; }
+  .exp-flabel { line-height: 1.4; }
+  /* 手機：時間軸收起來，面板變成貼在頁首下方的一條 */
+  .exp-tm { grid-template-columns: 1fr; }
+  .tm-rail, .tm-pointer { display: none; }
+  .tm-side { position: sticky; top: 64px; z-index: 6; background: var(--bg); padding: 10px 0; margin: 0 calc(var(--gutter) * -1) 12px; border-bottom: 1px solid var(--line); }
+  .tm-dial-wrap { position: static; }
+  .tm-dial { flex-direction: row; align-items: center; gap: 12px; padding: 8px 12px; }
+  .tm-dial-title, .tm-labels { display: none; }
+  .tm-digits { font-size: 20px; }
+  .tm-foot { flex-direction: column; font-size: 13px; gap: 2px; }
+  .tm-list .exp.is-on { transform: none; }
 }
