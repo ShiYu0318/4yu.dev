@@ -542,7 +542,7 @@ html.is-loading, html.is-loading body { overflow: hidden; }
 .hero > .scroll-down:hover { color: var(--accent); border-color: var(--accent); }
 .hero > .scroll-down.is-hidden { opacity: 0; pointer-events: none; }
 @keyframes scroll-bob { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(3px); } }
-@media (prefers-reduced-motion: reduce) { .hero > .scroll-down .icon { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .hero > .scroll-down .icon { animation: none; } .tm-dial, .tm-sheen { animation: none; } }
 
 /* 頁尾的回到頂端 */
 .to-top {
@@ -696,27 +696,36 @@ html.is-loading, html.is-loading body { overflow: hidden; }
 .exp-chip[aria-pressed="true"] { color: var(--c); border-color: var(--c); background: color-mix(in srgb, var(--c) 12%, transparent); }
 .exp-chip.is-lv { font-family: var(--font-mono); letter-spacing: -.05em; }
 
-/* 時光機時間軸：左欄粗軸 + 置中的「DESTINATION TIME」面板，捲動時固定在頁首下方 */
+/* 時光機時間軸：左欄粗軸 + 終端機風格的時光機面板，捲動時固定在畫面上方 1/3 */
 .exp-tm { display: grid; grid-template-columns: 264px minmax(0, 1fr); }
 .tm-side { position: relative; }
 .tm-rail { position: absolute; left: 50%; top: 0; bottom: 0; width: 6px; margin-left: -3px; border-radius: 6px; background: var(--raised); }
 .tm-fill { position: absolute; left: 0; top: 0; width: 100%; height: 0; border-radius: 6px; background: linear-gradient(var(--accent), var(--brand)); box-shadow: 0 0 14px rgba(102, 168, 255, .5); }
 .tm-dial-wrap { position: sticky; top: var(--dial-top, 30vh); z-index: 5; display: flex; justify-content: center; }
+/* 面板：終端機主導（深色 CRT 小螢幕 + 藍色磷光 LED 滾輪數字 + 掃描線），外層是全息玻璃的邊框與反光 */
 .tm-dial {
-  position: relative; display: flex; flex-direction: column; gap: 8px; padding: 12px 16px 12px;
-  background: #060d1a; border: 2px solid #22324f; border-radius: 6px;
-  box-shadow: inset 0 0 0 4px #0b1528, 0 12px 32px rgba(0, 3, 10, .6);
+  position: relative; display: flex; flex-direction: column; gap: 8px; padding: 14px 18px 12px; overflow: hidden;
+  font-family: var(--font-mono); border-radius: 16px;
+  background: radial-gradient(ellipse at center, rgba(14, 34, 66, .92), rgba(3, 8, 18, .95) 80%);
+  border: 1px solid #1d2f50;
+  box-shadow: 0 0 0 5px rgba(12, 21, 36, .9), 0 0 34px rgba(25, 91, 245, .25), inset 0 0 30px rgba(25, 91, 245, .18);
+  animation: crt-flicker 6s infinite steps(1);
 }
-.tm-dial-title { align-self: center; font-family: var(--font-mono); font-size: 11px; letter-spacing: .18em; color: #071026; background: var(--accent); padding: 2px 8px; border-radius: 2px; }
-.tm-digits { display: flex; align-items: center; font-family: var(--font-mono); font-size: 27px; line-height: 1; color: #8fc2ff; text-shadow: 0 0 6px rgba(102, 168, 255, .9), 0 0 16px rgba(25, 91, 245, .6); }
-.tm-sep { padding: 0 3px; color: var(--muted); text-shadow: none; }
-.dg { position: relative; display: inline-block; width: .62em; height: 1.15em; margin: 0 1px; overflow: hidden; border-radius: 2px; background: rgba(25, 91, 245, .08); }
-.dg::before { content: "8"; position: absolute; inset: 0; text-align: center; line-height: 1.15em; color: rgba(102, 168, 255, .08); text-shadow: none; }
+.tm-dial::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; background: repeating-linear-gradient(rgba(0, 0, 0, .22) 0 1px, transparent 1px 3px); }
+.tm-sheen { position: absolute; inset: -60%; pointer-events: none; background: linear-gradient(115deg, transparent 42%, rgba(255, 255, 255, .1) 50%, transparent 58%); animation: tm-sheen 4s infinite; }
+@keyframes tm-sheen { from { transform: translateX(-45%); } to { transform: translateX(45%); } }
+@keyframes crt-flicker { 0%, 96% { opacity: 1; } 97% { opacity: .88; } 98% { opacity: 1; } 99% { opacity: .92; } }
+.tm-prompt { font-size: 13px; color: #6f95cc; text-shadow: 0 0 4px rgba(102, 168, 255, .5); }
+.tm-digits { display: flex; align-items: center; font-family: var(--font-mono); font-size: 28px; line-height: 1; color: #9ccaff; text-shadow: 0 0 5px rgba(102, 168, 255, .9), 0 0 16px rgba(25, 91, 245, .6); }
+.tm-dial.is-glitch .tm-digits { animation: tm-glitch .35s steps(2) 1; }
+@keyframes tm-glitch { 0% { transform: translate(2px, -1px); filter: hue-rotate(40deg); } 50% { transform: translate(-2px, 1px); clip-path: inset(15% 0 35% 0); } 100% { transform: none; } }
+.tm-sep { padding: 0 2px; color: rgba(160, 200, 255, .45); text-shadow: none; }
+.dg { position: relative; display: inline-block; width: .62em; height: 1.15em; margin: 0 1px; overflow: hidden; border-radius: 2px; background: rgba(25, 91, 245, .07); }
+.dg::before { content: "8"; position: absolute; inset: 0; text-align: center; line-height: 1.15em; color: rgba(102, 168, 255, .07); text-shadow: none; }
 .dg .strip { position: absolute; left: 0; top: 0; width: 100%; transition: transform .7s cubic-bezier(.2, .9, .25, 1.15); }
 .dg .strip span { display: block; height: 1.15em; line-height: 1.15em; text-align: center; }
-.tm-labels { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; color: var(--accent); }
-.tm-foot { display: flex; justify-content: space-between; font-size: 14px; color: var(--text-2); }
-.tm-foot b { color: var(--accent); font-weight: 500; }
+.tm-foot { display: flex; justify-content: space-between; gap: 18px; font-size: 13px; color: #8fb3e6; }
+.tm-foot b { color: #cfe2ff; font-weight: 400; font-family: var(--font-sans); font-size: 14px; }
 .tm-n { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 .tm-pointer { position: absolute; top: 50%; right: 0; width: 0; height: 2px; background: var(--accent); }
 .tm-pointer::after { content: ""; position: absolute; right: -4px; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
@@ -755,8 +764,8 @@ html.is-loading, html.is-loading body { overflow: hidden; }
   .tm-rail, .tm-pointer { display: none; }
   .tm-side { position: sticky; top: 64px; z-index: 6; background: var(--bg); padding: 10px 0; margin: 0 calc(var(--gutter) * -1) 12px; border-bottom: 1px solid var(--line); }
   .tm-dial-wrap { position: static; }
-  .tm-dial { flex-direction: row; align-items: center; gap: 12px; padding: 8px 12px; }
-  .tm-dial-title, .tm-labels { display: none; }
+  .tm-dial { flex-direction: row; align-items: center; gap: 12px; padding: 8px 14px; border-radius: 12px; box-shadow: 0 0 0 3px rgba(12, 21, 36, .9), 0 0 20px rgba(25, 91, 245, .2), inset 0 0 20px rgba(25, 91, 245, .15); }
+  .tm-prompt, .tm-sheen { display: none; }
   .tm-digits { font-size: 20px; }
   .tm-foot { flex-direction: column; font-size: 13px; gap: 2px; }
   .tm-list .exp.is-on { transform: none; }
