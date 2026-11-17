@@ -55,13 +55,16 @@
         <a class="back-link" href="index.html"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>首頁</a>
         <p class="meta" id="exp-meta"></p>
         <h1 id="exp-page-title">經歷</h1>
-        <div class="controls">
-          <div id="exp-fields" class="segmented" role="tablist" aria-label="依領域篩選"></div>
-          <div id="exp-views" class="segmented" role="radiogroup" aria-label="分組方式"></div>
+        <div class="exp-toolbar">
+          <button id="exp-filter-toggle" class="button exp-tool" type="button" aria-expanded="false" aria-controls="exp-filters"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>篩選<span class="count" id="exp-filter-count"></span></button>
+          <button id="exp-sort" class="button exp-tool exp-sort" type="button" aria-label="排序：新到舊" title="排序：新到舊" data-dir="desc"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h10"/><path d="M3 12h7"/><path d="M3 18h4"/><path class="arrow" d="M18 4v16m-4-4 4 4 4-4"/></svg><span class="sort-label">新到舊</span></button>
+          <button id="exp-clear" class="exp-clear" type="button" hidden>清除篩選</button>
+          <p class="meta exp-shown" id="exp-shown" aria-live="polite"></p>
         </div>
+        <div id="exp-filters" class="exp-filters" hidden></div>
       </header>
-      <div id="exp-groups" class="exp-groups"></div>
-      <p id="exp-empty" class="empty" hidden>這個領域還沒有經歷</p>
+      <div id="exp-groups" class="exp-tm"></div>
+      <p id="exp-empty" class="empty" hidden>沒有符合篩選條件的經歷</p>
     </section>
   </main>
 
