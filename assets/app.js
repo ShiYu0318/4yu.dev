@@ -665,20 +665,46 @@
   /* ================= 共用：導覽、搜尋、頁尾、進度 ================= */
 
   // 流體 hover：一塊底色滑到游標所在的連結
+  // 導覽列：滑動底色停在目前的頁面（首頁依捲到的區塊切換經歷 / 專案），hover 時滑到游標下的連結；捲動後玻璃變深
   function initNavHover() {
-    const nav = $(".nav"), blob = $(".nav-hover");
-    if (!nav || !blob || !finePointer) return;
-    const items = $$(":scope > a, :scope > button", nav);
-    const move = (el) => {
+    const header = $(".site-header"), nav = $(".nav"), blob = $(".nav-hover");
+    if (!nav || !blob) return;
+    const items = $$(":scope > a", nav);
+    let current = $(':scope > a[aria-current="page"]', nav);
+    const move = (el, animate = true) => {
+      if (!el) { motion ? gsap.to(blob, { opacity: 0, duration: 0.2 }) : (blob.style.opacity = 0); return; }
       const r = el.getBoundingClientRect(), n = nav.getBoundingClientRect();
       const props = { x: r.left - n.left, width: r.width, opacity: 1 };
-      if (motion) gsap.to(blob, { ...props, duration: 0.35, ease: EASE });
+      if (motion && animate) gsap.to(blob, { ...props, duration: 0.35, ease: EASE });
+      else if (gsap) gsap.set(blob, props);
       else Object.assign(blob.style, { transform: `translateX(${props.x}px)`, width: `${props.width}px`, opacity: 1 });
     };
-    items.forEach((el) => el.addEventListener("pointerenter", () => move(el)));
-    nav.addEventListener("pointerleave", () => {
-      if (motion) gsap.to(blob, { opacity: 0, duration: 0.2 }); else blob.style.opacity = 0;
-    });
+    const rest = (animate) => move(current, animate);
+    if (finePointer) {
+      items.forEach((el) => el.addEventListener("pointerenter", () => move(el)));
+      nav.addEventListener("pointerleave", () => rest(true));
+    }
+    // 首頁：捲到哪個區塊，就標示哪個連結
+    const idOf = (a) => (/^([\w-]+)\.html$/.exec(a.getAttribute("href") || "") || [])[1];
+    const spots = items.map((a) => [a, idOf(a) && document.getElementById(idOf(a))]).filter(([a, sec]) => sec && !a.hasAttribute("aria-current"));
+    if (spots.length) {
+      const spy = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          const hit = spots.find(([, sec]) => sec === e.target);
+          if (e.isIntersecting) current = hit[0];
+          else if (current === hit[0]) current = null;
+          items.forEach((a) => a.toggleAttribute("data-current", a === current));
+          if (!nav.matches(":hover")) rest(true);
+        });
+      }, { rootMargin: "-45% 0px -50% 0px" });
+      spots.forEach(([, sec]) => spy.observe(sec));
+    }
+    requestAnimationFrame(() => rest(false));
+    document.fonts?.ready.then(() => rest(false));
+    addEventListener("resize", () => rest(false));
+    const onScroll = () => header?.classList.toggle("is-scrolled", scrollY > 24);
+    addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
   }
 
   // ⌘K 搜尋面板
@@ -1488,7 +1514,7 @@
     const center = () => {
       const dial = dialOf();
       if (!dial) return;
-      const head = $(".site-header")?.offsetHeight || 64;
+      const head = Math.round($(".site-header")?.getBoundingClientRect().bottom || 72);
       box.style.setProperty("--dial-top", `${Math.max(head + 16, Math.round(head + (innerHeight - head) / 3 - dial.offsetHeight / 2))}px`);
     };
     const show = (i) => {
