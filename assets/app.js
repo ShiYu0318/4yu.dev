@@ -1408,8 +1408,6 @@
     ["學習", "學習"],
   ];
   const EXP_TYPE = Object.fromEntries(EXP_TYPES.map(([id, title], i) => [id, { title, order: i }]));
-  const GRADES = ["碩二下", "碩二上", "碩一下", "碩一上", "大四下", "大四上", "大三下", "大三上", "大二下", "大二上", "大一下", "大一上", "高三下", "高三上", "高二下", "高二上", "高一下", "高一上", "國三下", "國三上", "國二下", "國二上", "國一下", "國一上",
-    "大四", "大三", "大二", "大一", "高三", "高二", "高一", "國三", "國二", "國一"];
   const today = new Date().toISOString().slice(0, 10);
 
   async function loadExperience() {
@@ -1426,28 +1424,32 @@
     return `${ymd(x.start)} – ${x.end > today ? "至今" : ymd(x.end)}`;
   }
 
-  // 一筆經歷：左邊「日期 / 標題 / ▫ 單位 / 標籤」，右邊「身分 / 成果」，中間用虛線連起來（參考履歷排版）
-  function expRow(x) {
-    const t = EXP_TYPE[x.type] || { title: x.type };
+  // 類型標籤的顏色：深底上好讀的低飽和色，一眼分得出研究 / 競賽 / 教學…
+  const TYPE_COLOR = {
+    研究: "#7ee0b5", 實習: "#66a8ff", 工作: "#66a8ff", 社群: "#f29ad8", 社團: "#c6a2ff", 競賽: "#ff9a8a",
+    檢定: "#ffb26b", 證照: "#ffb26b", 教學: "#ffd27a", 籌辦: "#b9a6ff", 活動: "#9fb3c8", 營隊: "#8fe3e8", 課程: "#a9e07e", 學習: "#a9e07e",
+  };
+  const typeColor = (t) => TYPE_COLOR[t] || "#a8bbdc";
+  const stage = (g) => ({ 國: "國中", 高: "高中", 大: "大學", 碩: "研究所" }[(g || "")[0]] || "");
+
+  // 一筆經歷：雙列卡片
+  //   上列：日期 / 類型 / 主辦單位 / 身分
+  //   下列：含金量（淺藍 → 深藍 5 格）/ #領域 / 標題 / 成果
+  function expRow(x, i = 0) {
     const title = x.link
       ? `<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.title)}${ICON.out}</a>`
       : esc(x.title);
-    const tags = parts(t.title, x.fields.join(" / "));
+    const lv = x.priority || 0;
     return `
-      <li class="exp" data-flip-id="${x.key}">
+      <li class="exp" data-flip-id="${x.key}" data-i="${i}">
         <p class="meta exp-date">${expDate(x)}${x.start > today ? `<span class="exp-soon">即將</span>` : ""}</p>
-        <div class="exp-line">
-          <h3>${title}</h3>
-          <span class="exp-leader" aria-hidden="true"></span>
-          ${x.role ? `<span class="exp-role">${esc(x.role)}</span>` : ""}
-        </div>
-        <div class="exp-detail">
-          <div>
-            ${x.org ? `<p class="exp-org">${esc(x.org)}</p>` : ""}
-            <p class="meta exp-tags">${tags}</p>
-          </div>
-          ${x.result ? `<p class="exp-result">${parts(...x.result.split(/\s*[・·]\s*/))}</p>` : ""}
-        </div>
+        <span class="exp-type" style="--c:${typeColor(x.type)}">${esc(x.type)}</span>
+        <p class="exp-org" title="${esc(x.org || "")}">${esc(x.org || "")}</p>
+        <span class="exp-role">${esc(x.role || "")}</span>
+        <span class="exp-lv" data-l="${lv}" title="含金量 ${lv ? `${lv} / 5` : "未評"}" aria-label="含金量 ${lv ? `${lv} / 5` : "未評"}"><i></i><i></i><i></i><i></i><i></i></span>
+        <p class="meta exp-tags">${x.fields.map((f) => `<span>#${esc(f.replace(/\s+/g, ""))}</span>`).join("")}</p>
+        <h3 class="exp-title">${title}</h3>
+        ${x.result ? `<p class="exp-result">${parts(...x.result.split(/\s*[・·]\s*/))}</p>` : `<span></span>`}
       </li>`;
   }
 
@@ -1472,7 +1474,7 @@
     let shown = 0;
     const add = () => {
       const next = data.items.slice(shown, shown + STEP);
-      box.insertAdjacentHTML("beforeend", next.map(expRow).join(""));
+      box.insertAdjacentHTML("beforeend", next.map((x, i) => expRow(x, shown + i)).join(""));
       riseIn([...box.children].slice(shown));
       shown += next.length;
       if (shown >= data.items.length) more.hidden = true;
@@ -1485,7 +1487,8 @@
   }
 
 
-  // 經歷頁：分類 / 時間 / 年級三種分組 + 領域篩選
+  // 經歷頁：左邊粗時間軸 + 固定在上方的「時光機面板」（年 / 月 / 日撥號），右邊雙列卡片
+  // 捲到哪張卡片，面板就轉到那張的日期；停手時把最近的卡片卡到面板旁邊。上方可依各種屬性篩選、切換新舊排序
   async function renderExperience() {
     let manifest, data;
     try { [manifest, data] = await Promise.all([loadManifest(), loadExperience()]); }
@@ -1498,93 +1501,201 @@
     const years = [...new Set(items.map((x) => x.start.slice(0, 4)))];
     $("#exp-meta").innerHTML = parts(`${items.length} 筆`, `${years.at(-1)}–${years[0]}`, `同步自 Notion，更新於 ${data.updated}`);
 
-    const fields = ["全部", ...Object.entries(items.flatMap((x) => x.fields).reduce((m, f) => ((m[f] = (m[f] || 0) + 1), m), {}))
-      .sort((a, b) => b[1] - a[1]).map(([f]) => f)];
-    const countOf = (f) => items.filter((x) => f === "全部" || x.fields.includes(f)).length;
-    $("#exp-fields").innerHTML = `<span class="thumb" aria-hidden="true"></span>` + fields.map((f, i) =>
-      `<button type="button" role="tab" data-value="${esc(f)}" aria-selected="${i === 0}">${esc(f)}<span class="count">${countOf(f)}</span></button>`).join("");
-
-    const VIEWS = [
-      { id: "year", label: "時間線" },
-      { id: "type", label: "分類" },
-      { id: "grade", label: "年級" },
+    // ---- 篩選：同一組內任一符合即可（OR），不同組之間都要符合（AND）
+    const tally = (vals) => Object.entries(vals.reduce((m, v) => ((m[v] = (m[v] || 0) + 1), m), {}));
+    const byCount = (es) => es.sort((a, b) => b[1] - a[1]);
+    const GROUPS = [
+      { id: "type", label: "類型", get: (x) => [x.type],
+        opts: tally(items.map((x) => x.type)).sort((a, b) => (EXP_TYPE[a[0]]?.order ?? 99) - (EXP_TYPE[b[0]]?.order ?? 99)) },
+      { id: "field", label: "領域", get: (x) => x.fields, opts: byCount(tally(items.flatMap((x) => x.fields))) },
+      { id: "role", label: "身分", get: (x) => [x.role], opts: byCount(tally(items.map((x) => x.role).filter(Boolean))) },
+      { id: "stage", label: "學段", get: (x) => [stage(x.grade)],
+        opts: ["研究所", "大學", "高中", "國中"].map((s) => [s, items.filter((x) => stage(x.grade) === s).length]).filter(([, n]) => n) },
+      { id: "lv", label: "含金量", get: (x) => [String(x.priority || 0)],
+        opts: ["5", "4", "3", "2", "1", "0"].map((v) => [v, items.filter((x) => String(x.priority || 0) === v).length]).filter(([, n]) => n) },
+      { id: "result", label: "成果", get: (x) => [x.result ? "有" : "無"], opts: [["有", items.filter((x) => x.result).length]] },
     ];
-    let view = "year", field = "全部";
-    try { const saved = localStorage.getItem("exp-view-v2"); if (VIEWS.some((v) => v.id === saved)) view = saved; } catch { /* 用預設 */ }
-    $("#exp-views").innerHTML = `<span class="thumb" aria-hidden="true"></span>` + VIEWS.map((v) =>
-      `<button type="button" role="radio" data-value="${v.id}" aria-checked="${v.id === view}"><span>${v.label}</span></button>`).join("");
+    const lvLabel = (v) => v === "0" ? "未評" : `${"■".repeat(+v)}${"□".repeat(5 - v)}`;
+    const optLabel = (g, v) => g.id === "lv" ? lvLabel(v) : g.id === "result" ? "有成果" : v;
+    const picked = Object.fromEntries(GROUPS.map((g) => [g.id, new Set()]));
+    const filtersEl = $("#exp-filters");
+    filtersEl.innerHTML = GROUPS.map((g) => `
+      <div class="exp-fgroup" role="group" aria-label="${g.label}">
+        <span class="exp-flabel">${g.label}</span>
+        <div class="exp-chips">${g.opts.map(([v, n]) => `
+          <button type="button" class="exp-chip${g.id === "lv" ? " is-lv" : ""}" data-g="${g.id}" data-v="${esc(v)}" aria-pressed="false"
+            ${g.id === "type" ? `style="--c:${typeColor(v)}"` : ""}>${esc(optLabel(g, v))}<span class="count">${n}</span></button>`).join("")}</div>
+      </div>`).join("");
 
-    const groupsOf = (list) => {
-      const by = (keyFn, order) => {
-        const m = new Map();
-        list.forEach((x) => { const k = keyFn(x); if (!m.has(k)) m.set(k, []); m.get(k).push(x); });
-        return [...m.entries()].sort((a, b) => order(a[0], b[0]));
-      };
-      if (view === "year") return by((x) => x.start.slice(0, 4), (a, b) => b.localeCompare(a));
-      if (view === "grade") return by((x) => x.grade || "其他", (a, b) => (GRADES.indexOf(a) + 99) % 99 - (GRADES.indexOf(b) + 99) % 99);
-      return by((x) => x.type, (a, b) => (EXP_TYPE[a]?.order ?? 99) - (EXP_TYPE[b]?.order ?? 99))
-        .map(([k, v]) => [EXP_TYPE[k]?.title || k, v]);
+    let dir = "desc";
+    try { if (localStorage.getItem("exp-sort") === "asc") dir = "asc"; } catch { /* 用預設 */ }
+    const sortBtn = $("#exp-sort");
+    const syncSort = () => {
+      const label = dir === "desc" ? "新到舊" : "舊到新";
+      sortBtn.dataset.dir = dir;
+      sortBtn.setAttribute("aria-label", `排序：${label}`); sortBtn.title = `排序：${label}（點一下切換）`;
+      $(".sort-label", sortBtn).textContent = label;
     };
-
-    // 時間線：年份是大段落，月份是小段落並附上當時的年級
-    const timelineHTML = (list) => groupsOf(list).map(([year, rows]) => {
-      const months = new Map();
-      rows.forEach((x) => { const k = x.start.slice(0, 7); if (!months.has(k)) months.set(k, []); months.get(k).push(x); });
-      return `
-        <section class="exp-year">
-          <h2 class="exp-year-head"><span>${esc(year)}</span><span class="meta">${rows.length} 筆</span></h2>
-          ${[...months.entries()].map(([m, xs]) => `
-            <section class="exp-month">
-              <h3 class="exp-month-head"><span class="exp-node" aria-hidden="true"></span>${esc(m.replace("-", "/"))}${xs[0].grade ? `<span>（${esc(xs[0].grade)}）</span>` : ""}</h3>
-              <ol class="exp-list">${xs.map(expRow).join("")}</ol>
-            </section>`).join("")}
-        </section>`;
-    }).join("");
+    syncSort();
 
     const box = $("#exp-groups");
-    let fading = null;
+    const visible = () => {
+      const list = items.filter((x) => GROUPS.every((g) => !picked[g.id].size || g.get(x).some((v) => picked[g.id].has(v))));
+      return dir === "desc" ? list : list.slice().reverse();
+    };
+    const digits = (n) => Array.from({ length: n }, () =>
+      `<span class="dg"><span class="strip">${"0123456789".split("").map((d) => `<span>${d}</span>`).join("")}</span></span>`).join("");
+
+    let list = [], cards = [], active = -1;
     const render = (animate) => {
-      const list = items.filter((x) => field === "全部" || x.fields.includes(field));
+      list = visible();
+      const n = GROUPS.reduce((s, g) => s + picked[g.id].size, 0);
+      $("#exp-filter-count").textContent = n ? String(n) : "";
+      $("#exp-clear").hidden = !n;
+      $("#exp-shown").textContent = n ? `顯示 ${list.length} / ${items.length} 筆` : "";
       $("#exp-empty").hidden = list.length > 0;
-      box.classList.toggle("timeline", view === "year");
-      box.innerHTML = view === "year" ? timelineHTML(list) : groupsOf(list).map(([title, rows], i) => `
-        <section class="exp-group">
-          <h2 class="exp-group-head"><span>${esc(title)}</span><span class="meta">${parts(String(i + 1).padStart(2, "0"), `${rows.length} 筆`)}</span><i aria-hidden="true"></i></h2>
-          <ol class="exp-list">${rows.map(expRow).join("")}</ol>
-        </section>`).join("");
-      const nodes = $$(".exp-group-head, .exp-year-head, .exp-month-head, .exp", box);
+      if (!list.length) { box.innerHTML = ""; cards = []; return; }
+      let lastY = "";
+      box.innerHTML = `
+        <div class="tm-side">
+          <div class="tm-rail" aria-hidden="true"><div class="tm-fill"></div></div>
+          <div class="tm-dial-wrap">
+            <div class="tm-dial" role="status" aria-live="off">
+              <span class="tm-dial-title" aria-hidden="true">DESTINATION TIME</span>
+              <div class="tm-digits" aria-hidden="true">${digits(4)}<span class="tm-sep">/</span>${digits(2)}<span class="tm-sep">/</span>${digits(2)}</div>
+              <div class="tm-labels" aria-hidden="true"><span>YEAR</span><span>MONTH</span><span>DAY</span></div>
+              <div class="tm-foot"><b class="tm-grade"></b><span class="tm-n"></span></div>
+              <span class="visually-hidden tm-sr"></span>
+              <span class="tm-pointer" aria-hidden="true"></span>
+            </div>
+          </div>
+        </div>
+        <ol class="exp-list tm-list">${list.map((x, i) => {
+          const y = x.start.slice(0, 4), head = y !== lastY ? `<li class="tm-year" aria-hidden="true">${y}</li>` : "";
+          lastY = y;
+          return head + expRow(x, i);
+        }).join("")}</ol>`;
+      cards = $$(".exp", box);
+      active = -1;
+      track();
+      const nodes = $$(".exp, .tm-year", box);
       if (animate && motion) {
-        // 畫面上的部分依序浮現，其餘的交給捲動淡入
         const inView = nodes.filter((el) => el.getBoundingClientRect().top < innerHeight);
         markRevealed(inView);
-        if (inView.length) gsap.fromTo(inView, { opacity: 0, y: 28 },
-          { opacity: 1, y: 0, duration: 0.8, ease: EASE, stagger: 0.03 });
+        if (inView.length) gsap.fromTo(inView, { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 0.8, ease: EASE, stagger: 0.03 });
         riseIn(nodes.filter((el) => !inView.includes(el)));
-      } else {
-        riseIn(nodes);
-      }
-      $$(".exp-group-head .meta", box).forEach((m) => FX.scramble?.(m));
+      } else riseIn(nodes);
+      if (motion) gsap.from(".tm-dial", { opacity: 0, y: 12, duration: 0.8, ease: EASE, delay: animate ? 0 : 0.2 + FX.introDelay });
     };
-    // 切換：舊的先淡出再換，不讓兩種排列疊在一起
+
+    // ---- 時光機面板：碰到面板中線的那張卡片就是「現在」
+    const dialOf = () => $(".tm-dial", box);
+    const show = (i) => {
+      if (i === active || !cards[i]) return;
+      active = i;
+      const x = list[i];
+      $$(".strip", box).forEach((s, k) => { s.style.transform = `translateY(${-Number(x.start.replace(/-/g, "")[k]) * 10}%)`; });
+      $(".tm-grade", box).textContent = x.grade || "";
+      $(".tm-n", box).textContent = `${i + 1} / ${list.length}`;
+      $(".tm-sr", box).textContent = ymd(x.start);
+      cards.forEach((c, k) => c.classList.toggle("is-on", k === i));
+    };
+    // 手機上面板是貼在頁首下的一條，基準線改成面板下緣再往下一點
+    const narrow = () => matchMedia("(max-width: 760px)").matches;
+    const line = () => {
+      if (narrow()) return $(".tm-side", box).getBoundingClientRect().bottom + 48;
+      const r = dialOf().getBoundingClientRect(); return r.top + r.height / 2;
+    };
+    function track() {
+      const dial = dialOf();
+      if (!dial || !cards.length) return;
+      const y = line();
+      let i = 0;
+      for (let k = 0; k < cards.length; k++) { if (cards[k].getBoundingClientRect().top <= y) i = k; else break; }
+      show(i);
+      if (narrow()) return;
+      const side = $(".tm-side", box).getBoundingClientRect();
+      $(".tm-fill", box).style.height = `${Math.max(0, Math.min(side.height, y - side.top))}px`;
+      // 指針從面板右緣一路接到卡片
+      const gap = Math.max(0, $(".tm-list", box).getBoundingClientRect().left - dial.getBoundingClientRect().right);
+      const ptr = $(".tm-pointer", box);
+      ptr.style.width = `${gap}px`; ptr.style.right = `${-gap}px`;
+    }
+
+    // ---- 自動卡上：停手後把最近的卡片頂端對齊面板頂端
+    let idle = 0, snapping = false;
+    const snap = () => {
+      if (snapping || !cards.length || narrow()) return;
+      const dial = dialOf().getBoundingClientRect();
+      const first = cards[0].getBoundingClientRect(), last = cards.at(-1).getBoundingClientRect();
+      if (first.top > dial.bottom || last.bottom < dial.top) return;   // 還沒捲到清單，或已經捲過頭
+      let best = null;
+      for (const c of cards) {
+        const d = c.getBoundingClientRect().top - dial.top;
+        if (!best || Math.abs(d) < Math.abs(best)) best = d;
+      }
+      if (best === null || Math.abs(best) < 2 || Math.abs(best) > 160) return;
+      snapping = true;
+      const done = () => { snapping = false; };
+      const target = scrollY + best;
+      if (FX.lenis) FX.lenis.scrollTo(target, { duration: 0.6, easing: (t) => 1 - Math.pow(1 - t, 3), onComplete: done });
+      else { scrollTo({ top: target, behavior: reduced ? "auto" : "smooth" }); setTimeout(done, 600); }
+    };
+    addEventListener("scroll", () => {
+      requestAnimationFrame(track);
+      clearTimeout(idle);
+      if (!snapping) idle = setTimeout(snap, 160);
+    }, { passive: true });
+    addEventListener("resize", () => requestAnimationFrame(track));
+    // 點卡片（不是點連結）也會把它卡到面板旁
+    box.addEventListener("click", (e) => {
+      const c = e.target.closest(".exp");
+      if (!c || e.target.closest("a") || matchMedia("(max-width: 760px)").matches) return;
+      const d = c.getBoundingClientRect().top - dialOf().getBoundingClientRect().top;
+      FX.lenis ? FX.lenis.scrollTo(scrollY + d, { duration: 0.8 }) : scrollTo({ top: scrollY + d, behavior: reduced ? "auto" : "smooth" });
+    });
+
+    // ---- 切換：舊的先淡出再換
+    let fading = null;
     const draw = (animate) => {
       if (!animate || !motion) { render(false); return; }
       fading?.kill();
-      const out = $$(".exp-group-head, .exp-year-head, .exp-month-head, .exp", box)
-        .filter((el) => { const r = el.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; });
+      const out = $$(".exp, .tm-year", box).filter((el) => { const r = el.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; });
       if (!out.length) { render(true); return; }
-      fading = gsap.to(out, { opacity: 0, y: -8, duration: 0.2, ease: "power2.in", stagger: 0.008, onComplete: () => render(true) });
+      fading = gsap.to(out, { opacity: 0, y: -8, duration: 0.2, ease: "power2.in", stagger: 0.006, onComplete: () => render(true) });
     };
 
-    segmented($("#exp-fields"), (v) => { field = v; draw(true); });
-    segmented($("#exp-views"), (v) => {
-      view = v;
-      try { localStorage.setItem("exp-view-v2", v); } catch { /* 無法儲存就算了 */ }
+    filtersEl.addEventListener("click", (e) => {
+      const b = e.target.closest(".exp-chip");
+      if (!b) return;
+      const set = picked[b.dataset.g], v = b.dataset.v;
+      set.has(v) ? set.delete(v) : set.add(v);
+      b.setAttribute("aria-pressed", set.has(v));
       draw(true);
     });
+    const toggle = $("#exp-filter-toggle");
+    toggle.addEventListener("click", () => {
+      const open = filtersEl.hidden;
+      filtersEl.hidden = !open;
+      toggle.setAttribute("aria-expanded", open);
+      if (open && motion) gsap.from(".exp-fgroup", { opacity: 0, y: -6, duration: 0.4, ease: EASE, stagger: 0.04 });
+    });
+    $("#exp-clear").addEventListener("click", () => {
+      Object.values(picked).forEach((s) => s.clear());
+      $$(".exp-chip", filtersEl).forEach((b) => b.setAttribute("aria-pressed", "false"));
+      draw(true);
+    });
+    sortBtn.addEventListener("click", () => {
+      dir = dir === "desc" ? "asc" : "desc";
+      try { localStorage.setItem("exp-sort", dir); } catch { /* 無法儲存就算了 */ }
+      syncSort();
+      draw(true);
+    });
+
     draw(false);
     if (motion) {
       splitReveal($("#exp-page-title"), FX.introDelay);
-      gsap.from(["#exp-meta", ".exp-head .controls"], { opacity: 0, y: 12, duration: 0.8, ease: EASE, stagger: 0.08, delay: 0.1 + FX.introDelay });
+      gsap.from(["#exp-meta", ".exp-toolbar"], { opacity: 0, y: 12, duration: 0.8, ease: EASE, stagger: 0.08, delay: 0.1 + FX.introDelay });
     }
   }
 
