@@ -314,7 +314,7 @@ main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平
 .tile:hover { color: var(--text); }
 .tile-shot { border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--surface); transition: border-color 150ms var(--ease); }
 .tile:hover .tile-shot { border-color: var(--line-strong); }
-.tile-shot img, .tile-shot .gen-cover { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; transition: transform 600ms var(--ease); }
+.tile-shot img, .tile-shot .gen-cover { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; transition: transform 600ms var(--ease); }
 .tile:hover .tile-shot img, .tile:hover .tile-shot .gen-cover { transform: scale(1.04); }
 .tile-text { padding-top: 16px; }
 .tile-text .meta { margin: 0 0 4px; }
@@ -338,8 +338,10 @@ main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平
 .gc-no { position: absolute; top: 6%; right: 7%; font-family: var(--font-mono); font-size: clamp(53px, 9.9vw, 132px); line-height: 1; color: color-mix(in srgb, var(--accent) 22%, transparent); font-weight: 500; }
 .tile .gen-cover { padding: 7%; }
 .tile .gc-title { font-size: 25px; }
+/* 矩陣的小卡：編號縮小，才不會壓到路徑那行 */
+.tile .gc-no { font-size: 36px; top: 8%; right: 6%; }
+.tile .gc-path, .tile .gc-stack { font-size: 14px; }
 .tile .gc-path, .tile .gc-stack { font-size: 13px; }
-.tile .gc-no { font-size: 70px; }
 
 /* 索引：像筆記本目錄的條列，hover 時旁邊浮出截圖預覽 */
 .index-head, .index a { display: grid; grid-template-columns: 64px minmax(0, 1fr) 160px 48px; gap: 24px; }
@@ -367,7 +369,7 @@ main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平
   box-shadow: var(--float-shadow); display: none;
 }
 .js .preview { display: block; opacity: 0; transform: scale(.96); }
-.preview img, .preview .gen-cover { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; }
+.preview img, .preview .gen-cover { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; }
 .preview .gen-cover { padding: 7%; gap: 4px; }
 .preview .gc-title { font-size: 23px; }
 .preview .gc-path, .preview .gc-stack { font-size: 12px; }
@@ -539,7 +541,7 @@ main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平
   .tile .gc-title { font-size: 20px; }
   .tile .gc-stack { display: none; }
   .tile .gc-path { font-size: 12px; }
-  .tile .gc-no { font-size: 44px; }
+  .tile .gc-no { font-size: 32px; }
   .projects-head { margin-bottom: 40px; }
   .index-head { display: none; }
   .index a { grid-template-columns: 32px minmax(0, 1fr); gap: 12px; padding: 20px 4px; }

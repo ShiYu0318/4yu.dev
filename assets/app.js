@@ -1082,17 +1082,15 @@
         showView(view);
         filter();
         const to = $$(".item:not([hidden])", viewEl(view));
-        markRevealed(to);
-        if (view === "rows") markRevealed($$(".feature-shot, .feature-text", viewEl(view)));
         if (motion) {
-          const shots = $$(".feature-shot", viewEl(view)), texts = $$(".feature-text", viewEl(view));
-          if (shots.length) { gsap.set(shots, { clearProps: "clipPath" }); shots.forEach((s) => gsap.set(s.firstElementChild, { scale: 1 })); }
-          if (texts.length) gsap.set(texts, { opacity: 1, y: 0, x: 0 });
-          if (shots.length) gsap.set(shots, { opacity: 1, x: 0 });
+          // 換到新版面時，重新用和首頁一樣的進場：畫面內的馬上播，下面的捲到才播
           const top = viewEl(view).getBoundingClientRect().top;
-          const inView = to.filter((el) => el.getBoundingClientRect().top < innerHeight + 40);
-          if (to.length) gsap.set(to, { opacity: 1, y: 0, x: 0 });
-          if (inView.length) gsap.fromTo(inView, { opacity: 0, x: (i) => (i % 2 ? 60 : -60) }, { opacity: 1, x: 0, duration: 0.7, ease: EASE, stagger: 0.035, clearProps: "transform" });
+          const parts = view === "rows" ? to.flatMap((f) => [f, $(".feature-shot", f), $(".feature-text", f)]) : to;
+          parts.forEach((el) => el && revealed.delete(el));
+          gsap.set(to, { opacity: 1, y: 0, x: 0 });
+          if (view === "rows") revealFeatures(to);
+          else if (view === "grid") slideIn(to, (el) => (el.offsetLeft + el.offsetWidth / 2 < el.parentElement.offsetWidth / 2 ? -80 : 80));
+          else slideIn(to, (el) => ([...el.parentElement.children].indexOf(el) % 2 ? 60 : -60));
           if (top < 0) FX.lenis ? FX.lenis.scrollTo("#projects", { offset: -72, duration: 0.8 }) : null;
         }
         window.ScrollTrigger?.refresh();
