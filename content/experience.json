@@ -299,7 +299,7 @@
       "link": "https://slides.com/shiyu/ai/#/49"
     },
     {
-      "title": "2026 聯合寒訓【閃電 4 連編】- AI 系列課程",
+      "title": "SCIST Camp 2026 中南資訊社群聯合寒訓【閃電 4 連編】- AI 系列課程",
       "role": "講師",
       "result": null,
       "org": "SCIST S6（南臺灣學生資訊社群 第 6 屆）x SCAICT（中部高中電資社團聯合會議）x NCKU EE（國立成功大學電機工程學系）",
@@ -457,7 +457,7 @@
       "link": null
     },
     {
-      "title": "SCIST Camp 2025 聯合寒訓 -【資深玩家】- AI/ML 主題課程",
+      "title": "SCIST Camp 2025 南 15 校資訊社聯合寒訓  -【資深玩家】- AI/ML 主題課程",
       "role": "講師",
       "result": null,
       "org": "SCIST S5（南臺灣學生資訊社群 第 5 屆）x 南 15 校資訊社",
@@ -473,7 +473,7 @@
       "link": null
     },
     {
-      "title": "SCIST Camp 2025 聯合寒訓 -【資深玩家】",
+      "title": "SCIST Camp 2025 南 15 校資訊社聯合寒訓  -【資深玩家】",
       "role": "財務 x 公關",
       "result": null,
       "org": "SCIST S5（南臺灣學生資訊社群 第 5 屆）x 南 15 校資訊社",
@@ -840,7 +840,7 @@
       "link": null
     },
     {
-      "title": "SCIST Camp 2024 -【資得其樂】",
+      "title": "SCIST Camp 2024 南 9 校資訊社聯合寒訓 -【資得其樂】",
       "role": "副召",
       "result": null,
       "org": "SCIST S4（南臺灣學生資訊社群 第 4 屆）x 南 9 校資訊社 x NCKU CSIE（國立成功大學資訊工程學系）",
@@ -1076,7 +1076,7 @@
         "IoT"
       ],
       "priority": 2,
-      "grade": "國三上",
+      "grade": "國三下",
       "start": "2022-05-15",
       "end": null,
       "link": null
@@ -1091,7 +1091,7 @@
         "程式 / 開發"
       ],
       "priority": 2,
-      "grade": "國三上",
+      "grade": "國三下",
       "start": "2022-04-15",
       "end": null,
       "link": null
@@ -1183,7 +1183,7 @@
         "程式 / 開發"
       ],
       "priority": 2,
-      "grade": "國二上",
+      "grade": "國二下",
       "start": "2021-04-23",
       "end": null,
       "link": null
@@ -1198,7 +1198,7 @@
         "IoT"
       ],
       "priority": 2,
-      "grade": "國二上",
+      "grade": "國二下",
       "start": "2021-04-18",
       "end": null,
       "link": null
@@ -1213,7 +1213,7 @@
         "程式 / 開發"
       ],
       "priority": 3,
-      "grade": "國二上",
+      "grade": "國二下",
       "start": "2021-03-04",
       "end": null,
       "link": null
