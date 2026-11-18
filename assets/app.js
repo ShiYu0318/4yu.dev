@@ -1510,8 +1510,9 @@
     let list = [], cards = [], active = -1, lastY = "";
     const narrow = () => matchMedia("(max-width: 760px)").matches;
     const dialOf = () => $(".tm-dial", box);
+    let groupOf = (x) => x.start.slice(0, 4);
     const rowsHTML = (xs, from) => xs.map((x, k) => {
-      const y = x.start.slice(0, 4), head = y !== lastY ? `<li class="tm-year" aria-hidden="true">${y}</li>` : "";
+      const y = groupOf(x), head = y !== lastY ? `<li class="tm-year" aria-hidden="true">${y}</li>` : "";
       lastY = y;
       return head + expRow(x, from + k);
     }).join("");
@@ -1644,7 +1645,8 @@
     const api = {
       nodes: () => $$(".exp, .tm-year", box),
       // 整份換掉（篩選、排序）
-      set(xs, animate) {
+      set(xs, animate, group) {
+        groupOf = group || ((x) => x.start.slice(0, 4));
         list = xs; lastY = ""; active = -1; rot = []; fiber.init = false;
         if (!xs.length) { box.innerHTML = ""; cards = []; return; }
         box.innerHTML = `
@@ -1750,22 +1752,34 @@
             ${g.id === "type" ? `style="--c:${typeColor(v)}"` : ""}>${esc(optLabel(g, v))}<span class="count">${n}</span></button>`).join("")}</div>
       </div>`).join("");
 
-    let dir = "desc";
-    try { if (localStorage.getItem("exp-sort") === "asc") dir = "asc"; } catch { /* 用預設 */ }
+    // 排序：dir 是時間方向（desc 新到舊 / asc 舊到新）；byLv 為 true 時改成重要程度高到低（同分再依時間）
+    let dir = "desc", byLv = false;
+    try {
+      const saved = localStorage.getItem("exp-sort");
+      if (saved === "asc") dir = "asc";
+      if (saved === "lv") byLv = true;
+    } catch { /* 用預設 */ }
+    const lvBtn = $("#exp-sort-lv");
     const sortBtn = $("#exp-sort");
     const syncSort = () => {
       const label = dir === "desc" ? "新到舊" : "舊到新";
       sortBtn.dataset.dir = dir;
-      sortBtn.setAttribute("aria-label", `排序：${label}`); sortBtn.title = `排序：${label}（點一下切換）`;
+      sortBtn.setAttribute("aria-pressed", String(!byLv));
+      sortBtn.setAttribute("aria-label", `依時間排序：${label}`); sortBtn.title = `依時間排序：${label}（點一下切換）`;
       $(".sort-label", sortBtn).textContent = label;
+      lvBtn?.setAttribute("aria-pressed", String(byLv));
     };
+    const saveSort = () => { try { localStorage.setItem("exp-sort", byLv ? "lv" : dir); } catch { /* 無法儲存就算了 */ } };
     syncSort();
 
     const box = $("#exp-groups");
     const visible = () => {
       const list = items.filter((x) => GROUPS.every((g) => !picked[g.id].size || g.get(x).some((v) => picked[g.id].has(v))));
+      if (byLv) return list.slice().sort((a, b) => (b.priority || 0) - (a.priority || 0) || b.start.localeCompare(a.start));
       return dir === "desc" ? list : list.slice().reverse();
     };
+    // 依重要程度排序時，分段標題改成星數
+    const lvGroup = (x) => x.priority ? `重要程度 ${"★".repeat(x.priority)}${"☆".repeat(5 - x.priority)}` : "未評";
     const tl = createTimeline(box);
     let list = [];
     const render = (animate) => {
@@ -1775,7 +1789,7 @@
       $("#exp-clear").hidden = !n;
       $("#exp-shown").textContent = n ? `顯示 ${list.length} / ${items.length} 筆` : "";
       $("#exp-empty").hidden = list.length > 0;
-      tl.set(list, animate);
+      tl.set(list, animate, byLv ? lvGroup : null);
     };
 
     // ---- 切換：舊的先淡出再換
@@ -1808,11 +1822,15 @@
       $$(".exp-chip", filtersEl).forEach((b) => b.setAttribute("aria-pressed", "false"));
       draw(true);
     });
+    // 時間按鈕：在重要程度模式時先切回時間排序；已經是時間排序時切換新舊
     sortBtn.addEventListener("click", () => {
-      dir = dir === "desc" ? "asc" : "desc";
-      try { localStorage.setItem("exp-sort", dir); } catch { /* 無法儲存就算了 */ }
-      syncSort();
-      draw(true);
+      if (byLv) byLv = false;
+      else dir = dir === "desc" ? "asc" : "desc";
+      saveSort(); syncSort(); draw(true);
+    });
+    lvBtn?.addEventListener("click", () => {
+      byLv = !byLv;
+      saveSort(); syncSort(); draw(true);
     });
 
     draw(false);

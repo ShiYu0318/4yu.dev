@@ -778,6 +778,10 @@ html.is-loading, html.is-loading body { overflow: hidden; }
 .exp-tool[aria-expanded="true"] { border-color: var(--accent); }
 .exp-sort .arrow { transition: transform .4s var(--ease); transform-origin: 18px 12px; }
 .exp-sort[data-dir="asc"] .arrow { transform: rotate(180deg); }
+/* 兩顆排序按鈕：目前使用中的那顆亮框，另一顆變暗 */
+.exp-sort[aria-pressed="false"], .exp-sort-lv[aria-pressed="false"] { color: var(--text-2); }
+.exp-sort[aria-pressed="true"], .exp-sort-lv[aria-pressed="true"] { border-color: var(--accent); color: var(--text); }
+.exp-sort-lv[aria-pressed="true"] .icon { fill: var(--accent); stroke: var(--accent); }
 .exp-clear { font: inherit; font-size: 15px; color: var(--muted); background: none; border: 0; cursor: pointer; text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 4px; }
 .exp-clear:hover { color: var(--accent); }
 .exp-shown { margin: 0 auto 0 0; font-size: 14px; order: -2; }
