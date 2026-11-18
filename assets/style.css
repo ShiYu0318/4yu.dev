@@ -326,14 +326,16 @@ main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平
 .gen-cover {
   position: relative; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px;
   width: 100%; height: 100%; aspect-ratio: 16 / 10; padding: 8%; overflow: hidden;
-  background-color: var(--surface);
-  background-image: radial-gradient(var(--line-strong) 1px, transparent 1.5px);
-  background-size: 20px 20px; background-position: 10px 10px;
+  /* 鈷藍光影：Logo 閃電的深海軍藍與鈷藍，從右上角打一道光進來（和首頁頭貼後面那層光同一個語言） */
+  background:
+    radial-gradient(ellipse 70% 90% at 92% 0%, color-mix(in srgb, var(--navy) 85%, transparent), transparent 70%),
+    radial-gradient(ellipse 40% 50% at 100% 0%, color-mix(in srgb, var(--brand) 35%, transparent), transparent 70%),
+    var(--surface);
 }
 .gc-path { font-family: var(--font-mono); font-size: 16px; color: var(--accent); }
 .gc-title { font-size: clamp(28px, 3.5vw, 48px); font-weight: 500; line-height: 1.1; letter-spacing: -0.02em; color: var(--text); }
 .gc-stack { font-family: var(--font-mono); font-size: 16px; color: var(--muted); }
-.gc-no { position: absolute; top: 6%; right: 7%; font-family: var(--font-mono); font-size: clamp(53px, 9.9vw, 132px); line-height: 1; color: var(--raised); font-weight: 500; }
+.gc-no { position: absolute; top: 6%; right: 7%; font-family: var(--font-mono); font-size: clamp(53px, 9.9vw, 132px); line-height: 1; color: color-mix(in srgb, var(--accent) 22%, transparent); font-weight: 500; }
 .tile .gen-cover { padding: 7%; }
 .tile .gc-title { font-size: 25px; }
 .tile .gc-path, .tile .gc-stack { font-size: 13px; }
