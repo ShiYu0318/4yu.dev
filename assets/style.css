@@ -587,11 +587,21 @@ html.is-loading, html.is-loading body { overflow: hidden; }
 .loader-screen { position: fixed; inset: 0; z-index: 200; background: var(--bg); pointer-events: none; }
 .loader-screen canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-/* 換頁布幕 */
+/* 換頁布幕：鈷藍光邊。純黑幕從下往上推，最前緣是一道鈷藍的光，後面帶一層深海軍藍的餘暉 */
 .curtain {
   position: fixed; inset: 0; z-index: 100; display: grid; place-items: center;
-  background: var(--raised); transform: scaleY(0); transform-origin: 50% 100%; pointer-events: none;
+  background: var(--bg); transform: translateY(110%); pointer-events: none;
 }
+.curtain::before {
+  content: ""; position: absolute; left: 0; right: 0; top: -1px; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent) 20%, var(--phosphor-hi) 50%, var(--accent) 80%, transparent);
+  box-shadow: 0 0 18px 2px var(--brand);
+}
+.curtain::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 45%; pointer-events: none;
+  background: radial-gradient(ellipse 60% 100% at 50% 0%, color-mix(in srgb, var(--navy) 90%, transparent), transparent 75%);
+}
+.curtain .wordmark { position: relative; z-index: 1; }
 .curtain .wordmark { font-size: 36px; opacity: 0; gap: 16px; }
 .curtain .wordmark-logo { height: 44px; }
 .is-leaving .curtain, .is-entering .curtain { pointer-events: all; }
@@ -621,7 +631,7 @@ html.is-loading, html.is-loading body { overflow: hidden; }
 .hero > .scroll-down:hover { color: var(--accent); border-color: var(--accent); }
 .hero > .scroll-down.is-hidden { opacity: 0; pointer-events: none; }
 @keyframes scroll-bob { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(3px); } }
-@media (prefers-reduced-motion: reduce) { .hero > .scroll-down .icon { animation: none; } .tm-dial, .tm-sheen { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .hero > .scroll-down .icon { animation: none; } .tm-sheen { animation: none; } }
 
 /* 頁尾的回到頂端 */
 .to-top {
@@ -805,19 +815,17 @@ html.is-loading, html.is-loading body { overflow: hidden; }
   background: radial-gradient(ellipse at center, var(--dial-core), var(--bg) 80%);
   border: 1px solid var(--dial-rim);
   box-shadow: 0 0 0 5px var(--surface), 0 0 34px color-mix(in srgb, var(--brand) 25%, transparent), inset 0 0 30px color-mix(in srgb, var(--brand) 18%, transparent);
-  animation: crt-flicker 6s infinite steps(1);
 }
 .tm-dial::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; background: repeating-linear-gradient(var(--scanline) 0 1px, transparent 1px 3px); }
 .tm-sheen { position: absolute; inset: -60%; pointer-events: none; background: linear-gradient(115deg, transparent 42%, var(--sheen) 50%, transparent 58%); animation: tm-sheen 4s infinite; }
 @keyframes tm-sheen { from { transform: translateX(-45%); } to { transform: translateX(45%); } }
-@keyframes crt-flicker { 0%, 96% { opacity: 1; } 97% { opacity: .88; } 98% { opacity: 1; } 99% { opacity: .92; } }
 .tm-prompt { font-size: 13px; color: var(--phosphor-dim); text-shadow: 0 0 4px color-mix(in srgb, var(--accent) 50%, transparent); }
 .tm-digits { display: flex; align-items: center; font-family: var(--font-mono); font-size: 25px; line-height: 1; color: var(--phosphor); text-shadow: 0 0 5px color-mix(in srgb, var(--accent) 90%, transparent), 0 0 16px color-mix(in srgb, var(--brand) 60%, transparent); }
 .tm-sep { padding: 0 2px; color: color-mix(in srgb, var(--phosphor) 45%, transparent); text-shadow: none; }
 /* 3D 滾輪：每一位是 10 面的圓柱，在小窗後面轉，上下有陰影像窺視窗 */
 .dg { position: relative; display: inline-block; width: .66em; height: 1.2em; margin: 0 1px; overflow: hidden; border-radius: 3px; perspective: 180px; background: linear-gradient(color-mix(in srgb, var(--brand) 10%, transparent), color-mix(in srgb, var(--brand) 3%, transparent) 50%, color-mix(in srgb, var(--brand) 10%, transparent)); }
 .dg::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(color-mix(in srgb, var(--bg) 90%, transparent), transparent 32%, transparent 68%, color-mix(in srgb, var(--bg) 90%, transparent)); }
-.dg .cyl { position: absolute; inset: 0; transform-style: preserve-3d; transform: translateZ(-1.85em); transition: transform .9s cubic-bezier(.3, 1.3, .4, 1); }
+.dg .cyl { position: absolute; inset: 0; transform-style: preserve-3d; transform: translateZ(-1.85em); transition: transform .7s var(--ease); }
 .dg .cyl span { position: absolute; inset: 0; display: grid; place-items: center; backface-visibility: hidden; }
 .tm-foot { display: flex; justify-content: space-between; gap: 20px; font-size: 13px; color: var(--phosphor-dim); }
 .tm-foot b { color: var(--phosphor-hi); font-weight: 400; font-family: var(--font-sans); font-size: 14px; }
@@ -873,9 +881,6 @@ html.is-loading, html.is-loading body { overflow: hidden; }
   .tm-dial-wrap { position: static; }
   .tm-dial { flex-direction: row; align-items: center; gap: 12px; padding: 8px 16px; border-radius: 12px; box-shadow: 0 0 0 3px var(--surface), 0 0 20px color-mix(in srgb, var(--brand) 20%, transparent), inset 0 0 20px color-mix(in srgb, var(--brand) 15%, transparent); }
   .tm-prompt, .tm-sheen { display: none; }
-  /* 手機上不閃爍、滾輪不回彈：面板一直在畫面上，任何晃動都很明顯 */
-  .tm-dial { animation: none; }
-  .dg .cyl { transition: transform .45s var(--ease); }
   .tm-digits { font-size: 20px; }
   .tm-foot { flex-direction: column; font-size: 13px; gap: 2px; }
   .tm-list { padding-left: 0; }

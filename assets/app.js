@@ -177,22 +177,26 @@
     curtain() {
       const el = $(".curtain"), mark = el && $(".wordmark", el);
       if (!el) return;
+      // 位移只交給 GSAP 的 yPercent（不然會和 CSS 的 translateY(110%) 疊加成兩倍）
+      gsap.set(el, { y: 0, yPercent: 110 });
       if (sessionStorage.getItem("curtain")) {
         sessionStorage.removeItem("curtain");
         document.documentElement.classList.add("is-entering");
-        gsap.set(el, { scaleY: 1, transformOrigin: "50% 0%" });
+        gsap.set(el, { yPercent: 0 });
         gsap.set(mark, { opacity: 1 });
-        gsap.timeline({ onComplete: () => document.documentElement.classList.remove("is-entering") })
+        gsap.timeline({ onComplete: () => { document.documentElement.classList.remove("is-entering"); gsap.set(el, { yPercent: 110 }); } })
           .to(mark, { opacity: 0, y: -12, duration: 0.25, ease: "power2.in" })
-          .to(el, { scaleY: 0, duration: 0.6, ease: "expo.inOut" }, "-=0.05");
+          .to(el, { yPercent: -100, duration: 0.65, ease: "expo.inOut" }, "-=0.05");
       }
       // 從部落格（blog.4yu.dev）點回來時，也用布幕收起來接上，兩個網站像同一個
       else if (document.referrer && SITES.includes(new URL(document.referrer).hostname) && new URL(document.referrer).hostname !== location.hostname) {
-        gsap.set(el, { scaleY: 1, transformOrigin: "50% 0%" });
+        gsap.set(el, { yPercent: 0 });
         gsap.set(mark, { opacity: 1 });
-        gsap.timeline().to(mark, { opacity: 0, y: -12, duration: 0.25, ease: "power2.in", delay: 0.1 }).to(el, { scaleY: 0, duration: 0.6, ease: "expo.inOut" }, "-=0.05");
+        gsap.timeline({ onComplete: () => gsap.set(el, { yPercent: 110 }) })
+          .to(mark, { opacity: 0, y: -12, duration: 0.25, ease: "power2.in", delay: 0.1 })
+          .to(el, { yPercent: -100, duration: 0.65, ease: "expo.inOut" }, "-=0.05");
       }
-      addEventListener("pageshow", (e) => { if (e.persisted) gsap.set(el, { scaleY: 0 }); });
+      addEventListener("pageshow", (e) => { if (e.persisted) gsap.set(el, { yPercent: 110 }); });
       document.addEventListener("click", (e) => {
         const a = e.target.closest("a[href]");
         if (e.defaultPrevented || !a || a.target === "_blank" || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
@@ -203,9 +207,8 @@
         e.preventDefault();
         if (!sibling) sessionStorage.setItem("curtain", "1");
         document.documentElement.classList.add("is-leaving");
-        gsap.set(el, { transformOrigin: "50% 100%" });
         gsap.timeline({ onComplete: () => { location.href = url.href; } })
-          .to(el, { scaleY: 1, duration: 0.5, ease: "expo.inOut" })
+          .fromTo(el, { yPercent: 110 }, { yPercent: 0, duration: 0.6, ease: "expo.inOut" })
           .fromTo(mark, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.25 }, "-=0.15");
       });
     },
@@ -1535,10 +1538,6 @@
       cards.forEach((c, k) => c.classList.toggle("is-on", k === i));
       fiber.spark = 0; fiber.kick();
       // 換日期時數字故障抖一下
-      // 手機上不抖：面板貼在頁首下，捲動時一直換日期，抖動會變成整條在晃；也不強制重排（不讀 offsetWidth）
-      if (motion && !narrow()) $(".tm-digits", box)?.animate(
-        [{ transform: "translate(2px, -1px)", filter: "hue-rotate(40deg)" }, { transform: "translate(-2px, 1px)", clipPath: "inset(15% 0 35% 0)" }, { transform: "none" }],
-        { duration: 350, easing: "steps(2)" });
     };
     // 基準線：面板中線；手機上面板是貼在頁首下的一條，改成面板下緣再往下一點
     const line = () => {
