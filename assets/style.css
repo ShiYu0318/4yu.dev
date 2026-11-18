@@ -109,13 +109,15 @@ button:disabled, [aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
 html { -webkit-tap-highlight-color: transparent; text-size-adjust: 100%; -webkit-text-size-adjust: 100%; }
 
 /* 觸控裝置：可點的東西至少 40px 高，手指才點得準 */
+/* 觸控裝置：可點的東西至少 44px（anti-slop R-03 的點擊下限） */
 @media (pointer: coarse) {
-  .nav > a, .nav > button { height: 40px; }
-  .search-trigger { height: 40px; }
-  .segmented button, .segmented .thumb { height: 40px; }
-  .back-link { padding: 8px 0; margin-bottom: 16px; }
-  .hero > .backdrop-next { width: 40px; height: 40px; }
-  .wordmark { min-height: 40px; }
+  .nav > a, .nav > button, .nav-text { height: 44px; }
+  .nav-icon, .search-trigger { width: 44px; height: 44px; }
+  .segmented button, .segmented .thumb { height: 44px; }
+  .back-link { padding: 12px 0; margin-bottom: 12px; }
+  .hero > .backdrop-next { width: 44px; height: 44px; }
+  .wordmark { min-height: 44px; }
+  .exp-chip, .exp-tool { height: 44px; }
 }
 img { max-width: 100%; display: block; }
 kbd {
@@ -404,7 +406,7 @@ main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平
 .project-head .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 .project-head .stack { margin-left: 12px; }
 .project-cover { margin: 56px 0 0; width: fit-content; max-width: 100%; border-radius: var(--r-card); overflow: hidden; border: 1px solid var(--line); box-shadow: var(--image-shadow); }
-.project-cover img { width: auto; max-width: 100%; max-height: 640px; object-fit: cover; object-position: top; }
+.project-cover img { width: auto; height: auto; max-width: 100%; max-height: 640px; object-fit: cover; object-position: top; }
 
 /* ---------- 9. 專案頁：版面與目錄 ---------- */
 .project-body {
@@ -506,12 +508,13 @@ main { display: block; overflow-x: clip; }  /* 左右滑入時不要撐出水平
   .nav { margin-left: auto; }
   .nav-actions { gap: 0; }
   .nav-text { padding: 0 8px; font-size: 16px; }
-  .nav-icon { width: 34px; height: 34px; }
+  .nav-icon { width: 44px; height: 44px; }
   .site-header .wordmark { font-size: 18px; gap: 8px; }
   .site-header .wordmark-logo { height: 22px; }
   .nav { font-size: 16px; gap: 0; }
-  .nav > a, .nav > button { padding: 0 8px; }
-  .search-trigger { width: 34px; height: 34px; border-radius: 10px; }
+  .nav > a, .nav > button { padding: 0 8px; height: 44px; }
+  .nav-text { height: 44px; }
+  .search-trigger { width: 44px; height: 44px; border-radius: 12px; }
   .hero { grid-template-columns: 1fr; gap: 40px; padding: 40px var(--gutter) 104px; }
   .hero h1 { font-size: 35px; }
   .hero .bio { font-size: 16px; line-height: 1.7; }
@@ -831,7 +834,11 @@ html.is-loading, html.is-loading body { overflow: hidden; }
 .tm-year { font-family: var(--font-mono); font-size: 15px; color: var(--muted); margin: 32px 0 12px; display: flex; align-items: center; gap: 12px; font-variant-numeric: tabular-nums; }
 .tm-year:first-child { margin-top: 0; }
 .tm-year::after { content: ""; flex: 1; height: 1px; background: var(--line); }
-.tm-list .exp { cursor: pointer; }
+/* 卡片底下的定位按鈕：蓋滿整張卡片，文字疊在上面但讓點擊穿過去；連結照常可點 */
+.exp-locate { position: absolute; inset: 0; z-index: 0; padding: 0; border: 0; border-radius: inherit; background: transparent; cursor: pointer; }
+.exp-locate:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.exp > :not(.exp-locate) { position: relative; z-index: 1; pointer-events: none; }
+.exp a { pointer-events: auto; }
 .tm-list .exp.is-on { border-color: var(--accent); background: var(--on-card); }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
@@ -866,6 +873,7 @@ html.is-loading, html.is-loading body { overflow: hidden; }
   .tm-digits { font-size: 20px; }
   .tm-foot { flex-direction: column; font-size: 13px; gap: 2px; }
   .tm-list { padding-left: 0; }
+  .exp-locate { display: none; }
 }
 
 /* ---------- 程式碼上色（highlight.js 的 class，只用設計變數；取代 github-dark） ---------- */

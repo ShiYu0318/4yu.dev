@@ -69,6 +69,10 @@
       "repo": "https://github.com/ShiYu0318/mAIjong",
       "demo": null,
       "cover": "content/img/maijong/table.webp",
+      "coverSize": [
+        1400,
+        875
+      ],
       "year": 2026,
       "status": "published",
       "updated": "2026-11-16",
@@ -89,6 +93,10 @@
       "repo": "https://github.com/ShiYu0318/EmbAId-Agent",
       "demo": "https://embaid-agent.vercel.app",
       "cover": "content/img/embaid-agent/hero.webp",
+      "coverSize": [
+        1400,
+        875
+      ],
       "year": 2026,
       "status": "published",
       "updated": "2026-11-16",
@@ -108,9 +116,13 @@
       "repo": "https://github.com/ShiYu0318/TQR",
       "demo": null,
       "cover": "content/img/tqr/social-preview.webp",
+      "coverSize": [
+        1280,
+        800
+      ],
       "year": 2026,
       "status": "published",
-      "updated": "2026-11-16",
+      "updated": "2026-11-18",
       "team": false
     },
     {
@@ -128,9 +140,10 @@
       "repo": "https://github.com/ShiYu0318/ScholaRAGent",
       "demo": null,
       "cover": null,
+      "coverSize": null,
       "year": 2026,
       "status": "published",
-      "updated": "2026-11-16",
+      "updated": "2026-11-18",
       "team": false
     },
     {
@@ -147,6 +160,10 @@
       "repo": "https://github.com/ShiYu0318/CodeFest-2026-Taipei-Maze",
       "demo": "https://codefest.yoyo899843.com/station-map",
       "cover": "content/img/codefest-taipei-maze/desktop-route.webp",
+      "coverSize": [
+        1400,
+        972
+      ],
       "year": 2026,
       "team": true,
       "status": "published",
@@ -166,6 +183,10 @@
       "repo": "https://github.com/ShiYu0318/AI-CUP-2026-ESG-Paper",
       "demo": null,
       "cover": "content/img/ai-cup-2026-esg-paper/hierarchy.webp",
+      "coverSize": [
+        1331,
+        831
+      ],
       "year": 2026,
       "team": true,
       "status": "published",
@@ -185,9 +206,13 @@
       "repo": "https://github.com/ShiYu0318/Isaac-Sim2Sim-RL",
       "demo": null,
       "cover": "content/img/isaac-sim2sim-rl/g1-mujoco.webp",
+      "coverSize": [
+        400,
+        300
+      ],
       "year": 2026,
       "status": "published",
-      "updated": "2026-11-16",
+      "updated": "2026-11-18",
       "team": false
     },
     {
@@ -204,9 +229,13 @@
       "repo": "https://github.com/ShiYu0318/AI-Games-Lab-JavaFX",
       "demo": null,
       "cover": "content/img/ai-games-lab/lobby.webp",
+      "coverSize": [
+        1400,
+        872
+      ],
       "year": 2026,
       "status": "published",
-      "updated": "2026-11-16",
+      "updated": "2026-11-18",
       "team": false
     },
     {
@@ -223,9 +252,10 @@
       "repo": "https://github.com/ShiYu0318/JevRAG",
       "demo": null,
       "cover": null,
+      "coverSize": null,
       "year": 2026,
       "status": "published",
-      "updated": "2026-11-16",
+      "updated": "2026-11-18",
       "team": false
     },
     {
@@ -241,6 +271,7 @@
       "repo": "https://github.com/ShiYu0318/NCU-What2Eat",
       "demo": null,
       "cover": null,
+      "coverSize": null,
       "year": 2026,
       "team": false,
       "status": "published",
@@ -260,6 +291,10 @@
       "repo": "https://github.com/ShiYu0318/ShiYu-AI-Courses-Archive",
       "demo": "https://slides.com/shiyu/ai/",
       "cover": "content/img/ai-courses/camp-2026.webp",
+      "coverSize": [
+        1400,
+        1130
+      ],
       "year": 2026,
       "status": "published",
       "updated": "2026-11-16",
@@ -278,6 +313,7 @@
       "repo": "https://github.com/ShiYu0318/CP-Code",
       "demo": null,
       "cover": null,
+      "coverSize": null,
       "year": 2026,
       "status": "published",
       "updated": "2026-11-16",

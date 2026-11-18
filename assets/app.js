@@ -750,6 +750,8 @@
       const i = $$("a", list).indexOf(a); if (i !== sel) { sel = i; mark(); }
     });
     dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
+    // Esc 一定關得掉：有些瀏覽器在沒有使用者手勢時會略過原生的 cancel，這裡自己接住
+    dlg.addEventListener("keydown", (e) => { if (e.key === "Escape" && dlg.open) { e.preventDefault(); dlg.close(); } });
   }
 
   function renderFooter(data) {
@@ -948,9 +950,11 @@
     }
   }
 
+  // 封面的寬高（projects.json 的 coverSize），讓瀏覽器先預留空間，載入時版面不會跳
+  const coverDims = (p) => Array.isArray(p.coverSize) ? ` width="${p.coverSize[0]}" height="${p.coverSize[1]}"` : "";
   // 封面：有截圖用截圖；沒有的話用程式畫一張專案資訊卡（不是假截圖）
   const coverHTML = (p, data) => p.cover
-    ? `<img src="${esc(p.cover)}" alt="${esc(p.title)} 的畫面" loading="lazy" decoding="async">`
+    ? `<img src="${esc(p.cover)}" alt="${esc(p.title)} 的畫面"${coverDims(p)} loading="lazy" decoding="async">`
     : `<div class="gen-cover" role="img" aria-label="${esc(p.title)} 的資訊卡">
          <span class="gc-path">~/projects/${esc(p.id)}</span>
          <span class="gc-title">${esc(p.title)}</span>
@@ -1307,7 +1311,7 @@
           ${p.demo ? external(p.demo, "線上展示") : ""}
           <span class="stack">${p.tags.map(esc).join(" / ")}</span>
         </div>
-        ${p.cover ? `<figure class="project-cover"><img src="${esc(p.cover)}" alt="${esc(p.title)} 的主要畫面"></figure>` : ""}`;
+        ${p.cover ? `<figure class="project-cover"><img src="${esc(p.cover)}" alt="${esc(p.title)} 的主要畫面"${coverDims(p)} fetchpriority="high"></figure>` : ""}`;
       splitReveal($("#project-head h1"), FX.introDelay);
       if (motion) gsap.from(["#project-head .meta", "#project-head .tagline", "#project-head .row"], { opacity: 0, y: 12, duration: 0.8, ease: EASE, stagger: 0.08, delay: 0.2 + FX.introDelay });
       if (motion && p.cover) gsap.from(".project-cover", { clipPath: "inset(10% 6% 10% 6% round 16px)", opacity: 0, duration: 1.2, ease: EASE, delay: 0.3 + FX.introDelay });
@@ -1472,6 +1476,7 @@
     const lv = x.priority || 0;
     return `
       <li class="exp" data-flip-id="${x.key}" data-i="${i}">
+        <button class="exp-locate" type="button" aria-label="把「${esc(x.title)}」對到時光機面板"></button>
         <p class="meta exp-date" aria-label="${esc(expDate(x))}">${expDateHTML(x)}${x.start > today ? `<span class="exp-soon">即將</span>` : ""}</p>
         <span class="exp-type" style="--c:${typeColor(x.type)}">${esc(x.type)}</span>
         <p class="exp-org">${esc(x.org || "")}</p>
@@ -1616,9 +1621,11 @@
     }, { passive: true });
     addEventListener("resize", () => { center(); requestAnimationFrame(track); });
     // 點卡片（不是點連結）也會把它卡到面板旁
+    // 卡片底下鋪一顆真的按鈕（滑鼠點卡片空白處、鍵盤 Tab 到卡片按 Enter 都會觸發），把這筆卡到面板旁
     box.addEventListener("click", (e) => {
-      const c = e.target.closest(".exp");
-      if (!c || e.target.closest("a") || narrow()) return;
+      const btn = e.target.closest(".exp-locate");
+      if (!btn || narrow()) return;
+      const c = btn.closest(".exp");
       const d = offsetOf(c);
       FX.lenis ? FX.lenis.scrollTo(scrollY + d, { duration: 0.8 }) : scrollTo({ top: scrollY + d, behavior: reduced ? "auto" : "smooth" });
     });

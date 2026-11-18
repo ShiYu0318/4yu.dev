@@ -6,11 +6,29 @@
 """
 import json
 import re
+import struct
 import sys
 from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+
+
+def webp_size(path):
+    """讀 webp 檔頭的寬高（VP8 / VP8L / VP8X 三種），讀不出來回傳 None。"""
+    b = Path(path).read_bytes()[:40]
+    if b[:4] != b"RIFF" or b[8:12] != b"WEBP":
+        return None
+    kind = b[12:16]
+    if kind == b"VP8 ":
+        w, h = struct.unpack("<HH", b[26:30])
+        return [w & 0x3FFF, h & 0x3FFF]
+    if kind == b"VP8L":
+        n = int.from_bytes(b[21:25], "little")
+        return [(n & 0x3FFF) + 1, ((n >> 14) & 0x3FFF) + 1]
+    if kind == b"VP8X":
+        return [int.from_bytes(b[24:27], "little") + 1, int.from_bytes(b[27:30], "little") + 1]
+    return None
 MANIFEST = ROOT / "content" / "projects.json"
 PROJECT_DIR = ROOT / "content" / "projects"
 
@@ -48,7 +66,7 @@ def check_manifest():
 
     cats = {c["id"] for c in data["categories"]}
     seen = set()
-    required = ["id", "title", "tagline", "category", "tags", "repo", "demo", "cover", "year", "team", "status", "updated"]
+    required = ["id", "title", "tagline", "category", "tags", "repo", "demo", "cover", "coverSize", "year", "team", "status", "updated"]
     for p in data["projects"]:
         pid = p.get("id", "<無 id>")
         where = f"projects.json[{pid}]"
@@ -86,6 +104,12 @@ def check_manifest():
                 err(where, f"cover 檔案不存在：{cover}")
             if not cover.startswith(f"content/img/{pid}/"):
                 err(where, f"cover 必須放在 content/img/{pid}/")
+            elif (ROOT / cover).is_file():
+                real = webp_size(ROOT / cover)
+                if real and p.get("coverSize") != real:
+                    err(where, f"coverSize 應該是 {real}（圖片實際寬高），目前是 {p.get('coverSize')}")
+        elif p.get("coverSize") is not None:
+            err(where, "沒有 cover 時 coverSize 要是 null")
         if not (PROJECT_DIR / f"{pid}.md").is_file():
             err(where, f"找不到 content/projects/{pid}.md")
 

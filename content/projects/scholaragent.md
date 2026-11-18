@@ -39,7 +39,7 @@ API 層刻意做得很薄：router 只處理 HTTP 驗證與 SSE 封裝，用例�
 
 ### 進階 RAG 技術組合
 
-查詢改寫（HyDE、multi-query、decomposition）、parent-document retrieval、contextual chunk embedding、語意答案快取，以及 self-reflective / corrective retrieval 與多代理的「撰寫—批評」迴圈。
+查詢改寫（HyDE、multi-query、decomposition）、parent-document retrieval、contextual chunk embedding、語意答案快取，以及 self-reflective / corrective retrieval 與多代理的「撰寫、批評」迴圈。
 
 > [!HIGHLIGHT] 自己實作評估，而不是多裝 41 個套件
 > 引入 `ragas` 會帶進 41 個間接相依與兩個版本衝突，所以我直接用幾百行程式碼實作 RAGAS 風格的 faithfulness、answer relevancy、context precision / recall。另一條「純離線」評估軌（precision@k、MRR、引用正確率）不需要 LLM，可以當 CI 的回歸關卡。
