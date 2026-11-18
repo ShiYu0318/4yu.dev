@@ -15,12 +15,23 @@
       location.replace("https://blog.4yu.dev" + p + rest);
     })();
   </script>
+  <meta name="description" content="4yü.dev 找不到這個頁面，可以回到首頁或前往部落格。">
   <style>
-    html { background: #050b17; color: #edf3ff; font-family: "Times New Roman", Times, "Noto Sans TC", "PingFang TC", sans-serif; }
-    body { min-height: 100vh; margin: 0; display: grid; place-items: center; text-align: center; }
-    p { color: #a8bbdc; font-size: 18px; }
-    code { font-family: "Courier Prime", "Courier New", monospace; color: #66a8ff; }
-    a { color: #edf3ff; }
+    /* Hallmark · shape: kept · genre: modern-minimal · theme: brand · redesign: restyle
+     * paper: oklch(0% 0 0) · accent: oklch(64% 0.19 264) · display: Times New Roman · body: Times New Roman · hero: kept · nav: none, a utility page · footer: none · signature: kept
+     * axes: black/serif/cobalt · posture: kept · surface: absolute · contrast: pass · fold: pass · v2.0.0 */
+    /* Hallmark · pre-emit critique: P3 H3 E3 S3 R3 V3 · weakest: V, a one-line utility page that matches the site's tokens */
+    /* Hallmark · waive 7b · --bg #000000 · pure black paper is the brief, same as assets/style.css */
+    :root { --bg: #000000; --text: #ededed; --text-2: #a1a1a1; --accent: #4a84ff; --font-sans: "Times New Roman", Times, "Noto Sans TC", "PingFang TC", sans-serif; --font-mono: "Courier Prime", "Courier New", monospace; color-scheme: dark; }
+    html, body { overflow-x: clip; }
+    html { background: var(--bg); color: var(--text); font-family: var(--font-sans); }
+    body { min-height: 100svh; margin: 0; display: grid; place-items: center; text-align: center; }
+    p { color: var(--text-2); font-size: 18px; }
+    code { font-family: var(--font-mono); color: var(--accent); }
+    a { color: var(--text); text-decoration-color: var(--accent); text-underline-offset: 4px; }
+    a:hover { color: var(--accent); }
+    a:active { opacity: .7; }
+    a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
   </style>
 </head>
 <body>

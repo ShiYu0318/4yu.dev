@@ -1391,8 +1391,7 @@
     const links = new Map($$("a", toc).map((a) => [decodeURIComponent(a.hash.slice(1)), a]));
     const setActive = (a) => {
       links.forEach((x) => x.classList.toggle("active", x === a));
-      marker.style.transform = `translateY(${a.offsetTop}px)`;
-      marker.style.height = `${a.offsetHeight}px`;
+      marker.style.transform = `translateY(${a.offsetTop}px) scaleY(${a.offsetHeight})`;
     };
     const obs = new IntersectionObserver((entries) => {
       entries.forEach((en) => { const a = links.get(en.target.id); if (en.isIntersecting && a) setActive(a); });

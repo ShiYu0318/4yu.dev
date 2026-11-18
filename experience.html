@@ -32,7 +32,7 @@
   <link rel="preload" href="content/experience.json" as="fetch" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime&family=Noto+Sans+TC:wght@400;500&family=Tinos&display=swap">
   <link rel="stylesheet" href="assets/style.css">
-  <script>/* 第一次進站：先蓋住畫面，等 app.js 的點陣加載動畫接手（AGENTS.md §6.5） */try{if(!sessionStorage.getItem("loaded")&&!matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("is-loading")}catch(e){}</script>
+  <script>/* 第一次進站：先蓋住畫面，等 app.js 的點陣加載動畫接手（AGENTS.md §6.5） */document.documentElement.classList.add("js");try{if(!sessionStorage.getItem("loaded")&&!matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("is-loading")}catch(e){}</script>
 </head>
 <body class="page-experience">
   <div class="progress" aria-hidden="true"></div>

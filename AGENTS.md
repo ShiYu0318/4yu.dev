@@ -39,7 +39,7 @@ shiyu-portfolio/
 │   └── vendor/               ← 第三方函式庫（只放 minified 檔，不要修改）
 │       ├── gsap.min.js、ScrollTrigger.min.js、SplitText.min.js、Flip.min.js   ← 動態
 │       ├── marked.min.js     ← Markdown 轉 HTML
-│       └── highlight.min.js、github-dark.min.css                         ← 程式碼上色
+│       └── highlight.min.js                                              ← 程式碼上色（配色寫在 style.css）
 ├── content/
 │   ├── projects.json         ← 個人資料 + 分類 + 專案清單（manifest）
 │   ├── experience.json       ← 經歷，由 scripts/sync_notion.py 從 Notion 產生，不要手改（§9）
@@ -230,26 +230,30 @@ shiyu-portfolio/
 
 ### 6.2 顏色
 
-配色取自 **GitHub 頭像（戴耳機的黑貓 + 電光藍背景）**。首頁顯示的是本人照片（`portrait.webp`，一般照片、圓形框、不加效果）；點陣效果只用在頁尾的 GitHub 頭像，**不要套在本人照片上**。
+2026-11-18 起改成**純黑為主**（Vercel 式：黑、灰、白色細線），藍色只取自 **Logo 閃電**：鈷藍當填色與光影，提亮的藍當少數文字強調。首頁顯示的是本人照片（`portrait.webp`，一般照片、圓形框、不加效果）；點陣效果只用在頁尾的 GitHub 頭像，**不要套在本人照片上**。
 
-只用 `assets/style.css` 開頭 `:root` 的變數，**禁止在其他地方寫死色碼**。
+只用 `assets/style.css` 開頭 `:root` 的變數，**禁止在其他地方寫死色碼**（`404.html` 與 `NCCU-GenAI-HW/index.html` 各有一小段同值的 `:root`）。樣式表第一行是 Hallmark 的戳記與豁免紀錄（見 §6.6），不要刪。
 
 | 變數 | 色碼 | 來源 / 用途 |
 |---|---|---|
-| `--bg` | `#050b17` | 黑貓的黑帶一點深藍，頁面底色 |
-| `--surface` | `#0c1524` | 程式碼區、分段控制、hover 底 |
-| `--raised` | `#141e31` | 耳機的深藍灰，選取中的項目、行內程式碼 |
-| `--line` / `--line-strong` | 白 8% / 14% | 所有分隔線與邊框 |
-| `--text` / `--text-2` / `--muted` | `#edf3ff` / `#a8bbdc` / `#798ba9` | 眼睛的白、字幕的淡藍白；文字只有這三種角色 |
-| `--brand` | `#195bf5` | 頭像背景的電光藍，**只當填色**：主要按鈕（白字，對比 8.7:1）、游標的「複製」標籤、頁尾點陣頭像的藍色背景、頂端 2px 進度條 |
-| `--accent` | `#66a8ff` | 電光藍提亮後的文字版：hover、目錄目前位置、HIGHLIGHT。一頁不超過幾處 |
+| `--bg` | `#000000` | 純黑，頁面底色 |
+| `--surface` | `#0a0a0a` | 卡片、程式碼區、分段控制 |
+| `--raised` | `#161616` | 選取中的項目、行內程式碼 |
+| `--line` / `--line-strong` | 白 8% / 14.5% | 所有分隔線與邊框；深度靠細線與黑的深淺，不靠陰影 |
+| `--text` / `--text-2` / `--muted` | `#ededed` / `#a1a1a1` / `#8f8f8f` | 中性灰，不帶藍；文字只有這三種角色 |
+| `--brand` | `#0a2fe6` | 閃電的鈷藍，**只當填色**：主要按鈕（白字 8.2:1）、游標的「複製」標籤、頁尾點陣頭像背景、頂端進度條、時光機面板的光 |
+| `--brand-hover` | `#2350f5` | 主要按鈕 hover |
+| `--accent` | `#4a84ff` | 閃電高光的藍，文字用（純黑上 6:1）：hover、連結底線、目錄目前位置。一頁不超過幾處 |
+| `--navy` | `#000a80` | 閃電暗面的深海軍藍，**只當光影**：首屏頭貼後面的一層微光 |
+| `--lv-1` … `--lv-5` | `#c9d4f2` → `#0a2fe6` | 經歷「重要程度」5 格，銀白到鈷藍 |
+| `--phosphor` / `-hi` / `-dim` | `#a9bfff` / `#dbe4ff` / `#7389c9` | 時光機面板與光纖的磷光、程式碼上色 |
 | `--wip` | `#e0b866` | 只給 WIP 提示框 |
 
-- **色相統一在藍色（約 214°–222°）**：底色、文字、強調色都是同一個藍的不同明暗，不要用 230° 以上的靛藍或紫藍，看起來會偏紫。
-- `--brand` 放在深底上當文字只有 2.3:1，太暗，**不能拿來寫字或當細線**，文字一律用 `--accent`。
-- `--brand` 只出現在上面列的地方，不要再加新的用途。
+- `--brand` 放在黑底上當文字只有 2.6:1，**不能拿來寫字或當細線**，文字一律用 `--accent`。
+- 經歷的類型標籤（`TYPE_COLOR` 多色）是使用者選的，保留。
+- 程式碼上色不再載入 vendor 的 github-dark，改由 `style.css` 最後的 `.hljs-*` 規則用變數上色。
 
-**禁止**：漸層文字與彩色漸層背景、發光陰影、放射狀色塊、彩色邊框，也不要把頭像的電光藍鋪成大面積背景（資訊卡的點狀底紋、首屏背景附近的提亮與邊緣淡出遮罩是允許的 `radial-gradient` 用法）。深度只靠底色深淺與細線；唯一的陰影是截圖底下的中性陰影（`--image-shadow`）。
+**禁止**：漸層文字與彩色漸層背景、紫藍漸層、大面積鋪藍。允許的光影只有首屏頭貼後面的 `--navy` 微光、時光機面板的磷光與時間軸的流光（使用者指定）。
 
 ### 6.3 字體與文字
 
@@ -325,6 +329,11 @@ shiyu-portfolio/
 - 「捲到時出現」一律用 IntersectionObserver 判斷元素實際位置，不要用 ScrollTrigger 在載入時算好的捲動位置（切換檢視、圖片載入後頁面高度會變，算好的位置會失效，元素就永遠不出現）。
 - GSAP 或 Lenis 沒載入時，內容要完整顯示；初始隱藏狀態只能由 JS 在確定要播動畫時設定。
 - 對話框（⌘K）打開時暫停 Lenis，可捲動的清單加 `data-lenis-prevent`。
+
+
+### 6.6 Hallmark 與 anti-slop
+
+2026-11-18 用 [Hallmark](https://github.com/Nutlope/hallmark)（restyle：排版不動、換配色系統）與 [anti-slop](https://github.com/miqdadbadjuber/anti-slop) 改過全站。改樣式後可以跑 Hallmark 的 `sloplint.mjs . --genre modern-minimal`，要維持 0 FAIL；豁免寫在 `style.css` 開頭的戳記下面，格式 `/* Hallmark · waive <gate> · <證據> · <理由> */`。導覽列的玻璃效果、時光機面板的光、純黑底色是使用者指定，已豁免。
 
 ---
 
