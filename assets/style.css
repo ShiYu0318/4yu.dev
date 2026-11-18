@@ -781,11 +781,11 @@ html.is-loading, html.is-loading body { overflow: hidden; }
 .exp-sort .sort-dir { color: var(--muted); }
 .exp-sort .chev { width: 16px; height: 16px; transition: transform .3s var(--ease); }
 .exp-sort[aria-expanded="true"] .chev { transform: rotate(180deg); }
-.exp-sort-menu { position: absolute; top: calc(100% + 8px); right: 0; z-index: 40; min-width: 200px; padding: 6px; display: grid; background: var(--raised); border: 1px solid var(--line-strong); border-radius: 12px; }
+.exp-sort-menu { position: absolute; top: calc(100% + 8px); right: 0; z-index: 40; min-width: 200px; padding: 8px; display: grid; background: var(--raised); border: 1px solid var(--line-strong); border-radius: 12px; }
 .exp-sort-menu[hidden] { display: none; }
-.exp-sort-menu .sort-head { margin: 6px 10px 4px; font-size: 13px; color: var(--muted); }
-.exp-sort-menu hr { border: 0; border-top: 1px solid var(--line); margin: 6px 4px; }
-.exp-sort-menu button { font: inherit; font-size: 15px; height: 36px; padding: 0 10px; display: flex; align-items: center; justify-content: space-between; gap: 16px; color: var(--text-2); background: none; border: 0; border-radius: 8px; cursor: pointer; text-align: left; }
+.exp-sort-menu .sort-head { margin: 8px 12px 4px; font-size: 13px; color: var(--muted); }
+.exp-sort-menu hr { border: 0; border-top: 1px solid var(--line); margin: 8px 4px; }
+.exp-sort-menu button { font: inherit; font-size: 15px; height: 36px; padding: 0 12px; display: flex; align-items: center; justify-content: space-between; gap: 16px; color: var(--text-2); background: none; border: 0; border-radius: 8px; cursor: pointer; text-align: left; }
 .exp-sort-menu button:hover, .exp-sort-menu button:focus-visible { background: var(--hover-fill); color: var(--text); outline: none; }
 .exp-sort-menu button .icon { width: 16px; height: 16px; visibility: hidden; stroke: var(--accent); }
 .exp-sort-menu button[aria-checked="true"] { color: var(--text); }
@@ -811,8 +811,8 @@ html.is-loading, html.is-loading body { overflow: hidden; }
 .exp-chip.is-lv { letter-spacing: -.05em; }
 /* 學段樹：每往下一層縮排並接一條細線；有子項被選時上層用虛線框表示 */
 .exp-tree { display: grid; gap: 8px; }
-.exp-tier[data-depth="1"], .exp-tier[data-depth="2"] { padding-left: 14px; border-left: 1px solid var(--line-strong); }
-.exp-tier[data-depth="2"] { margin-left: 14px; }
+.exp-tier[data-depth="1"], .exp-tier[data-depth="2"] { padding-left: 16px; border-left: 1px solid var(--line-strong); }
+.exp-tier[data-depth="2"] { margin-left: 16px; }
 .exp-chip.is-sub { font-size: 14px; height: 30px; }
 .exp-chip[data-partial] { color: var(--text); border-color: var(--c); border-style: dashed; }
 
