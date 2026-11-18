@@ -1537,7 +1537,10 @@
       cards.forEach((c, k) => c.classList.toggle("is-on", k === i));
       fiber.spark = 0; fiber.kick();
       // 換日期時數字故障抖一下
-      if (motion) { const d = dialOf(); d.classList.remove("is-glitch"); void d.offsetWidth; d.classList.add("is-glitch"); }
+      // 手機上不抖：面板貼在頁首下，捲動時一直換日期，抖動會變成整條在晃；也不強制重排（不讀 offsetWidth）
+      if (motion && !narrow()) $(".tm-digits", box)?.animate(
+        [{ transform: "translate(2px, -1px)", filter: "hue-rotate(40deg)" }, { transform: "translate(-2px, 1px)", clipPath: "inset(15% 0 35% 0)" }, { transform: "none" }],
+        { duration: 350, easing: "steps(2)" });
     };
     // 基準線：面板中線；手機上面板是貼在頁首下的一條，改成面板下緣再往下一點
     const line = () => {
@@ -1555,9 +1558,10 @@
       const side = $(".tm-side", box).getBoundingClientRect();
       $(".tm-fill", box).style.height = `${Math.max(0, Math.min(side.height, y - side.top))}px`;
       // 時間軸的光條跟著捲動往下流，捲得越快越亮
+      // 變數只設在時間軸那條上，不設在整個清單（否則每次捲動整串卡片都要重算樣式）
       const dy = scrollY - (flow.last ?? scrollY);
       flow.last = scrollY; flow.pos += dy * 1.6; flow.speed = Math.min(1, flow.speed + Math.abs(dy) / 120);
-      box.style.setProperty("--flow", `${flow.pos.toFixed(1)}px`);
+      $(".tm-rail", box)?.style.setProperty("--flow", `${flow.pos.toFixed(1)}px`);
       fiber.kick();
     }
     const flow = { pos: 0, speed: 0, last: null };
@@ -1588,7 +1592,7 @@
         } else sp.style.opacity = "0";
         // 時間軸光條的亮度慢慢退回
         flow.speed *= 0.94;
-        box.style.setProperty("--flow-glow", flow.speed.toFixed(3));
+        $(".tm-rail", box)?.style.setProperty("--flow-glow", flow.speed.toFixed(3));
         const still = Math.abs(this.v) < 0.02 && Math.abs(target - this.off) < 0.2 && this.spark >= 1 && flow.speed < 0.01;
         if (once || still) { this.running = false; return; }
         requestAnimationFrame(() => this.step());
@@ -1614,12 +1618,15 @@
       if (FX.lenis) FX.lenis.scrollTo(scrollY + best, { duration: 0.6, easing: (t) => 1 - Math.pow(1 - t, 3), onComplete: done });
       else { scrollTo({ top: scrollY + best, behavior: reduced ? "auto" : "smooth" }); setTimeout(done, 600); }
     };
+    // 一個畫格只算一次（捲動事件一個畫格可能來好幾次）
+    let queued = false;
+    const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; track(); }); } };
     addEventListener("scroll", () => {
-      requestAnimationFrame(track);
+      schedule();
       clearTimeout(idle);
       if (!snapping) idle = setTimeout(snap, 160);
     }, { passive: true });
-    addEventListener("resize", () => { center(); requestAnimationFrame(track); });
+    addEventListener("resize", () => { center(); schedule(); });
     // 點卡片（不是點連結）也會把它卡到面板旁
     // 卡片底下鋪一顆真的按鈕（滑鼠點卡片空白處、鍵盤 Tab 到卡片按 Enter 都會觸發），把這筆卡到面板旁
     box.addEventListener("click", (e) => {

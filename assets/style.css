@@ -811,8 +811,6 @@ html.is-loading, html.is-loading body { overflow: hidden; }
 @keyframes crt-flicker { 0%, 96% { opacity: 1; } 97% { opacity: .88; } 98% { opacity: 1; } 99% { opacity: .92; } }
 .tm-prompt { font-size: 13px; color: var(--phosphor-dim); text-shadow: 0 0 4px color-mix(in srgb, var(--accent) 50%, transparent); }
 .tm-digits { display: flex; align-items: center; font-family: var(--font-mono); font-size: 25px; line-height: 1; color: var(--phosphor); text-shadow: 0 0 5px color-mix(in srgb, var(--accent) 90%, transparent), 0 0 16px color-mix(in srgb, var(--brand) 60%, transparent); }
-.tm-dial.is-glitch .tm-digits { animation: tm-glitch .35s steps(2) 1; }
-@keyframes tm-glitch { 0% { transform: translate(2px, -1px); filter: hue-rotate(40deg); } 50% { transform: translate(-2px, 1px); clip-path: inset(15% 0 35% 0); } 100% { transform: none; } }
 .tm-sep { padding: 0 2px; color: color-mix(in srgb, var(--phosphor) 45%, transparent); text-shadow: none; }
 /* 3D 滾輪：每一位是 10 面的圓柱，在小窗後面轉，上下有陰影像窺視窗 */
 .dg { position: relative; display: inline-block; width: .66em; height: 1.2em; margin: 0 1px; overflow: hidden; border-radius: 3px; perspective: 180px; background: linear-gradient(color-mix(in srgb, var(--brand) 10%, transparent), color-mix(in srgb, var(--brand) 3%, transparent) 50%, color-mix(in srgb, var(--brand) 10%, transparent)); }
@@ -868,10 +866,14 @@ html.is-loading, html.is-loading body { overflow: hidden; }
   /* 手機：時間軸收起來，面板變成貼在頁首下方的一條 */
   .exp-tm { grid-template-columns: 1fr; }
   .tm-rail, .tm-fiber { display: none; }
-  .tm-side { position: sticky; top: calc(var(--header-total) + 6px); z-index: 6; background: var(--bg); padding: 12px 0; margin: 0 calc(var(--gutter) * -1) 12px; border-bottom: 1px solid var(--line); }
+  /* 自己一層合成：捲動時主執行緒忙也不會拖著它晃（iOS 的 sticky 常見問題） */
+  .tm-side { transform: translateZ(0); position: sticky; top: calc(var(--header-total) + 6px); z-index: 6; background: var(--bg); padding: 12px 0; margin: 0 calc(var(--gutter) * -1) 12px; border-bottom: 1px solid var(--line); }
   .tm-dial-wrap { position: static; }
   .tm-dial { flex-direction: row; align-items: center; gap: 12px; padding: 8px 16px; border-radius: 12px; box-shadow: 0 0 0 3px var(--surface), 0 0 20px color-mix(in srgb, var(--brand) 20%, transparent), inset 0 0 20px color-mix(in srgb, var(--brand) 15%, transparent); }
   .tm-prompt, .tm-sheen { display: none; }
+  /* 手機上不閃爍、滾輪不回彈：面板一直在畫面上，任何晃動都很明顯 */
+  .tm-dial { animation: none; }
+  .dg .cyl { transition: transform .45s var(--ease); }
   .tm-digits { font-size: 20px; }
   .tm-foot { flex-direction: column; font-size: 13px; gap: 2px; }
   .tm-list { padding-left: 0; }
