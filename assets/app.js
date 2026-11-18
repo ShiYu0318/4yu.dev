@@ -1469,7 +1469,7 @@
 
   // 一筆經歷：雙列卡片
   //   上列：日期 / 類型 / 主辦單位 / 身分
-  //   下列：重要程度（淺藍 → 深藍 5 格）/ #領域 / 標題 / 成果
+  //   下列：權重（淺藍 → 深藍 5 格）/ #領域 / 標題 / 成果
   function expRow(x, i = 0) {
     const title = x.link
       ? `<a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.title)}${ICON.out}</a>`
@@ -1482,7 +1482,7 @@
         <span class="exp-type" style="--c:${typeColor(x.type)}">${esc(x.type)}</span>
         <p class="exp-org">${esc(x.org || "")}</p>
         <span class="exp-role">${esc(x.role || "")}</span>
-        <span class="exp-lv" data-l="${lv}" title="重要程度 ${lv ? `${lv} / 5` : "未評"}" aria-label="重要程度 ${lv ? `${lv} / 5` : "未評"}"><i></i><i></i><i></i><i></i><i></i></span>
+        <span class="exp-lv" data-l="${lv}" title="權重 ${lv ? `${lv} / 5` : "未評"}" aria-label="權重 ${lv ? `${lv} / 5` : "未評"}"><i></i><i></i><i></i><i></i><i></i></span>
         <p class="meta exp-tags">${x.fields.map((f) => `<span>#${esc(f.replace(/\s+/g, ""))}</span>`).join("")}</p>
         <h3 class="exp-title">${title}</h3>
         ${x.result ? `<p class="exp-result">${parts(...x.result.split(/\s*[・·]\s*/))}</p>` : `<span></span>`}
@@ -1737,7 +1737,7 @@
       { id: "role", label: "身分", get: (x) => [x.role], opts: byCount(tally(items.map((x) => x.role).filter(Boolean))) },
       { id: "stage", label: "學段", get: (x) => [stage(x.grade)],
         opts: ["研究所", "大學", "高中", "國中"].map((s) => [s, items.filter((x) => stage(x.grade) === s).length]).filter(([, n]) => n) },
-      { id: "lv", label: "重要程度", get: (x) => [String(x.priority || 0)],
+      { id: "lv", label: "權重", get: (x) => [String(x.priority || 0)],
         opts: ["5", "4", "3", "2", "1", "0"].map((v) => [v, items.filter((x) => String(x.priority || 0) === v).length]).filter(([, n]) => n) },
     ];
     const lvLabel = (v) => v === "0" ? "未評" : `${"■".repeat(+v)}${"□".repeat(5 - v)}`;
@@ -1752,7 +1752,7 @@
             ${g.id === "type" ? `style="--c:${typeColor(v)}"` : ""}>${esc(optLabel(g, v))}<span class="count">${n}</span></button>`).join("")}</div>
       </div>`).join("");
 
-    // 排序：dir 是時間方向（desc 新到舊 / asc 舊到新）；byLv 為 true 時改成重要程度高到低（同分再依時間）
+    // 排序：dir 是時間方向（desc 新到舊 / asc 舊到新）；byLv 為 true 時改成權重高到低（同分再依時間）
     let dir = "desc", byLv = false;
     try {
       const saved = localStorage.getItem("exp-sort");
@@ -1778,8 +1778,8 @@
       if (byLv) return list.slice().sort((a, b) => (b.priority || 0) - (a.priority || 0) || b.start.localeCompare(a.start));
       return dir === "desc" ? list : list.slice().reverse();
     };
-    // 依重要程度排序時，分段標題改成星數
-    const lvGroup = (x) => x.priority ? `重要程度 ${"★".repeat(x.priority)}${"☆".repeat(5 - x.priority)}` : "未評";
+    // 依權重排序時，分段標題改成星數
+    const lvGroup = (x) => x.priority ? `權重 ${"★".repeat(x.priority)}${"☆".repeat(5 - x.priority)}` : "未評";
     const tl = createTimeline(box);
     let list = [];
     const render = (animate) => {
@@ -1822,7 +1822,7 @@
       $$(".exp-chip", filtersEl).forEach((b) => b.setAttribute("aria-pressed", "false"));
       draw(true);
     });
-    // 時間按鈕：在重要程度模式時先切回時間排序；已經是時間排序時切換新舊
+    // 時間按鈕：在權重模式時先切回時間排序；已經是時間排序時切換新舊
     sortBtn.addEventListener("click", () => {
       if (byLv) byLv = false;
       else dir = dir === "desc" ? "asc" : "desc";
