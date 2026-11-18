@@ -1,5 +1,19 @@
 {
   "updated": "2026-11-18",
+  "typeColors": {
+    "實習": "purple",
+    "教學": "green",
+    "檢定": "red",
+    "活動": "orange",
+    "營隊": "orange",
+    "研究": "purple",
+    "社團": "blue",
+    "社群": "blue",
+    "競賽": "red",
+    "籌辦": "blue",
+    "課程": "orange",
+    "證照": "red"
+  },
   "items": [
     {
       "title": "社群課程 - Deep Reinforcement Learning 深度強化學習基礎理論與遊戲訓練實作",

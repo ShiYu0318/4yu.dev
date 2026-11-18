@@ -204,6 +204,10 @@ def check_experience():
     except json.JSONDecodeError as e:
         err(where, f"不是合法 JSON：{e}")
         return 0
+    notion_colors = {"default", "gray", "brown", "orange", "yellow", "green", "blue", "purple", "pink", "red"}
+    for t, c in (data.get("typeColors") or {}).items():
+        if c not in notion_colors:
+            err(where, f"typeColors 的「{t}」顏色 {c} 不是 Notion 的顏色名稱")
     for i, x in enumerate(data.get("items", [])):
         extra = set(x) - EXP_KEYS
         if extra:

@@ -1445,6 +1445,7 @@
     if (!res.ok) throw new Error(`讀不到 ${EXPERIENCE}（HTTP ${res.status}）`);
     const data = await res.json();
     data.items.forEach((x, i) => { x.key = `exp-${i}`; });
+    typeColors = data.typeColors || {};
     return data;
   }
 
@@ -1453,18 +1454,17 @@
     if (!x.end || x.end === x.start) return ymd(x.start);
     return `${ymd(x.start)} – ${x.end > today ? "至今" : ymd(x.end)}`;
   }
-  // 卡片上的日期：區間拆成兩行，第二行用 ↳ 接起來
+  // 卡片上的日期：區間拆成三行，起始、小箭頭、結束
   function expDateHTML(x) {
     if (!x.end || x.end === x.start) return `<span>${ymd(x.start)}</span>`;
-    return `<span>${ymd(x.start)}</span><span class="exp-to"><i aria-hidden="true">↳</i>${x.end > today ? "至今" : ymd(x.end)}</span>`;
+    return `<span>${ymd(x.start)}</span><span class="exp-arrow" aria-hidden="true">↓</span><span class="exp-to">${x.end > today ? "至今" : ymd(x.end)}</span>`;
   }
 
   // 類型標籤的顏色：深底上好讀的低飽和色，一眼分得出研究 / 競賽 / 教學…
-  const TYPE_COLOR = {
-    研究: "#7ee0b5", 實習: "#66a8ff", 工作: "#66a8ff", 社群: "#f29ad8", 社團: "#c6a2ff", 競賽: "#ff9a8a",
-    檢定: "#ffb26b", 證照: "#ffb26b", 教學: "#ffd27a", 籌辦: "#b9a6ff", 活動: "#9fb3c8", 營隊: "#8fe3e8", 課程: "#a9e07e", 學習: "#a9e07e",
-  };
-  const typeColor = (t) => TYPE_COLOR[t] || "#a8bbdc";
+  // 類型標籤的顏色：跟 Notion「類型」欄的選項顏色一樣（experience.json 的 typeColors，例如 競賽 → red），
+  // 對到 style.css 裡 --notion-<顏色> 的深色模式文字色
+  let typeColors = {};
+  const typeColor = (t) => `var(--notion-${typeColors[t] || "default"})`;
   const stage = (g) => ({ 國: "國中", 高: "高中", 大: "大學", 碩: "研究所" }[(g || "")[0]] || "");
 
   // 一筆經歷：雙列卡片

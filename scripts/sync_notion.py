@@ -9,7 +9,10 @@
   NOTION_TOKEN=secret_xxx NOTION_DATA_SOURCE_ID=452fc424-... python3 scripts/sync_notion.py
 
   # 從已匯出的 JSON 讀（MCP 查詢結果，欄位同上，日期欄叫 s / e）
-  python3 scripts/sync_notion.py --from rows.json
+  python3 scripts/sync_notion.py --from rows.json [--colors colors.json]
+
+「類型」標籤在網站上的顏色跟著 Notion 那一欄的選項顏色走：API 模式會順便讀資料表的欄位設定，
+--from 模式可以用 --colors 給 {"競賽": "red", ...}；都沒有時沿用 experience.json 原本的 typeColors。
 
 只用標準函式庫，不需要 pip install。
 """
@@ -85,6 +88,21 @@ def fetch_api(token: str, source: str) -> list[dict]:
         cursor = data["next_cursor"]
 
 
+NOTION_COLORS = {"default", "gray", "brown", "orange", "yellow", "green", "blue", "purple", "pink", "red"}
+
+
+def fetch_type_colors(token: str, source: str) -> dict:
+    """讀資料表的欄位設定，拿「類型」每個選項在 Notion 裡的顏色（例如 {"競賽": "red"}）。"""
+    req = urllib.request.Request(
+        f"{API}/data_sources/{source}",
+        headers={"Authorization": f"Bearer {token}", "Notion-Version": NOTION_VERSION},
+    )
+    with urllib.request.urlopen(req, timeout=30) as res:
+        props = json.load(res).get("properties", {})
+    opts = (props.get("類型") or {}).get("select", {}).get("options", [])
+    return {o["name"]: o.get("color", "default") for o in opts}
+
+
 def stars(v) -> int:
     return str(v or "").count("⭐")
 
@@ -116,18 +134,27 @@ def normalize(row: dict) -> dict | None:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--from", dest="src", help="改從 JSON 檔讀取（不連 Notion）")
+    ap.add_argument("--colors", help="「類型」選項顏色的 JSON 檔，例如 {\"競賽\": \"red\"}（搭配 --from）")
     args = ap.parse_args()
+    old = json.loads(OUT.read_text(encoding="utf-8")) if OUT.exists() else {}
+    colors = old.get("typeColors", {})
 
     if args.src:
         rows = json.loads(Path(args.src).read_text(encoding="utf-8"))
         if isinstance(rows, dict):
             rows = rows.get("results", [])
+        if args.colors:
+            colors = json.loads(Path(args.colors).read_text(encoding="utf-8"))
     else:
         token, source = os.environ.get("NOTION_TOKEN"), os.environ.get("NOTION_DATA_SOURCE_ID")
         if not token or not source:
             print("沒有 NOTION_TOKEN / NOTION_DATA_SOURCE_ID，略過同步", file=sys.stderr)
             return 0
         rows = fetch_api(token, source)
+        try:
+            colors = fetch_type_colors(token, source) or colors
+        except Exception as e:  # 讀不到欄位設定就沿用原本的顏色，不影響同步
+            print(f"讀不到「類型」的顏色，沿用原本的：{e}", file=sys.stderr)
 
     items = [x for x in (normalize(r) for r in rows) if x]
     items.sort(key=lambda x: x["start"], reverse=True)
@@ -135,11 +162,11 @@ def main() -> int:
         print("沒有任何勾選的列，保留原本的 experience.json", file=sys.stderr)
         return 1
 
-    old = json.loads(OUT.read_text(encoding="utf-8")) if OUT.exists() else {}
-    if old.get("items") == items:
+    colors = {k: (v if v in NOTION_COLORS else "default") for k, v in sorted(colors.items())}
+    if old.get("items") == items and old.get("typeColors", {}) == colors:
         print(f"沒有變動（{len(items)} 筆）")
         return 0
-    OUT.write_text(json.dumps({"updated": date.today().isoformat(), "items": items},
+    OUT.write_text(json.dumps({"updated": date.today().isoformat(), "typeColors": colors, "items": items},
                               ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"已寫入 {OUT.relative_to(ROOT)}：{len(items)} 筆")
     return 0

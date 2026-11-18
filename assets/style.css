@@ -56,6 +56,18 @@
   --lv-4: #2350f5;
   --lv-5: #0a2fe6;
 
+  /* Notion 選項顏色（深色模式的文字色），經歷的「類型」標籤用 */
+  --notion-default: #a1a1a1;
+  --notion-gray: #9b9b9b;
+  --notion-brown: #ba856f;
+  --notion-orange: #c77d48;
+  --notion-yellow: #ca9849;
+  --notion-green: #529e72;
+  --notion-blue: #5e87c9;
+  --notion-purple: #9d68d3;
+  --notion-pink: #d15796;
+  --notion-red: #df5452;
+
   /* 時光機面板：黑色螢幕上的鈷藍磷光 */
   --phosphor: #a9bfff;
   --phosphor-hi: #dbe4ff;
@@ -729,9 +741,9 @@ html.is-loading, html.is-loading body { overflow: hidden; }
   transition: border-color .3s var(--ease), background-color .3s var(--ease), transform .4s var(--ease);
 }
 .exp:hover { border-color: var(--line-strong); }
-.exp-date { margin: 0; font-size: 14px; line-height: 1.5; color: var(--text-2); font-variant-numeric: tabular-nums; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; white-space: nowrap; }
+.exp-date { margin: 0; font-size: 14px; line-height: 1.5; color: var(--text-2); font-variant-numeric: tabular-nums; display: inline-flex; justify-self: start; flex-direction: column; align-items: center; gap: 2px; white-space: nowrap; }
 .exp-to { color: var(--muted); }
-.exp-to i { font-style: normal; color: var(--accent); margin-right: 4px; }
+.exp-arrow { font-size: 12px; line-height: 1; color: var(--accent); }
 .exp-soon { font-family: var(--font-mono); font-size: 12px; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 0 4px; line-height: 18px; }
 .exp-type {
   justify-self: start; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; line-height: 1; padding: 4px 8px; border-radius: var(--r-tag); white-space: nowrap;
