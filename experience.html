@@ -60,8 +60,10 @@
         <h1 id="exp-page-title">經歷</h1>
         <div class="exp-toolbar">
           <button id="exp-filter-toggle" class="button exp-tool" type="button" aria-expanded="false" aria-controls="exp-filters"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>篩選<span class="count" id="exp-filter-count"></span></button>
-          <button id="exp-sort" class="button exp-tool exp-sort" type="button" aria-label="排序：新到舊" title="排序：新到舊" data-dir="desc"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h10"/><path d="M3 12h7"/><path d="M3 18h4"/><path class="arrow" d="M18 4v16m-4-4 4 4 4-4"/></svg><span class="sort-label">新到舊</span></button>
-          <button id="exp-sort-lv" class="button exp-tool exp-sort-lv" type="button" aria-pressed="false" title="依權重排序（高到低）"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>權重</button>
+          <div class="exp-sortwrap">
+            <button id="exp-sort" class="button exp-tool exp-sort" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="exp-sort-menu" aria-label="排序：時間，新到舊"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h10"/><path d="M3 12h7"/><path d="M3 18h4"/><path d="M18 4v16m-4-4 4 4 4-4"/></svg><span class="sort-label">時間</span><span class="sort-dir">新到舊</span><svg class="icon chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div id="exp-sort-menu" class="exp-sort-menu" role="menu" aria-label="排序" hidden></div>
+          </div>
           <button id="exp-clear" class="exp-clear" type="button" hidden>清除篩選</button>
           <p class="meta exp-shown" id="exp-shown" aria-live="polite"></p>
         </div>

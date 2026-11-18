@@ -1735,16 +1735,52 @@
         opts: tally(items.map((x) => x.type)).sort((a, b) => (EXP_TYPE[a[0]]?.order ?? 99) - (EXP_TYPE[b[0]]?.order ?? 99)) },
       { id: "field", label: "領域", get: (x) => x.fields, opts: byCount(tally(items.flatMap((x) => x.fields))) },
       { id: "role", label: "身分", get: (x) => [x.role], opts: byCount(tally(items.map((x) => x.role).filter(Boolean))) },
-      { id: "stage", label: "學段", get: (x) => [stage(x.grade)],
-        opts: ["研究所", "大學", "高中", "國中"].map((s) => [s, items.filter((x) => stage(x.grade) === s).length]).filter(([, n]) => n) },
+      { id: "stage", label: "學段", get: (x) => { const g = x.grade || ""; return g ? [g[0], g.slice(0, 2), g] : []; }, opts: [] },
       { id: "lv", label: "權重", get: (x) => [String(x.priority || 0)],
         opts: ["5", "4", "3", "2", "1", "0"].map((v) => [v, items.filter((x) => String(x.priority || 0) === v).length]).filter(([, n]) => n) },
     ];
     const lvLabel = (v) => v === "0" ? "未評" : `${"■".repeat(+v)}${"□".repeat(5 - v)}`;
     const optLabel = (g, v) => g.id === "lv" ? lvLabel(v) : v;
     const picked = Object.fromEntries(GROUPS.map((g) => [g.id, new Set()]));
+
+    // 學段樹：第一層 國中 / 高中 / 大學 / 研究所，第二層 一～四年級，第三層 上 / 下學期（只列有資料的）
+    const STAGES = [["國", "國中"], ["高", "高中"], ["大", "大學"], ["碩", "研究所"]];
+    const NUMS = ["一", "二", "三", "四"];
+    const under = (p) => items.filter((x) => (x.grade || "").startsWith(p)).length;
+    const sp = picked.stage;
+    let openStage = "", openGrade = "";
+    const touched = (p) => [...sp].some((v) => v.startsWith(p));             // 自己或底下有被選
+    const treeChip = (p, label, depth) => {
+      const on = sp.has(p), part = !on && touched(p);
+      return `<button type="button" class="exp-chip${depth ? " is-sub" : ""}" data-g="stage" data-v="${p}" aria-pressed="${on}"${part ? " data-partial" : ""}>${label}<span class="count">${under(p)}</span></button>`;
+    };
+    const treeHTML = () => {
+      const rows = [STAGES.filter(([k]) => under(k)).map(([k, t]) => treeChip(k, t, 0)).join("")];
+      if (openStage && touched(openStage))
+        rows.push(NUMS.map((n) => openStage + n).filter(under).map((p) => treeChip(p, `${p[1]}年級`, 1)).join(""));
+      if (openGrade && openGrade.startsWith(openStage) && touched(openGrade))
+        rows.push(["上", "下"].map((t) => openGrade + t).filter(under).map((p) => treeChip(p, `${p[2]}學期`, 2)).join(""));
+      return rows.map((r, i) => `<div class="exp-chips exp-tier" data-depth="${i}">${r}</div>`).join("");
+    };
+    // 選上層會蓋掉底下的細項；選細項會把上層換成只剩這個細項
+    const pickTree = (p) => {
+      if (sp.has(p)) sp.delete(p);
+      else { [...sp].forEach((v) => { if (v.startsWith(p) || p.startsWith(v)) sp.delete(v); }); sp.add(p); }
+      if (p.length === 1) { openStage = p; openGrade = ""; }
+      else if (p.length === 2) { openStage = p[0]; openGrade = p; }
+    };
+    const drawTree = (focus) => {
+      const el = $(".exp-tree", filtersEl);
+      el.innerHTML = treeHTML();
+      if (focus) $(`[data-v="${focus}"]`, el)?.focus();
+    };
+
     const filtersEl = $("#exp-filters");
-    filtersEl.innerHTML = GROUPS.map((g) => `
+    filtersEl.innerHTML = GROUPS.map((g) => g.id === "stage" ? `
+      <div class="exp-fgroup" role="group" aria-label="${g.label}">
+        <span class="exp-flabel">${g.label}</span>
+        <div class="exp-tree">${treeHTML()}</div>
+      </div>` : `
       <div class="exp-fgroup" role="group" aria-label="${g.label}">
         <span class="exp-flabel">${g.label}</span>
         <div class="exp-chips">${g.opts.map(([v, n]) => `
@@ -1752,34 +1788,49 @@
             ${g.id === "type" ? `style="--c:${typeColor(v)}"` : ""}>${esc(optLabel(g, v))}<span class="count">${n}</span></button>`).join("")}</div>
       </div>`).join("");
 
-    // 排序：dir 是時間方向（desc 新到舊 / asc 舊到新）；byLv 為 true 時改成權重高到低（同分再依時間）
-    let dir = "desc", byLv = false;
-    try {
-      const saved = localStorage.getItem("exp-sort");
-      if (saved === "asc") dir = "asc";
-      if (saved === "lv") byLv = true;
-    } catch { /* 用預設 */ }
-    const lvBtn = $("#exp-sort-lv");
-    const sortBtn = $("#exp-sort");
-    const syncSort = () => {
-      const label = dir === "desc" ? "新到舊" : "舊到新";
-      sortBtn.dataset.dir = dir;
-      sortBtn.setAttribute("aria-pressed", String(!byLv));
-      sortBtn.setAttribute("aria-label", `依時間排序：${label}`); sortBtn.title = `依時間排序：${label}（點一下切換）`;
-      $(".sort-label", sortBtn).textContent = label;
-      lvBtn?.setAttribute("aria-pressed", String(byLv));
+    // 排序：下拉選單選依據（時間 / 權重 / 年級 / 類型 / 時長）和方向；時間軸的分段標題跟著依據換
+    const typeN = Object.fromEntries(tally(items.map((x) => x.type)));
+    const gradeRank = (g) => g ? "國高大碩".indexOf(g[0]) * 10 + NUMS.indexOf(g[1]) * 2 + (g[2] === "下" ? 1 : 0) : -1;
+    const days = (x) => x.end ? Math.round((new Date(x.end) - new Date(x.start)) / 864e5) : 0;
+    const SORTS = {
+      time: { label: "時間", dirs: ["新到舊", "舊到新"], key: (x) => +x.start.replaceAll("-", ""), group: (x) => x.start.slice(0, 4) },
+      lv: { label: "權重", dirs: ["高到低", "低到高"], key: (x) => x.priority || 0,
+        group: (x) => x.priority ? `權重 ${"★".repeat(x.priority)}${"☆".repeat(5 - x.priority)}` : "未評" },
+      grade: { label: "年級", dirs: ["高年級先", "低年級先"], key: (x) => gradeRank(x.grade), group: (x) => x.grade || "未填年級" },
+      type: { label: "類型", dirs: ["多到少", "少到多"], key: (x) => typeN[x.type] || 0, group: (x) => x.type },
+      dur: { label: "時長", dirs: ["長到短", "短到長"], key: days,
+        group: (x) => { const d = days(x); return d >= 365 ? "一年以上" : d >= 30 ? "一個月以上" : d >= 7 ? "一週以上" : d >= 1 ? "數天" : "單日"; } },
     };
-    const saveSort = () => { try { localStorage.setItem("exp-sort", byLv ? "lv" : dir); } catch { /* 無法儲存就算了 */ } };
+    let sortKey = "time", sortDir = 0;                                         // sortDir：0 是第一個方向（新到舊、高到低…）
+    try {
+      const saved = localStorage.getItem("exp-sort") || "";
+      if (saved === "asc") sortDir = 1;                                      // 舊版存的值
+      else if (saved === "lv") sortKey = "lv";
+      else if (saved.startsWith("{")) { const o = JSON.parse(saved); if (SORTS[o.k]) { sortKey = o.k; sortDir = o.d ? 1 : 0; } }
+    } catch { /* 用預設 */ }
+    const sortBtn = $("#exp-sort"), sortMenu = $("#exp-sort-menu");
+    const syncSort = () => {
+      const S = SORTS[sortKey];
+      $(".sort-label", sortBtn).textContent = S.label;
+      $(".sort-dir", sortBtn).textContent = S.dirs[sortDir];
+      sortBtn.setAttribute("aria-label", `排序：${S.label}，${S.dirs[sortDir]}`);
+      sortMenu.innerHTML = `
+        <p class="sort-head" aria-hidden="true">依據</p>
+        ${Object.entries(SORTS).map(([k, o]) => `<button type="button" role="menuitemradio" data-k="${k}" aria-checked="${k === sortKey}">${o.label}<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>`).join("")}
+        <hr>
+        <p class="sort-head" aria-hidden="true">方向</p>
+        ${S.dirs.map((t, i) => `<button type="button" role="menuitemradio" data-d="${i}" aria-checked="${i === sortDir}">${t}<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button>`).join("")}`;
+    };
+    const saveSort = () => { try { localStorage.setItem("exp-sort", JSON.stringify({ k: sortKey, d: sortDir })); } catch { /* 無法儲存就算了 */ } };
     syncSort();
 
     const box = $("#exp-groups");
     const visible = () => {
       const list = items.filter((x) => GROUPS.every((g) => !picked[g.id].size || g.get(x).some((v) => picked[g.id].has(v))));
-      if (byLv) return list.slice().sort((a, b) => (b.priority || 0) - (a.priority || 0) || b.start.localeCompare(a.start));
-      return dir === "desc" ? list : list.slice().reverse();
+      const S = SORTS[sortKey], sign = sortDir ? 1 : -1;
+      // 主要依據 → 同值時讓同一段的排在一起 → 段內一律新到舊
+      return list.slice().sort((a, b) => sign * (S.key(a) - S.key(b)) || S.group(a).localeCompare(S.group(b)) || b.start.localeCompare(a.start));
     };
-    // 依權重排序時，分段標題改成星數
-    const lvGroup = (x) => x.priority ? `權重 ${"★".repeat(x.priority)}${"☆".repeat(5 - x.priority)}` : "未評";
     const tl = createTimeline(box);
     let list = [];
     const render = (animate) => {
@@ -1789,7 +1840,7 @@
       $("#exp-clear").hidden = !n;
       $("#exp-shown").textContent = n ? `顯示 ${list.length} / ${items.length} 筆` : "";
       $("#exp-empty").hidden = list.length > 0;
-      tl.set(list, animate, byLv ? lvGroup : null);
+      tl.set(list, animate, SORTS[sortKey].group);
     };
 
     // ---- 切換：舊的先淡出再換
@@ -1805,6 +1856,7 @@
     filtersEl.addEventListener("click", (e) => {
       const b = e.target.closest(".exp-chip");
       if (!b) return;
+      if (b.dataset.g === "stage") { pickTree(b.dataset.v); drawTree(b.dataset.v); draw(true); return; }
       const set = picked[b.dataset.g], v = b.dataset.v;
       set.has(v) ? set.delete(v) : set.add(v);
       b.setAttribute("aria-pressed", set.has(v));
@@ -1820,18 +1872,35 @@
     $("#exp-clear").addEventListener("click", () => {
       Object.values(picked).forEach((s) => s.clear());
       $$(".exp-chip", filtersEl).forEach((b) => b.setAttribute("aria-pressed", "false"));
+      openStage = openGrade = ""; drawTree();
       draw(true);
     });
-    // 時間按鈕：在權重模式時先切回時間排序；已經是時間排序時切換新舊
-    sortBtn.addEventListener("click", () => {
-      if (byLv) byLv = false;
-      else dir = dir === "desc" ? "asc" : "desc";
-      saveSort(); syncSort(); draw(true);
+    // 排序選單：點按鈕開關；點依據或方向就套用並收起；Esc、點外面都會收起；上下鍵在選項間移動
+    const menuItems = () => $$("[role=menuitemradio]", sortMenu);
+    const openMenu = (on) => {
+      sortMenu.hidden = !on;
+      sortBtn.setAttribute("aria-expanded", String(on));
+      if (on) {
+        ($("[aria-checked=true]", sortMenu) || menuItems()[0]).focus();
+        if (motion) gsap.fromTo(sortMenu, { opacity: 0, y: -6 }, { opacity: 1, y: 0, duration: 0.25, ease: EASE });
+      }
+    };
+    sortBtn.addEventListener("click", () => openMenu(sortMenu.hidden));
+    sortMenu.addEventListener("click", (e) => {
+      const b = e.target.closest("[role=menuitemradio]");
+      if (!b) return;
+      if (b.dataset.k) { if (b.dataset.k !== sortKey) { sortKey = b.dataset.k; sortDir = 0; } }
+      else sortDir = +b.dataset.d;
+      saveSort(); syncSort(); openMenu(false); sortBtn.focus(); draw(true);
     });
-    lvBtn?.addEventListener("click", () => {
-      byLv = !byLv;
-      saveSort(); syncSort(); draw(true);
+    sortMenu.addEventListener("keydown", (e) => {
+      const xs = menuItems(), i = xs.indexOf(document.activeElement);
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); xs[(i + (e.key === "ArrowDown" ? 1 : -1) + xs.length) % xs.length].focus(); }
+      else if (e.key === "Home" || e.key === "End") { e.preventDefault(); xs[e.key === "Home" ? 0 : xs.length - 1].focus(); }
+      else if (e.key === "Escape") { e.preventDefault(); openMenu(false); sortBtn.focus(); }
+      else if (e.key === "Tab") openMenu(false);
     });
+    document.addEventListener("click", (e) => { if (!sortMenu.hidden && !e.target.closest(".exp-sortwrap")) openMenu(false); });
 
     draw(false);
     if (motion) {
