@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-17",
+  "updated": "2026-11-18",
   "items": [
     {
       "title": "社群課程 - Deep Reinforcement Learning 深度強化學習基礎理論與遊戲訓練實作",
@@ -8,9 +8,10 @@
       "org": "GDGoC@NCU（國立中央大學 Google 學生開發者社群）",
       "type": "教學",
       "fields": [
-        "AI/ML"
+        "AI/ML",
+        "社群 / 社團"
       ],
-      "priority": 0,
+      "priority": 3,
       "grade": "大二上",
       "start": "2026-12-03",
       "end": null,
@@ -27,10 +28,40 @@
         "AI/ML",
         "演算法"
       ],
-      "priority": 0,
+      "priority": 2,
       "grade": "大二上",
       "start": "2026-11-07",
       "end": "2026-11-08",
+      "link": "https://github.com/ShiYu0318/CodeFest-2026-Taipei-Maze"
+    },
+    {
+      "title": "115 年度 NCPC 全國大專校院電腦軟體設計競賽 - 決賽",
+      "role": "參賽者",
+      "result": null,
+      "org": "國立臺灣師範大學",
+      "type": "競賽",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 2,
+      "grade": "大二上",
+      "start": "2026-10-18",
+      "end": null,
+      "link": "https://github.com/ShiYu0318/CodeFest-2026-Taipei-Maze"
+    },
+    {
+      "title": "115 年度 NCPC 全國大專校院電腦軟體設計競賽 - 初賽",
+      "role": "參賽者",
+      "result": "晉級決賽（TEAM: NCU_Overfitting）",
+      "org": "國立臺灣師範大學",
+      "type": "競賽",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 4,
+      "grade": "大二上",
+      "start": "2026-10-04",
+      "end": null,
       "link": "https://github.com/ShiYu0318/CodeFest-2026-Taipei-Maze"
     },
     {
@@ -38,27 +69,29 @@
       "role": "技術組長",
       "result": null,
       "org": "GDGoC@NCU（國立中央大學 Google 學生開發者社群）",
-      "type": "社群",
+      "type": "社團",
       "fields": [
+        "社群 / 社團",
         "AI/ML",
         "程式 / 開發"
       ],
-      "priority": 0,
+      "priority": 4,
       "grade": "大二上",
       "start": "2026-09-01",
       "end": "2027-08-31",
       "link": null
     },
     {
-      "title": "115 學年度讀書會",
+      "title": "115 學年度中央大學競技程式讀書會",
       "role": "負責人",
       "result": null,
       "org": "NCUCP（中央大學競技程式）",
-      "type": "社群",
+      "type": "社團",
       "fields": [
+        "社群 / 社團",
         "演算法"
       ],
-      "priority": 0,
+      "priority": 3,
       "grade": "大二上",
       "start": "2026-09-01",
       "end": "2027-08-31",
@@ -73,9 +106,9 @@
       "fields": [
         "AI/ML"
       ],
-      "priority": 0,
+      "priority": 5,
       "grade": "大一下",
-      "start": "2026-08-31",
+      "start": "2026-08-28",
       "end": null,
       "link": "https://research.nii.ac.jp/ntcir/"
     },
@@ -88,7 +121,7 @@
       "fields": [
         "AI/ML"
       ],
-      "priority": 0,
+      "priority": 4,
       "grade": "大一下",
       "start": "2026-08-01",
       "end": "2028-08-31",
@@ -103,7 +136,7 @@
       "fields": [
         "AI/ML"
       ],
-      "priority": 0,
+      "priority": 5,
       "grade": "大一下",
       "start": "2026-07-23",
       "end": null,
@@ -118,11 +151,26 @@
       "fields": [
         "AI/ML"
       ],
-      "priority": 0,
+      "priority": 5,
       "grade": "大一下",
       "start": "2026-07-17",
       "end": null,
       "link": null
+    },
+    {
+      "title": "2026 跨校聯盟程式設計競賽",
+      "role": "參賽者",
+      "result": null,
+      "org": "國立臺北商業大學",
+      "type": "競賽",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 1,
+      "grade": "大一下",
+      "start": "2026-06-06",
+      "end": null,
+      "link": "https://github.com/ShiYu0318/CodeFest-2026-Taipei-Maze"
     },
     {
       "title": "社群課程 - GenAI 實戰：LLM x RAG 應用開發",
@@ -132,9 +180,10 @@
       "type": "教學",
       "fields": [
         "AI/ML",
-        "程式 / 開發"
+        "程式 / 開發",
+        "社群 / 社團"
       ],
-      "priority": 0,
+      "priority": 3,
       "grade": "大一下",
       "start": "2026-05-21",
       "end": null,
@@ -150,7 +199,7 @@
         "程式 / 開發",
         "AI/ML"
       ],
-      "priority": 0,
+      "priority": 4,
       "grade": "大一下",
       "start": "2026-05-19",
       "end": "2028-08-31",
@@ -163,13 +212,29 @@
       "org": "CYSHIRC（嘉義高中資訊研究社）",
       "type": "教學",
       "fields": [
-        "AI/ML"
+        "AI/ML",
+        "社群 / 社團"
       ],
-      "priority": 0,
+      "priority": 3,
       "grade": "大一下",
       "start": "2026-05-13",
       "end": null,
       "link": "https://slides.com/shiyu/ai/#/25/0/0"
+    },
+    {
+      "title": "2026 全國程式力競賽",
+      "role": "參賽者",
+      "result": null,
+      "org": "致理科技大學",
+      "type": "競賽",
+      "fields": [
+        "演算法"
+      ],
+      "priority": 1,
+      "grade": "大一下",
+      "start": "2026-05-09",
+      "end": null,
+      "link": "https://github.com/ShiYu0318/CodeFest-2026-Taipei-Maze"
     },
     {
       "title": "AI 系列社課 II - Diffusion 圖像生成原理與應用",
@@ -178,9 +243,10 @@
       "org": "CYSHIRC（嘉義高中資訊研究社）",
       "type": "教學",
       "fields": [
-        "AI/ML"
+        "AI/ML",
+        "社群 / 社團"
       ],
-      "priority": 0,
+      "priority": 3,
       "grade": "大一下",
       "start": "2026-04-22",
       "end": null,
@@ -193,9 +259,10 @@
       "org": "臺南女中 x 臺南二中 x 嘉義高中 x 嘉義女中 x 大灣高中",
       "type": "教學",
       "fields": [
-        "AI/ML"
+        "AI/ML",
+        "社群 / 社團"
       ],
-      "priority": 0,
+      "priority": 3,
       "grade": "大一下",
       "start": "2026-04-12",
       "end": null,
@@ -208,9 +275,10 @@
       "org": "CYSHIRC 嘉義高中資訊研究社",
       "type": "教學",
       "fields": [
-        "AI/ML"
+        "AI/ML",
+        "社群 / 社團"
       ],
-      "priority": 0,
+      "priority": 3,
       "grade": "大一下",
       "start": "2026-04-01",
       "end": null,
@@ -224,9 +292,10 @@
       "type": "教學",
       "fields": [
         "AI/ML",
-        "程式 / 開發"
+        "程式 / 開發",
+        "社群 / 社團"
       ],
-      "priority": 0,
+      "priority": 4,
       "grade": "大一上",
       "start": "2026-02-05",
       "end": "2026-02-08",
@@ -241,7 +310,7 @@
       "fields": [
         "程式 / 開發"
       ],
-      "priority": 0,
+      "priority": 2,
       "grade": "大一上",
       "start": "2025-12-13",
       "end": null,
@@ -254,9 +323,10 @@
       "org": "GDGoC@NCU（國立中央大學 Google 學生開發者社群）",
       "type": "教學",
       "fields": [
-        "AI/ML"
+        "AI/ML",
+        "社群 / 社團"
       ],
-      "priority": 0,
+      "priority": 3,
       "grade": "大一上",
       "start": "2025-11-27",
       "end": null,
@@ -269,9 +339,10 @@
       "org": "GDGoC@NCU（國立中央大學 Google 學生開發者社群）",
       "type": "教學",
       "fields": [
-        "AI/ML"
+        "AI/ML",
+        "社群 / 社團"
       ],
-      "priority": 0,
+      "priority": 3,
       "grade": "大一上",
       "start": "2025-11-20",
       "end": null,
@@ -282,11 +353,11 @@
       "role": "講師",
       "result": null,
       "org": "嘉義高中 x 嘉義女中 x 永慶高中 x 臺南女中 x 臺南一中 x 臺南二中 x 大灣高中 x 南大附中 x 新化高中",
-      "type": "教學",
+      "type": "活動",
       "fields": [
         "社群 / 社團"
       ],
-      "priority": 0,
+      "priority": 2,
       "grade": "大一上",
       "start": "2025-10-26",
       "end": null,
@@ -299,9 +370,10 @@
       "org": "GDGoC@NCU（國立中央大學 Google 學生開發者社群）",
       "type": "社群",
       "fields": [
-        "AI/ML"
+        "AI/ML",
+        "社群 / 社團"
       ],
-      "priority": 0,
+      "priority": 3,
       "grade": "大一上",
       "start": "2025-09-01",
       "end": "2026-08-31",
@@ -314,9 +386,10 @@
       "org": "SCIST S5（南臺灣學生資訊社群 第 5 屆）x NHDK（四校聯合初學者程式設計練習賽）",
       "type": "籌辦",
       "fields": [
-        "演算法"
+        "演算法",
+        "社群 / 社團"
       ],
-      "priority": 0,
+      "priority": 3,
       "grade": "高三下",
       "start": "2025-08-06",
       "end": null,
@@ -329,9 +402,10 @@
       "org": "數位實中 x 師大附中 x 政大附中 x 松山高中",
       "type": "教學",
       "fields": [
-        "AI/ML"
+        "AI/ML",
+        "社群 / 社團"
       ],
-      "priority": 0,
+      "priority": 3,
       "grade": "高三下",
       "start": "2025-03-01",
       "end": null,
@@ -346,7 +420,7 @@
       "fields": [
         "AI/ML"
       ],
-      "priority": 0,
+      "priority": 3,
       "grade": "高三上",
       "start": "2025-02-04",
       "end": "2025-02-07",
@@ -359,9 +433,10 @@
       "org": "SCIST S5（南臺灣學生資訊社群 第 5 屆）x NHDK（四校聯合初學者程式設計練習賽）",
       "type": "籌辦",
       "fields": [
-        "演算法"
+        "演算法",
+        "社群 / 社團"
       ],
-      "priority": 0,
+      "priority": 3,
       "grade": "高三上",
       "start": "2025-02-01",
       "end": null,
@@ -374,9 +449,10 @@
       "org": "SCIST S5（南臺灣學生資訊社群 第 5 屆）x 南 15 校資訊社",
       "type": "教學",
       "fields": [
-        "AI/ML"
+        "AI/ML",
+        "社群 / 社團"
       ],
-      "priority": 0,
+      "priority": 4,
       "grade": "高三上",
       "start": "2025-01-24",
       "end": "2025-01-26",
@@ -389,9 +465,9 @@
       "org": "SCIST S5（南臺灣學生資訊社群 第 5 屆）x 南 15 校資訊社",
       "type": "籌辦",
       "fields": [
-        "AI/ML"
+        "社群 / 社團"
       ],
-      "priority": 0,
+      "priority": 2,
       "grade": "高三上",
       "start": "2025-01-24",
       "end": "2025-01-26",
@@ -406,7 +482,7 @@
       "fields": [
         "演算法"
       ],
-      "priority": 0,
+      "priority": 4,
       "grade": "高三上",
       "start": "2024-11-05",
       "end": null,
@@ -415,13 +491,13 @@
     {
       "title": "APCS 大學程式設計先修檢測",
       "role": "考生",
-      "result": "觀念題 5 級分 + 實作題 5 級分",
+      "result": "觀念題 5 級 + 實作題 5 級分",
       "org": "教育部高中職程式設計適性精進計畫",
       "type": "檢定",
       "fields": [
         "演算法"
       ],
-      "priority": 4,
+      "priority": 5,
       "grade": "高三上",
       "start": "2024-10-20",
       "end": null,
@@ -434,7 +510,8 @@
       "org": "SCIST S5（南臺灣學生資訊社群 第 5 屆）",
       "type": "教學",
       "fields": [
-        "演算法"
+        "演算法",
+        "社群 / 社團"
       ],
       "priority": 3,
       "grade": "高三上",
@@ -449,9 +526,10 @@
       "org": "SCIST S5（南臺灣學生資訊社群 第 5 屆）",
       "type": "教學",
       "fields": [
-        "資訊安全"
+        "資訊安全",
+        "社群 / 社團"
       ],
-      "priority": 0,
+      "priority": 2,
       "grade": "高三上",
       "start": "2024-09-14",
       "end": null,
@@ -481,7 +559,7 @@
       "fields": [
         "演算法"
       ],
-      "priority": 3,
+      "priority": 2,
       "grade": "高二下",
       "start": "2024-08-06",
       "end": null,
@@ -496,7 +574,7 @@
       "fields": [
         "演算法"
       ],
-      "priority": 2,
+      "priority": 1,
       "grade": "高二下",
       "start": "2024-07-28",
       "end": "2024-08-01",
@@ -507,11 +585,12 @@
       "role": "助教",
       "result": null,
       "org": "SCIST S5（南臺灣學生資訊社群 第 5 屆）",
-      "type": "社群",
+      "type": "教學",
       "fields": [
-        "演算法"
+        "演算法",
+        "社群 / 社團"
       ],
-      "priority": 4,
+      "priority": 2,
       "grade": "高二下",
       "start": "2024-07-01",
       "end": "2025-06-30",
@@ -524,9 +603,10 @@
       "org": "SCIST S5（南臺灣學生資訊社群 第 5 屆）",
       "type": "社群",
       "fields": [
+        "社群 / 社團",
         "演算法"
       ],
-      "priority": 4,
+      "priority": 5,
       "grade": "高二下",
       "start": "2024-07-01",
       "end": "2025-06-30",
@@ -535,7 +615,7 @@
     {
       "title": "APCS 大學程式設計先修檢測",
       "role": "考生",
-      "result": "觀念題 4 級分 + 實作題 4 級分",
+      "result": "觀念題 4 級 + 實作題 4 級分",
       "org": "教育部高中職程式設計適性精進計畫",
       "type": "檢定",
       "fields": [
@@ -556,7 +636,7 @@
       "fields": [
         "AI/ML"
       ],
-      "priority": 3,
+      "priority": 2,
       "grade": "高二下",
       "start": "2024-06-11",
       "end": null,
@@ -569,7 +649,9 @@
       "org": "臺南一中 x 臺南二中 x 臺南女中 x 南大附中",
       "type": "籌辦",
       "fields": [
-        "AI/ML"
+        "社群 / 社團",
+        "AI/ML",
+        "程式 / 開發"
       ],
       "priority": 3,
       "grade": "高二下",
@@ -584,7 +666,8 @@
       "org": "臺南一中 x 臺南二中 x 臺南女中 x 南大附中",
       "type": "教學",
       "fields": [
-        "AI/ML"
+        "AI/ML",
+        "社群 / 社團"
       ],
       "priority": 3,
       "grade": "高二下",
@@ -631,7 +714,7 @@
       "fields": [
         "程式 / 開發"
       ],
-      "priority": 3,
+      "priority": 2,
       "grade": "高二下",
       "start": "2024-05-27",
       "end": null,
@@ -676,9 +759,24 @@
       "fields": [
         "資訊安全"
       ],
-      "priority": 2,
+      "priority": 1,
       "grade": "高二下",
       "start": "2024-05-25",
+      "end": null,
+      "link": null
+    },
+    {
+      "title": "SecurityFocus Online 課程",
+      "role": "學員",
+      "result": null,
+      "org": "教育部先進資通安全實務人才培育計畫",
+      "type": "課程",
+      "fields": [
+        "資訊安全"
+      ],
+      "priority": 1,
+      "grade": "高二下",
+      "start": "2024-05-24",
       "end": null,
       "link": null
     },
@@ -736,7 +834,7 @@
       "fields": [
         "社群 / 社團"
       ],
-      "priority": 5,
+      "priority": 4,
       "grade": "高二上",
       "start": "2024-02-05",
       "end": "2024-02-07",
@@ -745,13 +843,13 @@
     {
       "title": "Fun AI Winter Camp 2024",
       "role": "學員",
-      "result": "表現特優 + 研習證明",
+      "result": "個人表現特優獎",
       "org": "國立清華大學 x 國立成功大學 x 國立陽明交通大學 x 國立臺灣科技大學 x 智慧辨識產業服務研究中心 x Google Research x 社團法人中華民國愛自造者學習協會 x PAIA",
       "type": "營隊",
       "fields": [
         "AI/ML"
       ],
-      "priority": 4,
+      "priority": 3,
       "grade": "高二上",
       "start": "2024-01-02",
       "end": "2024-01-04",
@@ -796,7 +894,7 @@
       "fields": [
         "演算法"
       ],
-      "priority": 2,
+      "priority": 3,
       "grade": "高二上",
       "start": "2023-10-29",
       "end": "2024-06-15",
@@ -805,7 +903,7 @@
     {
       "title": "APCS 大學程式設計先修檢測",
       "role": "考生",
-      "result": "觀念題 3 級分 + 實作題 3 級分",
+      "result": "觀念題 3 級 + 實作題 3 級分",
       "org": "教育部高中職程式設計適性精進計畫",
       "type": "檢定",
       "fields": [
@@ -871,7 +969,7 @@
       "fields": [
         "程式 / 開發"
       ],
-      "priority": 3,
+      "priority": 2,
       "grade": "高二上",
       "start": "2023-10-01",
       "end": "2023-12-31",
@@ -916,7 +1014,7 @@
       "fields": [
         "演算法"
       ],
-      "priority": 4,
+      "priority": 3,
       "grade": "高一下",
       "start": "2023-07-09",
       "end": null,
@@ -929,7 +1027,9 @@
       "org": "南大附中",
       "type": "社團",
       "fields": [
-        "演算法"
+        "社群 / 社團",
+        "演算法",
+        "程式 / 開發"
       ],
       "priority": 5,
       "grade": "高一下",
@@ -956,38 +1056,42 @@
       "title": "110 學年度 第 3 屆科技教育創意實作競賽 全國線上賽 資訊科技組",
       "role": "參賽者",
       "result": null,
-      "org": null,
+      "org": "教育部國民及學前教育署",
       "type": "競賽",
       "fields": [
         "IoT"
       ],
-      "priority": 0,
+      "priority": 2,
       "grade": "國三上",
       "start": "2022-05-15",
       "end": null,
       "link": null
     },
     {
-      "title": "110 學年度 貓咪盃 Scratch 程式設計競賽 全國賽 國中動畫組",
+      "title": "110 學年度 全國中小學資訊應用競賽 - 貓咪盃 Scratch 程式設計競賽 全國賽 國中動畫組",
       "role": "參賽者",
       "result": null,
-      "org": null,
+      "org": "教育部國民及學前教育署",
       "type": "競賽",
-      "fields": [],
-      "priority": 0,
+      "fields": [
+        "程式 / 開發"
+      ],
+      "priority": 2,
       "grade": "國三上",
       "start": "2022-04-15",
       "end": null,
       "link": null
     },
     {
-      "title": "110 學年度 貓咪盃 Scratch 程式設計競賽 嘉義縣複賽 國中動畫組",
+      "title": "110 學年度 全國中小學資訊應用競賽 - 貓咪盃 Scratch 程式設計競賽 嘉義縣複賽 國中動畫組",
       "role": "參賽者",
       "result": "特優（嘉義縣代表隊晉級全國賽）",
-      "org": null,
+      "org": "教育部國民及學前教育署",
       "type": "競賽",
-      "fields": [],
-      "priority": 0,
+      "fields": [
+        "程式 / 開發"
+      ],
+      "priority": 3,
       "grade": "國三上",
       "start": "2022-01-25",
       "end": null,
@@ -997,25 +1101,27 @@
       "title": "110 學年度 第 3 屆科技教育創意實作競賽 嘉義縣賽 資訊科技組",
       "role": "參賽者",
       "result": "特優（嘉義縣代表隊晉級全國賽）",
-      "org": null,
+      "org": "教育部國民及學前教育署",
       "type": "競賽",
       "fields": [
         "IoT"
       ],
-      "priority": 0,
+      "priority": 3,
       "grade": "國三上",
       "start": "2022-01-06",
       "end": null,
       "link": null
     },
     {
-      "title": "110 學年度 貓咪盃 Scratch 程式設計競賽 線上初賽 國中動畫組",
+      "title": "110 學年度 全國中小學資訊應用競賽 - 貓咪盃 Scratch 程式設計競賽 線上初賽 國中動畫組",
       "role": "參賽者",
       "result": "獲得嘉義縣複賽參賽資格",
-      "org": null,
+      "org": "教育部國民及學前教育署",
       "type": "競賽",
-      "fields": [],
-      "priority": 0,
+      "fields": [
+        "程式 / 開發"
+      ],
+      "priority": 2,
       "grade": "國三上",
       "start": "2021-12-17",
       "end": null,
@@ -1025,12 +1131,12 @@
       "title": "2021 全國中學生遙控帆船 STEAM 創客大賽 南區賽",
       "role": "參賽者",
       "result": null,
-      "org": null,
+      "org": "國立海洋科技博物館",
       "type": "競賽",
       "fields": [
         "IoT"
       ],
-      "priority": 0,
+      "priority": 2,
       "grade": "國三上",
       "start": "2021-10-09",
       "end": null,
@@ -1042,23 +1148,27 @@
       "result": "創始社長 x 資訊校隊",
       "org": "嘉義縣竹崎高中（國中部）",
       "type": "社團",
-      "fields": [],
-      "priority": 0,
+      "fields": [
+        "社群 / 社團",
+        "程式 / 開發",
+        "IoT"
+      ],
+      "priority": 3,
       "grade": "國三上",
       "start": "2021-09-01",
       "end": null,
       "link": null
     },
     {
-      "title": "109 學年度 貓咪盃 Scratch 程式設計競賽 全國賽 硬體組",
+      "title": "109 學年度 全國中小學資訊應用競賽 - 貓咪盃 Scratch 程式設計競賽 全國賽 硬體組",
       "role": "參賽者",
       "result": null,
-      "org": null,
+      "org": "教育部國民及學前教育署",
       "type": "競賽",
       "fields": [
-        "IoT"
+        "程式 / 開發"
       ],
-      "priority": 0,
+      "priority": 2,
       "grade": "國二上",
       "start": "2021-04-23",
       "end": null,
@@ -1068,27 +1178,27 @@
       "title": "109 學年度 第 2 屆科技教育創意實作競賽 全國賽 資訊科技應用組",
       "role": "參賽者",
       "result": null,
-      "org": null,
+      "org": "教育部國民及學前教育署",
       "type": "競賽",
       "fields": [
         "IoT"
       ],
-      "priority": 0,
+      "priority": 2,
       "grade": "國二上",
       "start": "2021-04-18",
       "end": null,
       "link": null
     },
     {
-      "title": "109 學年度 貓咪盃 Scratch 程式設計競賽 嘉義縣賽 國中硬體組",
+      "title": "109 學年度 全國中小學資訊應用競賽 - 貓咪盃 Scratch 程式設計競賽 嘉義縣賽 國中硬體組",
       "role": "參賽者",
-      "result": "特優・嘉義縣代表隊晉級全國賽",
-      "org": null,
+      "result": "特優（嘉義縣代表隊晉級全國賽）",
+      "org": "教育部國民及學前教育署",
       "type": "競賽",
       "fields": [
-        "IoT"
+        "程式 / 開發"
       ],
-      "priority": 0,
+      "priority": 3,
       "grade": "國二上",
       "start": "2021-03-04",
       "end": null,
@@ -1097,13 +1207,13 @@
     {
       "title": "109 學年度 第 2 屆科技教育創意實作競賽 嘉義縣賽 資訊科技組",
       "role": "參賽者",
-      "result": "特優・縣代表隊晉級全國賽",
-      "org": null,
+      "result": "特優（嘉義縣代表隊晉級全國賽）",
+      "org": "教育部國民及學前教育署",
       "type": "競賽",
       "fields": [
         "IoT"
       ],
-      "priority": 0,
+      "priority": 3,
       "grade": "國二上",
       "start": "2021-01-07",
       "end": null,

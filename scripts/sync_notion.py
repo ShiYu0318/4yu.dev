@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """把 Notion「經歷」表格裡「網站」打勾的列，轉成 content/experience.json。
 
-只輸出公開欄位（AGENTS.md §9）：Title、身分、成果、主辦單位、類型、領域、含金量、年級、Date、補充連結。
+只輸出公開欄位（AGENTS.md §9）：Title、身分、成果、主辦單位、類型、領域、重要程度（舊名：含金量）、年級、Date、補充連結。
 備註、證書、原始標題、類別、CV、放、編號等欄位一律不讀進輸出，Notion 頁面網址也不輸出。
 
 用法：
@@ -31,7 +31,7 @@ NOTION_VERSION = "2025-09-03"
 # Notion 欄位名稱 → 輸出欄位。只有這些會被讀取。欄位改過名，新舊名稱都認得。
 PUBLIC = {
     "Title": "title", "身分": "role", "成果": "result", "主辦單位": "org", "單位": "org",
-    "類型": "type", "領域": "fields", "含金量": "priority", "優先級": "priority", "年級": "grade",
+    "類型": "type", "領域": "fields", "重要程度": "priority", "含金量": "priority", "優先級": "priority", "年級": "grade",
     "補充連結": "link", "連結": "link",
 }
 pick = lambda row, *names: next((row[n] for n in names if row.get(n) not in (None, "", [])), None)
@@ -105,7 +105,7 @@ def normalize(row: dict) -> dict | None:
         "org": org,
         "type": pick(row, "類型") or "其他",
         "fields": fields or [],
-        "priority": stars(pick(row, "含金量", "優先級")),
+        "priority": stars(pick(row, "重要程度", "含金量", "優先級")),
         "grade": pick(row, "年級"),
         "start": row["s"][:10],
         "end": (row.get("e") or "")[:10] or None,
