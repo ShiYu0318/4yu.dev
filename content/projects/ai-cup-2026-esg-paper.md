@@ -62,4 +62,4 @@ python reproduce.py        # 重新產生 8 張論文表格並逐位元比對
 
 - **GitHub**：<https://github.com/ShiYu0318/AI-CUP-2026-ESG-Paper>
 - **論文重現套件**：<https://github.com/ShiYu0318/NTCIR-19-ESG-Validity-Layer>
-- **相關專案**：[JevRAG](project.html?id=jevrag)
+- **相關專案**：[JevRAG](project?id=jevrag)

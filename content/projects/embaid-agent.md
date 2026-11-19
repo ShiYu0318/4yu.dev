@@ -57,4 +57,4 @@
 
 - **GitHub**：<https://github.com/ShiYu0318/EmbAId-Agent>
 - **線上展示**：<https://embaid-agent.vercel.app>
-- **相關專案**：[ScholaRAGent](project.html?id=scholaragent)
+- **相關專案**：[ScholaRAGent](project?id=scholaragent)

@@ -168,7 +168,7 @@ def check_markdown(p):
         if not (ROOT / src).is_file():
             err(where, f"圖片不存在：{src}")
 
-    for target in re.findall(r"\]\(project\.html\?id=([^)#]+)\)", body):
+    for target in re.findall(r"\]\(project(?:\.html)?\?id=([^)#]+)\)", body):
         if not (PROJECT_DIR / f"{target}.md").is_file():
             err(where, f"站內連結指向不存在的專案：{target}")
 

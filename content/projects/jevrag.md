@@ -55,4 +55,4 @@ python -m jevrag demo        # http://127.0.0.1:8900
 ## 連結
 
 - **GitHub**：<https://github.com/ShiYu0318/JevRAG>
-- **相關專案**：[ScholaRAGent](project.html?id=scholaragent)、[EmbAId Agent](project.html?id=embaid-agent)
+- **相關專案**：[ScholaRAGent](project?id=scholaragent)、[EmbAId Agent](project?id=embaid-agent)

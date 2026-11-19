@@ -61,4 +61,4 @@
 - **GitHub**：<https://github.com/ShiYu0318/ShiYu-AI-Courses-Archive>
 - **文件 / 簡報**：<https://slides.com/shiyu/ai/>
 - **Camp 2026 完整資源庫**：<https://github.com/ShiYu0318/ShiYu-AI-Courses-SCIST-Camp-2026>
-- **相關專案**：[CP-Code](project.html?id=cp-code)
+- **相關專案**：[CP-Code](project?id=cp-code)

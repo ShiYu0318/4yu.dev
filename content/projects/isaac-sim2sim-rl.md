@@ -57,4 +57,4 @@ Sim2Sim 最容易出錯的不是物理，而是「介面」：觀測的順序、
 ## 連結
 
 - **GitHub**：<https://github.com/ShiYu0318/Isaac-Sim2Sim-RL>
-- **相關專案**：[mAIjong 麥醬](project.html?id=maijong)、[AI Games Lab](project.html?id=ai-games-lab)
+- **相關專案**：[mAIjong 麥醬](project?id=maijong)、[AI Games Lab](project?id=ai-games-lab)

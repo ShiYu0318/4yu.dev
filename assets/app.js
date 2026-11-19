@@ -202,7 +202,7 @@
         if (e.defaultPrevented || !a || a.target === "_blank" || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
         const url = new URL(a.href, location.href);
         const sibling = url.origin !== location.origin && SITES.includes(url.hostname);
-        if (!sibling && (url.origin !== location.origin || !/\.html$|\/$/.test(url.pathname))) return;
+        if (!sibling && (url.origin !== location.origin || !/\.html$|\/$|^\/[a-z-]+$/.test(url.pathname))) return;
         if (url.pathname === location.pathname && url.search === location.search) return;
         e.preventDefault();
         if (!sibling) sessionStorage.setItem("curtain", "1");
@@ -724,7 +724,7 @@
       results = data.published.filter((p) => match(p, q));
       sel = Math.min(sel, Math.max(results.length - 1, 0));
       list.innerHTML = results.map((p, i) => `
-        <li><a role="option" href="project.html?id=${encodeURIComponent(p.id)}" aria-selected="${i === sel}">
+        <li><a role="option" href="project?id=${encodeURIComponent(p.id)}" aria-selected="${i === sel}">
           <span class="meta">${String(p.no).padStart(2, "0")}</span>
           <span>${esc(p.title)}<small>${esc(p.tagline)}</small></span>
           <span class="meta">${esc(data.catTitle[p.category])}</span>
@@ -746,7 +746,7 @@
     input.addEventListener("keydown", (e) => {
       if (e.key === "ArrowDown") { e.preventDefault(); sel = Math.min(sel + 1, results.length - 1); mark(); }
       else if (e.key === "ArrowUp") { e.preventDefault(); sel = Math.max(sel - 1, 0); mark(); }
-      else if (e.key === "Enter" && results[sel]) { e.preventDefault(); location.href = `project.html?id=${encodeURIComponent(results[sel].id)}`; }
+      else if (e.key === "Enter" && results[sel]) { e.preventDefault(); location.href = `project?id=${encodeURIComponent(results[sel].id)}`; }
     });
     list.addEventListener("pointermove", (e) => {
       const a = e.target.closest("a"); if (!a) return;
@@ -966,7 +966,7 @@
        </div>`;
 
   // 交錯檢視的一列（首頁的專案區與專案頁共用）
-  const projectHref = (p) => `project.html?id=${encodeURIComponent(p.id)}`;
+  const projectHref = (p) => `project?id=${encodeURIComponent(p.id)}`;
   const featureHTML = (p, data) => `
       <a class="feature item" data-flip-id="${esc(p.id)}" data-cat="${esc(p.category)}" href="${projectHref(p)}">
         <div class="feature-shot">${coverHTML(p, data)}</div>
@@ -1025,7 +1025,7 @@
 
     const list = data.published;
     const meta = (p) => parts(no(p.no), data.catTitle[p.category], p.year, p.team && "團隊");
-    const href = (p) => `project.html?id=${encodeURIComponent(p.id)}`;
+    const href = (p) => `project?id=${encodeURIComponent(p.id)}`;
 
     $("#view-rows").innerHTML = list.map((p) => featureHTML(p, data)).join("");
 
@@ -1290,7 +1290,7 @@
     if (p) {
       document.title = `${p.title} | 4yü.dev`;
       // 每個專案自己的 description、canonical 與分享預覽（Google 會執行 JS 後讀到）
-      const url = `https://4yu.dev/project.html?id=${encodeURIComponent(p.id)}`;
+      const url = `https://4yu.dev/project?id=${encodeURIComponent(p.id)}`;
       const desc = `${p.tagline}。${p.tags.join(" / ")}`;
       const image = p.cover ? `https://4yu.dev/${p.cover}` : "https://4yu.dev/content/img/profile/og.jpg";
       const meta = (sel, attr, val) => { const el = $(sel); if (el) el.setAttribute(attr, val); };
@@ -1412,7 +1412,7 @@
     const i = list.findIndex((p) => p.id === id);
     if (i < 0) return;
     const link = (p, cls, label) => p
-      ? `<a class="${cls}" href="project.html?id=${encodeURIComponent(p.id)}"><span class="meta">${parts(label, no(p.no))}</span>${esc(p.title)}</a>`
+      ? `<a class="${cls}" href="project?id=${encodeURIComponent(p.id)}"><span class="meta">${parts(label, no(p.no))}</span>${esc(p.title)}</a>`
       : "";
     $("#pager").innerHTML = link(list[i - 1], "prev", "上一個") + link(list[i + 1], "next", "下一個");
   }
@@ -1910,7 +1910,7 @@
   }
 
   function errorBox(msg) {
-    return `<div class="error-box">${esc(msg)}<br><a href="projects.html">回到所有專案</a></div>`;
+    return `<div class="error-box">${esc(msg)}<br><a href="projects">回到所有專案</a></div>`;
   }
 
   FX.init();

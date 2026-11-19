@@ -64,4 +64,4 @@ POST /api/eval  {"engine": "judge"}     # LLM-as-judge 指標
 ## 連結
 
 - **GitHub**：<https://github.com/ShiYu0318/ScholaRAGent>
-- **相關專案**：[EmbAId Agent](project.html?id=embaid-agent)、[JevRAG](project.html?id=jevrag)
+- **相關專案**：[EmbAId Agent](project?id=embaid-agent)、[JevRAG](project?id=jevrag)

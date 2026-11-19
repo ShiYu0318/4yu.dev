@@ -74,4 +74,4 @@ WebSocket 支援批次訊息，同一波事件只保留最後一份完整狀態�
 ## 連結
 
 - **GitHub**：<https://github.com/ShiYu0318/mAIjong>
-- **相關專案**：[AI Games Lab](project.html?id=ai-games-lab)：用 20 款遊戲展示各種 AI 演算法
+- **相關專案**：[AI Games Lab](project?id=ai-games-lab)：用 20 款遊戲展示各種 AI 演算法

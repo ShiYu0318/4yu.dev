@@ -52,4 +52,4 @@
 ## 連結
 
 - **GitHub**：<https://github.com/ShiYu0318/CP-Code>
-- **相關專案**：[AI 授課紀錄與教材](project.html?id=ai-courses)
+- **相關專案**：[AI 授課紀錄與教材](project?id=ai-courses)

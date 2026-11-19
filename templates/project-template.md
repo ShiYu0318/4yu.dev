@@ -55,4 +55,4 @@
 
 - **GitHub**：<https://github.com/ShiYu0318/xxx>
 - **線上展示**：<https://...>
-- **相關專案**：[mAIjong 麥醬](project.html?id=maijong)
+- **相關專案**：[mAIjong 麥醬](project?id=maijong)

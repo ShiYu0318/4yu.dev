@@ -14,8 +14,8 @@ def build() -> str:
     latest = max((p.get("updated", "") for p in pubs), default="") or date.today().isoformat()
     exp = ROOT / "content" / "experience.json"
     exp_updated = json.loads(exp.read_text(encoding="utf-8")).get("updated", latest) if exp.exists() else latest
-    urls = [(f"{SITE}/", latest, "1.0"), (f"{SITE}/projects.html", latest, "0.8"), (f"{SITE}/experience.html", exp_updated, "0.8")]
-    urls += [(f"{SITE}/project.html?id={p['id']}", p.get("updated", latest), "0.7") for p in pubs]
+    urls = [(f"{SITE}/", latest, "1.0"), (f"{SITE}/projects", latest, "0.8"), (f"{SITE}/experience", exp_updated, "0.8")]
+    urls += [(f"{SITE}/project?id={p['id']}", p.get("updated", latest), "0.7") for p in pubs]
     rows = "\n".join(f"  <url><loc>{u}</loc><lastmod>{m}</lastmod><priority>{pr}</priority></url>" for u, m, pr in urls)
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{rows}\n</urlset>\n'
 

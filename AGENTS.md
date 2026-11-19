@@ -25,7 +25,7 @@ shiyu-portfolio/
 ├── CLAUDE.md                 ← 只是指向 AGENTS.md，不要在裡面寫規則
 ├── index.html                ← 首頁：自我介紹 + 經歷前 10 筆 + 專案前 10 個（各有「更多」與「全部」）
 ├── projects.html             ← 專案頁：篩選 + 交錯 / 矩陣 / 表格三種檢視（JS 讀 projects.json 產生）
-├── project.html              ← 專案介紹頁：project.html?id=<project-id>
+├── project.html              ← 專案介紹頁：網址是 project?id=<project-id>
 ├── experience.html           ← 經歷頁：時光機時間軸 + 多屬性篩選 + 新舊排序（JS 讀 experience.json 產生，見 §9）
 ├── 404.html                  ← 找不到頁面：舊部落格網址（4yu.dev/post/...）轉到 blog.4yu.dev 同路徑；/NCCU-GenAI-HW/... 轉成去掉前綴的網址
 ├── NCCU-GenAI-HW/index.html  ← 作業繳交時的舊網址 4yu.dev/NCCU-GenAI-HW/，轉到首頁，不要刪
@@ -53,7 +53,8 @@ shiyu-portfolio/
 ├── scripts/
 │   ├── check.py              ← 一致性檢查，改完內容一定要跑
 │   ├── sync_notion.py        ← Notion「經歷」表格 → content/experience.json
-│   └── sitemap.py            ← 依 projects.json 重新產生 sitemap.xml
+│   ├── sitemap.py            ← 依 projects.json 重新產生 sitemap.xml
+│   └── serve.py              ← 本機預覽伺服器（/experience 對到 experience.html，同 GitHub Pages）
 └── .github/workflows/sync-notion.yml ← 每天自動跑 sync_notion.py 與 sitemap.py，有變動才 commit
 ```
 
@@ -206,10 +207,10 @@ shiyu-portfolio/
 - **GitHub**：<https://github.com/ShiYu0318/xxx>
 - **線上展示**：<https://...>
 - **文件 / 簡報**：<https://...>
-- **相關專案**：[mAIjong 麥醬](project.html?id=maijong)
+- **相關專案**：[mAIjong 麥醬](project?id=maijong)
 ```
 
-站內互連一律寫 `project.html?id=<id>`。
+站內互連一律寫 `project?id=<id>`。網址不加 `.html`：站內連結寫 `experience`、`projects`、`project?id=<id>`，回首頁寫 `./`，canonical 與 sitemap 也一樣（GitHub Pages 會自動對到同名的 `.html` 檔）。
 
 ---
 
@@ -366,10 +367,10 @@ shiyu-portfolio/
 
 ### 本機預覽
 
-網站用 `fetch()` 讀檔，不能直接雙擊 HTML，請在專案根目錄執行：
+網站用 `fetch()` 讀檔，不能直接雙擊 HTML；站內連結也不帶 `.html`，`python3 -m http.server` 找不到 `/experience`。請在專案根目錄執行：
 
 ```bash
-python3 -m http.server 8000
+python3 scripts/serve.py 8000
 # 打開 http://localhost:8000
 ```
 

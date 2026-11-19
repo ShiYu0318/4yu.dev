@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://4yu.dev/</loc><lastmod>2026-11-18</lastmod><priority>1.0</priority></url>
-  <url><loc>https://4yu.dev/projects.html</loc><lastmod>2026-11-18</lastmod><priority>0.8</priority></url>
-  <url><loc>https://4yu.dev/experience.html</loc><lastmod>2026-11-18</lastmod><priority>0.8</priority></url>
-  <url><loc>https://4yu.dev/project.html?id=maijong</loc><lastmod>2026-11-16</lastmod><priority>0.7</priority></url>
-  <url><loc>https://4yu.dev/project.html?id=embaid-agent</loc><lastmod>2026-11-16</lastmod><priority>0.7</priority></url>
-  <url><loc>https://4yu.dev/project.html?id=tqr</loc><lastmod>2026-11-18</lastmod><priority>0.7</priority></url>
-  <url><loc>https://4yu.dev/project.html?id=scholaragent</loc><lastmod>2026-11-18</lastmod><priority>0.7</priority></url>
-  <url><loc>https://4yu.dev/project.html?id=codefest-taipei-maze</loc><lastmod>2026-11-17</lastmod><priority>0.7</priority></url>
-  <url><loc>https://4yu.dev/project.html?id=ai-cup-2026-esg-paper</loc><lastmod>2026-11-17</lastmod><priority>0.7</priority></url>
-  <url><loc>https://4yu.dev/project.html?id=isaac-sim2sim-rl</loc><lastmod>2026-11-18</lastmod><priority>0.7</priority></url>
-  <url><loc>https://4yu.dev/project.html?id=ai-games-lab</loc><lastmod>2026-11-18</lastmod><priority>0.7</priority></url>
-  <url><loc>https://4yu.dev/project.html?id=jevrag</loc><lastmod>2026-11-18</lastmod><priority>0.7</priority></url>
-  <url><loc>https://4yu.dev/project.html?id=ncu-what2eat</loc><lastmod>2026-11-17</lastmod><priority>0.7</priority></url>
-  <url><loc>https://4yu.dev/project.html?id=ai-courses</loc><lastmod>2026-11-16</lastmod><priority>0.7</priority></url>
-  <url><loc>https://4yu.dev/project.html?id=cp-code</loc><lastmod>2026-11-16</lastmod><priority>0.7</priority></url>
+  <url><loc>https://4yu.dev/projects</loc><lastmod>2026-11-18</lastmod><priority>0.8</priority></url>
+  <url><loc>https://4yu.dev/experience</loc><lastmod>2026-11-18</lastmod><priority>0.8</priority></url>
+  <url><loc>https://4yu.dev/project?id=maijong</loc><lastmod>2026-11-16</lastmod><priority>0.7</priority></url>
+  <url><loc>https://4yu.dev/project?id=embaid-agent</loc><lastmod>2026-11-16</lastmod><priority>0.7</priority></url>
+  <url><loc>https://4yu.dev/project?id=tqr</loc><lastmod>2026-11-18</lastmod><priority>0.7</priority></url>
+  <url><loc>https://4yu.dev/project?id=scholaragent</loc><lastmod>2026-11-18</lastmod><priority>0.7</priority></url>
+  <url><loc>https://4yu.dev/project?id=codefest-taipei-maze</loc><lastmod>2026-11-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://4yu.dev/project?id=ai-cup-2026-esg-paper</loc><lastmod>2026-11-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://4yu.dev/project?id=isaac-sim2sim-rl</loc><lastmod>2026-11-18</lastmod><priority>0.7</priority></url>
+  <url><loc>https://4yu.dev/project?id=ai-games-lab</loc><lastmod>2026-11-18</lastmod><priority>0.7</priority></url>
+  <url><loc>https://4yu.dev/project?id=jevrag</loc><lastmod>2026-11-18</lastmod><priority>0.7</priority></url>
+  <url><loc>https://4yu.dev/project?id=ncu-what2eat</loc><lastmod>2026-11-17</lastmod><priority>0.7</priority></url>
+  <url><loc>https://4yu.dev/project?id=ai-courses</loc><lastmod>2026-11-16</lastmod><priority>0.7</priority></url>
+  <url><loc>https://4yu.dev/project?id=cp-code</loc><lastmod>2026-11-16</lastmod><priority>0.7</priority></url>
 </urlset>
